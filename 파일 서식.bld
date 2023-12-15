@@ -1,0 +1,5 @@
+Title of the tounament
+Type(1: BBAnte, 2: allAnte)
+number of blind levels(Break 포함)
+duration list
+(1,10,100,200,200)$(1,10,200,400,400)$(0,10,0,0,0)$... 의 형식 \\ (break여부, 분단위 시간, sb, bb, bbante)
