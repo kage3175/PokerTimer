@@ -3,6 +3,7 @@ import pygame
 import ctypes
 from pygame.locals import *
 import os
+import timer
 
 WHITE = (255,255,255)
 BLACK = (0,0,0)
@@ -77,6 +78,7 @@ def main_load():
   lstRectBlinds = []
   lstRectBackgrounds = []
   lstBoxBlinds=[] # (rect, text_blindbreak, text_level, text_SB, text_BB, text_Ante, up, down, delete)
+  lstLevel, lstBlind = [],[]
   selected = -1
   
   dictType = {1:"BB Ante", 2:"All Ante"}
@@ -149,6 +151,9 @@ def main_load():
   textSetting = fontEmpty.render("Blind Setting", True, BLACK)
   objSetting = textSetting.get_rect()
   objSetting.center = (midpoint[0], round(100/screenScale))
+  textSavenGo = fontButton.render("Save & Go", True, BLACK)
+  objSavenGo = textNext.get_rect()
+  objSavenGo.center = (midpoint[0] + round(300/screenScale), round(1030/screenScale))
 
 
   rectNext = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
@@ -162,10 +167,11 @@ def main_load():
   running = True
 
   
-  gotomain = True
+  gotomain = False
   flagNext = False
+  flagTimer = False
+  title=""
 
-  title_working, numBlind_working, lstBlind_working = 0,0,0
 
   while running:
     if not flagNext:
@@ -179,11 +185,9 @@ def main_load():
             position = pygame.mouse.get_pos()
             
             if(rectNext.left<=position[0]<=rectNext.right and rectNext.top <= position[1] <= rectNext.bottom): #Next Button
-              print("Next")
               flagNext = True
               objControl = lstBlindObjs[selected]
               tempLst = objControl.getLstBlinds()
-              print(tempLst)
               level = 1
               cnt = 0
               lstBoxBlinds = []
@@ -211,7 +215,22 @@ def main_load():
                   tempTup = (1,(tempBox,(temptext1,objtemp1), (temptext2,objtemp2), (temptext3,objtemp3)))
                 lstBoxBlinds.insert(0,tempTup)
                 level+=1;cnt+=1
-            elif(rectBack.left<=position[0]<=rectBack.right and rectBack.top <= position[1] <= rectBack.bottom): #Next Button
+              
+              outfile = open('./doc/'+objControl.getFilename(), "w")
+              print(objControl.getTitle(), file=outfile)
+              print(objControl.getType(), file= outfile)
+              templst = objControl.getLstDurations()
+              print(str(objControl.getNumBlinds()), file=outfile)
+              for i in range(len(templst)):
+                print(str(templst[i]) + ",", end = "", file=outfile)
+              print("", file=outfile)
+              templst = objControl.getLstBlinds()
+              for i in range(objControl.getNumBlinds()-1):
+                print("("+str(templst[i][0])+","+str(templst[i][1])+","+str(templst[i][2])+","+str(templst[i][3])+ ","+str(templst[i][4])+")",end="$", file=outfile)
+              i = objControl.getNumBlinds()-1
+              print("("+str(templst[i][0])+","+str(templst[i][1])+","+str(templst[i][2])+","+str(templst[i][3])+ ","+str(templst[i][4])+")",end="", file=outfile)
+              outfile.close()
+            elif(rectBack.left<=position[0]<=rectBack.right and rectBack.top <= position[1] <= rectBack.bottom): #Back Button
               running = False
               gotomain = True
             else:
@@ -275,7 +294,21 @@ def main_load():
         elif event.type == MOUSEBUTTONDOWN:
           if event.button == 4:
             pass
-      
+          if event.button == 1:
+            position = pygame.mouse.get_pos()
+            if(rectNext.left<=position[0]<=rectNext.right and rectNext.top<=position[1]<=rectNext.bottom):
+              flagTimer = True
+              running = False
+              templst = lstBlindObjs[selected].getLstBlinds()
+              lstLevel = [0]
+              lstBlind = [0]
+              title = lstBlindObjs[selected].getTitle()
+              for item in templst:
+                lstLevel.append(item[1])
+                if item[1] == 0:
+                  lstBlind.append(0)
+                else:
+                  lstBlind.append(item[2:5])
       screen.blit(imgBackground, (0,0))
       pygame.draw.rect(screen,WHITE,rectSetting)
       screen.blit(textSetting, objSetting)
@@ -295,6 +328,13 @@ def main_load():
             for j in range(3):
               screen.blit(lstBoxBlinds[i][1][j+1][0], lstBoxBlinds[i][1][j+1][1])
       pygame.draw.line(screen,WHITE, (0,round(CUTLINE/screenScale)), (round(2048/screenScale),round(CUTLINE/screenScale)))
+      pygame.draw.rect(screen, PALEGRAY, rectNext)
+      pygame.draw.rect(screen, GRAY, rectNext, width = 4)
+      screen.blit(textSavenGo, objSavenGo)
+      pygame.draw.rect(screen, PALEGRAY, rectBack)
+      pygame.draw.rect(screen, GRAY, rectBack, width = 4)
+      screen.blit(textBack, objBack)
+      pygame.draw.line(screen,WHITE, (0,round(CUTLINE/screenScale)), (round(2048/screenScale),round(CUTLINE/screenScale)))
       pygame.display.flip()
       time.sleep(0.05)
 
@@ -303,5 +343,7 @@ def main_load():
   pygame.quit()
   if gotomain:
     return True
+  elif flagTimer:
+    timer.main(lstBlind, lstLevel, title)
   else: return False
 ##################### End of main_load

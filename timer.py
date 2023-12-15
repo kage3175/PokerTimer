@@ -50,7 +50,12 @@ def levelupdate(minute, second, total, amount, currLevel, soundlvlup):
   tot -= amount
   return min, sec,tot,level 
 
-def main():
+def main(lstBLINDS, lstLevels,title):
+  TESTLEVELS = lstLevels
+  TESTLEVELS.append(0)
+
+  TESTBLINDS = lstBLINDS
+  TESTBLINDS.append((0,0,0))
   running = True
   pygame.init()
   
@@ -103,7 +108,7 @@ def main():
   textMainTimer = fontMainTimer.render(strTimer, True, WHITE)
   objTextMainTimer = textMainTimer.get_rect()
   objTextMainTimer.center = locMainTimer
-  textTitleTournament = fontTitleTournament.render('Test', True, PALEGRAY)
+  textTitleTournament = fontTitleTournament.render(title, True, PALEGRAY)
   objTextTitleTournament = textTitleTournament.get_rect()
   objTextTitleTournament.center = locTitleTournament
   textCurrLevel = fontTitleTournament.render('Level ' + str(currLevel), True, WHITE)
