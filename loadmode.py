@@ -10,12 +10,16 @@ BLACK = (0,0,0)
 PALEGRAY = (150,150,150)
 GRAY = (200,200,200)
 SELECTED = (200,50,50)
+DARKGRAY = (75,75,75)
+BLINDGRAY = (175,175,175)
+BREAKGRAY = (215,215,215)
 
 CUTLINE = 900
 BOXHEIGHT = 210
 SCRLLFACTOR = 25
 BOXINTERVAL = 240
-BLINDINTERVAL = 110
+BLINDINTERVAL = 60
+
 
 class BlindFile:
   def __init__(self) -> None:
@@ -28,7 +32,7 @@ class BlindFile:
   def make(self, file):
     self.title = file.readline().strip()
     self.type = int(file.readline().strip())
-    self.numBlinds = numBlind = int(file.readline().strip())
+    self.numBlinds = int(file.readline().strip())
     self.lstDurations = list(map(int, file.readline()[:-2].strip().split(",")))
 
     temp_blinds = file.readline().strip().replace("(", "").replace(")","")
@@ -86,7 +90,7 @@ def main_load():
   fontEmpty = pygame.font.Font('./font/NanumGothic.ttf', round(120/screenScale))
   fontSup = pygame.font.Font('./font/NanumGothic.ttf', round(30/screenScale))
   fontButton = pygame.font.Font('./font/NanumGothicBold.ttf', round(80/screenScale))
-  fontBox = pygame.font.Font('./font/NanumGothic.ttf', round(40/screenScale))
+  fontBox = pygame.font.Font('./font/NanumGothic.ttf', round(20/screenScale))
 
   try:
     lst_blindfiles = os.listdir('./doc')
@@ -137,7 +141,7 @@ def main_load():
   '''for obj in lstBlindObjs:
     print(obj.getTitle(), obj.getType(), obj.getNumBlinds(), obj.getLstDurations(), obj.getLstBlinds())'''
 
-  
+#region texts  
 
   textEmpty = fontEmpty.render("There is no saved blind settings", True, WHITE)
   objEmpty = textEmpty.get_rect()
@@ -148,19 +152,37 @@ def main_load():
   textBack = fontButton.render("Back", True, BLACK)
   objBack = textBack.get_rect()
   objBack.center = (midpoint[0] - round(300/screenScale), round(1030/screenScale))
-  textSetting = fontEmpty.render("Blind Setting", True, BLACK)
-  objSetting = textSetting.get_rect()
-  objSetting.center = (midpoint[0], round(100/screenScale))
+  #textSetting = fontEmpty.render("Blind Setting", True, BLACK)
+  #objSetting = textSetting.get_rect()
+  #objSetting.center = (midpoint[0], round(100/screenScale))
   textSavenGo = fontButton.render("Save & Go", True, BLACK)
   objSavenGo = textNext.get_rect()
   objSavenGo.center = (midpoint[0] + round(300/screenScale), round(1030/screenScale))
+  textSettingLevel = fontSup.render("Level", True, WHITE)
+  objSettingLevel = textSettingLevel.get_rect()
+  objSettingLevel.center = (midpoint[0]-round(400/screenScale), round(90/screenScale))
+  textSettingBB = fontSup.render("BB", True, WHITE)
+  objSBB = textSettingBB.get_rect()
+  objSBB.center = (midpoint[0] - round(225/screenScale), round(90/screenScale))
+  textSettingSB = fontSup.render("SB", True, WHITE)
+  objSSB = textSettingSB.get_rect()
+  objSSB.center = (midpoint[0] - round(50/screenScale), round(90/screenScale))
+  textSettingAnte = fontSup.render("Ante", True, WHITE)
+  objSAnte = textSettingAnte.get_rect()
+  objSAnte.center = (midpoint[0] + round(125/screenScale), round(90/screenScale))
+  textSettingDur = fontSup.render("Duration", True, WHITE)
+  objSDur = textSettingDur.get_rect()
+  objSDur.center = (midpoint[0] + round(300/screenScale), round(90/screenScale))
 
+#endregion
 
   rectNext = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
   rectNext.center = (midpoint[0] + round(300/screenScale), round(1030/screenScale))
   rectBack = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
   rectBack.center = (midpoint[0] - round(300/screenScale), round(1030/screenScale))
-  rectSetting = pygame.Rect(0,0,round(2200/screenScale), round(200/screenScale))
+  #rectSetting = pygame.Rect(0,0,round(2200/screenScale), round(200/screenScale))
+  rectSettings = pygame.Rect(0,0,round(2200/screenScale), round(120/screenScale))
+  rectDelete = pygame.Rect(0,0,round(20/screenScale), round(20/screenScale))
 
   #print(lst_blindfiles)
 
@@ -192,29 +214,37 @@ def main_load():
               cnt = 0
               lstBoxBlinds = []
               for i in range(objControl.getNumBlinds()):
-                tempBox = pygame.Rect(0,0,round(1800/screenScale),round(90/screenScale))
-                tempBox.center = (midpoint[0], round((300+cnt*BLINDINTERVAL)/screenScale))
+                tempBox = pygame.Rect(0,0,round(900/screenScale),round(50/screenScale))
+                tempBox.center = (midpoint[0], round((150+cnt*BLINDINTERVAL)/screenScale))
                 if tempLst[i][0] == 0: #Break
                   temptext1 = fontBox.render("Break", True, BLACK)
                   objtemp1 = temptext1.get_rect()
-                  objtemp1.center = (midpoint[0]-round(300/screenScale), round((300+cnt*BLINDINTERVAL)/screenScale))
-                  temptext2 = fontBox.render(str(tempLst[i][1]), True, BLACK)
+                  objtemp1.center = (midpoint[0]-round(400/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale))
+                  temptext2 = fontBox.render(str(tempLst[i][1]), True, BLACK) # Duration
                   objtemp2 = temptext2.get_rect()
-                  objtemp2.center = (midpoint[0] - round(200/screenScale), round((300+cnt*BLINDINTERVAL)/screenScale))
-                  tempTup = (0,(tempBox,(temptext1,objtemp1), (temptext2,objtemp2)))
+                  objtemp2.center = (midpoint[0] + round(300/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale))
+                  tempLst2 = [0,[tempBox,[temptext1,objtemp1], [temptext2,objtemp2]]]
                 else: #Blind
-                  temptext1 = fontBox.render("Blind", True, BLACK)
+                  temptext1 = fontBox.render(str(level), True, BLACK) # Level
                   objtemp1 = temptext1.get_rect()
-                  objtemp1.center = (midpoint[0]-round(300/screenScale), round((300+cnt*BLINDINTERVAL)/screenScale))
-                  temptext2 = fontBox.render(str(tempLst[i][1]), True, BLACK)
+                  objtemp1.center = (midpoint[0]-round(400/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale))
+                  temptext2 = fontBox.render(str(tempLst[i][1]), True, BLACK) # Duration
                   objtemp2 = temptext2.get_rect()
-                  objtemp2.center = (midpoint[0] - round(200/screenScale), round((300+cnt*BLINDINTERVAL)/screenScale))
-                  temptext3 = fontBox.render(str(level), True, BLACK)
+                  objtemp2.center = (midpoint[0] + round(300/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale))
+                  temptext3 = fontBox.render(str(tempLst[i][2]), True, BLACK) # BB
                   objtemp3 = temptext3.get_rect()
-                  objtemp3.center = (midpoint[0] + round(300/screenScale), round((300+cnt*BLINDINTERVAL)/screenScale))
-                  tempTup = (1,(tempBox,(temptext1,objtemp1), (temptext2,objtemp2), (temptext3,objtemp3)))
-                lstBoxBlinds.insert(0,tempTup)
-                level+=1;cnt+=1
+                  objtemp3.center = (midpoint[0] - round(225/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale))
+                  temptext4 = fontBox.render(str(tempLst[i][3]), True, BLACK) # SB
+                  objtemp4 = temptext4.get_rect()
+                  objtemp4.center = (midpoint[0] - round(50/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale))
+                  temptext5 = fontBox.render(str(tempLst[i][4]), True, BLACK) # Ante
+                  objtemp5 = temptext5.get_rect()
+                  objtemp5.center = (midpoint[0] + round(125/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale))
+                  tempLst2 = [1,[tempBox,[temptext1,objtemp1], [temptext2,objtemp2], [temptext3,objtemp3], [temptext4, objtemp4], [temptext5, objtemp5]]]
+                  
+                  level+=1
+                lstBoxBlinds.insert(0,tempLst2)
+                cnt+=1
               
               outfile = open('./doc/'+objControl.getFilename(), "w")
               print(objControl.getTitle(), file=outfile)
@@ -247,16 +277,16 @@ def main_load():
           elif event.button == 4: #scroll up
             #print("Scrllup")
             for i in range(numFile):
-              lstRectBackgrounds[i][0].top = lstRectBackgrounds[i][0].top-SCRLLFACTOR
-              lstRectBackgrounds[i][1].top = lstRectBackgrounds[i][1].top-SCRLLFACTOR
+              lstRectBackgrounds[i][0].top = lstRectBackgrounds[i][0].top-round(SCRLLFACTOR / screenScale)
+              lstRectBackgrounds[i][1].top = lstRectBackgrounds[i][1].top-round(SCRLLFACTOR / screenScale)
               for j in range(3):
-                lstRectBlinds[i][j].top = lstRectBlinds[i][j].top-SCRLLFACTOR
+                lstRectBlinds[i][j].top = lstRectBlinds[i][j].top-round(SCRLLFACTOR / screenScale)
           elif event.button == 5:
             for i in range(numFile):
-              lstRectBackgrounds[i][0].top = lstRectBackgrounds[i][0].top+SCRLLFACTOR
-              lstRectBackgrounds[i][1].top = lstRectBackgrounds[i][1].top+SCRLLFACTOR
+              lstRectBackgrounds[i][0].top = lstRectBackgrounds[i][0].top+round(SCRLLFACTOR / screenScale)
+              lstRectBackgrounds[i][1].top = lstRectBackgrounds[i][1].top+round(SCRLLFACTOR / screenScale)
               for j in range(3):
-                lstRectBlinds[i][j].top = lstRectBlinds[i][j].top+SCRLLFACTOR
+                lstRectBlinds[i][j].top = lstRectBlinds[i][j].top+round(SCRLLFACTOR / screenScale)
       screen.blit(imgBackground, (0,0))
       if flagEmpty:
         screen.blit(textEmpty, objEmpty)
@@ -292,8 +322,17 @@ def main_load():
             running = False
             gotomain = False
         elif event.type == MOUSEBUTTONDOWN:
-          if event.button == 4:
+          if event.button == 4 or event.button == 5:
+            f = -1 if (event.button == 4) else 1
             pass
+            for i in range(lstBlindObjs[selected].getNumBlinds()):
+              lstBoxBlinds[i][1][0].top = lstBoxBlinds[i][1][0].top + f*round(SCRLLFACTOR / screenScale)
+              if lstBoxBlinds[i][0] == 0: #Break
+                for j in range(2):
+                  lstBoxBlinds[i][1][j+1][1].top = lstBoxBlinds[i][1][j+1][1].top + f*round(SCRLLFACTOR / screenScale)
+              else:
+                for j in range(5):
+                  lstBoxBlinds[i][1][j+1][1].top = lstBoxBlinds[i][1][j+1][1].top + f*round(SCRLLFACTOR / screenScale)
           if event.button == 1:
             position = pygame.mouse.get_pos()
             if(rectNext.left<=position[0]<=rectNext.right and rectNext.top<=position[1]<=rectNext.bottom):
@@ -310,12 +349,12 @@ def main_load():
                 else:
                   lstBlind.append(item[2:5])
       screen.blit(imgBackground, (0,0))
-      pygame.draw.rect(screen,WHITE,rectSetting)
-      screen.blit(textSetting, objSetting)
+      #pygame.draw.rect(screen,WHITE,rectSetting)
+      #screen.blit(textSetting, objSetting)
+      
       for i in range(lstBlindObjs[selected].getNumBlinds()):
         tempbox = lstBoxBlinds[i][1][0]
-        #print(tempbox)
-        if 180/screenScale<tempbox.bottom<(CUTLINE)/screenScale:
+        if 120/screenScale<tempbox.bottom<(CUTLINE)/screenScale:
           
           if lstBoxBlinds[i][0] == 0: #Break
             pygame.draw.rect(screen,WHITE, tempbox)
@@ -323,10 +362,12 @@ def main_load():
             for j in range(2):
               screen.blit(lstBoxBlinds[i][1][j+1][0], lstBoxBlinds[i][1][j+1][1])
           else:
-            pygame.draw.rect(screen,PALEGRAY, tempbox)
+            pygame.draw.rect(screen,GRAY, tempbox)
             pygame.draw.rect(screen,BLACK, tempbox, width=4)
-            for j in range(3):
+            for j in range(5):
               screen.blit(lstBoxBlinds[i][1][j+1][0], lstBoxBlinds[i][1][j+1][1])
+      pygame.draw.rect(screen, DARKGRAY, rectSettings)
+      pygame.draw.line(screen, BLACK, (0,round(120/screenScale)), (round(2200/screenScale),round(120/screenScale)), width=5)
       pygame.draw.line(screen,WHITE, (0,round(CUTLINE/screenScale)), (round(2048/screenScale),round(CUTLINE/screenScale)))
       pygame.draw.rect(screen, PALEGRAY, rectNext)
       pygame.draw.rect(screen, GRAY, rectNext, width = 4)
@@ -335,6 +376,11 @@ def main_load():
       pygame.draw.rect(screen, GRAY, rectBack, width = 4)
       screen.blit(textBack, objBack)
       pygame.draw.line(screen,WHITE, (0,round(CUTLINE/screenScale)), (round(2048/screenScale),round(CUTLINE/screenScale)))
+      screen.blit(textSettingLevel, objSettingLevel)
+      screen.blit(textSettingBB, objSBB)
+      screen.blit(textSettingAnte, objSAnte)
+      screen.blit(textSettingSB, objSSB)
+      screen.blit(textSettingDur, objSDur)
       pygame.display.flip()
       time.sleep(0.05)
 
