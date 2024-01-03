@@ -75,9 +75,9 @@ def main(lstBLINDS, lstLevels,title):
   screenScale = 1152/screensize[1]
   surface = pygame.display.set_mode(screensize, FULLSCREEN)
   soundLevelup = pygame.mixer.Sound("./sound/levelup.mp3")
-  tests = pygame.Surface((800,100))
-  tests.set_alpha(128)
-  tests.fill(YELLOW)
+  pauseBox = pygame.Surface((800,100))
+  pauseBox.set_alpha(128)
+  pauseBox.fill(YELLOW)
 
   start_time = time.time()
   timer = 0
@@ -169,7 +169,7 @@ def main(lstBLINDS, lstLevels,title):
   objTextChipsinplay = textChipsinplay.get_rect()
   objTextChipsinplay.topleft = (round(115/screenScale),round(420/screenScale))
   textChipsinplaynum = fontSideNum.render("0", True, WHITE)
-  objTextChipsinplaynum = textChipsinplaynum.get_rect()
+  objTextChipsinplaynum = textChipsinplaynum.get_rect()940
   objTextChipsinplaynum.topleft = (round(115/screenScale),round(475/screenScale))
   textEntries = fontSide.render("Entries", True, WHITE)
   objTextEntries = textEntries.get_rect()
@@ -277,7 +277,7 @@ def main(lstBLINDS, lstLevels,title):
       #pygame.draw.rect(surface, WHITE, rectPause)
       pygame.draw.rect(surface, RED, rectPauseline, width=5)
       pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
-      surface.blit(tests, rectPause)
+      surface.blit(pauseBox, rectPause)
       surface.blit(textPause, objTextPause)
       pygame.display.flip()
       pause_time_to_add = pause_start - time.time()
@@ -308,54 +308,54 @@ def main(lstBLINDS, lstLevels,title):
               if flagPlayer:
                 textPlayernum = fontSideNum.render(format(temp_input, ","), True, BLACK)
                 objTextPlayernum = textPlayernum.get_rect()
-                objTextPlayernum.topleft = (round(115/screenScale),round(205/screenScale))
+                objTextPlayernum.topleft = (round(115/screenScale),round(165/screenScale))
               elif flagAverage:
                 textAveragenum = fontSideNum.render(format(temp_input, ","), True, BLACK)
                 objTextAveragenum = textAveragenum.get_rect()
-                objTextAveragenum.topleft = (round(115/screenScale),round(380/screenScale))
+                objTextAveragenum.topleft = (round(115/screenScale),round(320/screenScale))
               elif flagChips:
                 textChipsinplaynum = fontSideNum.render(format(temp_input, ","), True, BLACK)
                 objTextChipsinplaynum = textChipsinplaynum.get_rect()
-                objTextChipsinplaynum.topleft = (round(115/screenScale),round(555/screenScale))
+                objTextChipsinplaynum.topleft = (round(115/screenScale),round(475/screenScale))
               elif flagEntries:
                 textEntriesnum = fontSideNum.render(format(temp_input, ","), True, BLACK)
                 objTextEntriesnum = textEntriesnum.get_rect()
-                objTextEntriesnum.topleft = (round(115/screenScale),round(730/screenScale))
+                objTextEntriesnum.topleft = (round(115/screenScale),round(630/screenScale))
               elif flagStarting:
                 textStartingstacknum = fontSideNum.render(format(temp_input, ","), True, BLACK)
                 objTextStartingstacknum = textStartingstacknum.get_rect()
-                objTextStartingstacknum.topleft = (round(115/screenScale),round(905/screenScale))
+                objTextStartingstacknum.topleft = (round(115/screenScale),round(785/screenScale))
           if event.key == K_RETURN:
             if flagPlayer:
               numPlayer = temp_input
               textPlayernum = fontSideNum.render(format(numPlayer, ","), True, WHITE)
               objTextPlayernum = textPlayernum.get_rect()
-              objTextPlayernum.topleft = (round(115/screenScale),round(205/screenScale))
+              objTextPlayernum.topleft = (round(115/screenScale),round(165/screenScale))
             elif flagAverage:
               numAverage = temp_input
               textAveragenum = fontSideNum.render(format(numAverage, ","), True, WHITE)
               objTextAveragenum = textAveragenum.get_rect()
-              objTextAveragenum.topleft = (round(115/screenScale),round(380/screenScale))
+              objTextAveragenum.topleft = (round(115/screenScale),round(320/screenScale))
             elif flagChips:
               numChips = temp_input
               textChipsinplaynum = fontSideNum.render(format(numChips, ","), True, WHITE)
               objTextChipsinplaynum = textChipsinplaynum.get_rect()
-              objTextChipsinplaynum.topleft = (round(115/screenScale),round(555/screenScale))
+              objTextChipsinplaynum.topleft = (round(115/screenScale),round(475/screenScale))
               if numPlayer > 0:
                 numAverage = numChips // numPlayer
                 textAveragenum = fontSideNum.render(format(numAverage, ","), True, WHITE)
                 objTextAveragenum = textAveragenum.get_rect()
-                objTextAveragenum.topleft = (round(115/screenScale),round(380/screenScale))
+                objTextAveragenum.topleft = (round(115/screenScale),round(320/screenScale))
             elif flagEntries:
               numEntries = temp_input
               textEntriesnum = fontSideNum.render(format(numEntries, ","), True, WHITE)
               objTextEntriesnum = textEntriesnum.get_rect()
-              objTextEntriesnum.topleft = (round(115/screenScale),round(730/screenScale))
+              objTextEntriesnum.topleft = (round(115/screenScale),round(630/screenScale))
             elif flagStarting:
               numStarting = temp_input
               textStartingstacknum = fontSideNum.render(format(numStarting, ","), True, WHITE)
               objTextStartingstacknum = textStartingstacknum.get_rect()
-              objTextStartingstacknum.topleft = (round(115/screenScale),round(905/screenScale))
+              objTextStartingstacknum.topleft = (round(115/screenScale),round(785/screenScale))
             temp_input = 0
             flagPlayer, flagAverage, flagChips, flagEntries, flagStarting = False, False,False,False,False
           if event.key == K_RIGHT: ### 1분 뒤로
@@ -370,7 +370,7 @@ def main(lstBLINDS, lstLevels,title):
                   objTextPause.center = locMainTimer
                   pygame.draw.rect(surface, RED, rectPauseline, width=5)
                   pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
-                  surface.blit(tests, rectPause)
+                  surface.blit(pauseBox, rectPause)
                   surface.blit(textPause, objTextPause)
                   pygame.display.flip()
                   for event in pygame.event.get():
@@ -451,27 +451,27 @@ def main(lstBLINDS, lstLevels,title):
           if flagPlayer:
             textPlayernum = fontSideNum.render(format(numPlayer, ","), True, WHITE)
             objTextPlayernum = textPlayernum.get_rect()
-            objTextPlayernum.topleft = (round(115/screenScale),round(205/screenScale))
+            objTextPlayernum.topleft = (round(115/screenScale),round(165/screenScale))
             flagPlayer = False
           if flagAverage:
             textAveragenum = fontSideNum.render(format(numAverage, ","), True, WHITE)
             objTextAveragenum = textAveragenum.get_rect()
-            objTextAveragenum.topleft = (round(115/screenScale),round(380/screenScale))
+            objTextAveragenum.topleft = (round(115/screenScale),round(320/screenScale))
             flagAverage = False
           if flagChips:
             textChipsinplaynum = fontSideNum.render(format(numChips, ","), True, WHITE)
             objTextChipsinplaynum = textChipsinplaynum.get_rect()
-            objTextChipsinplaynum.topleft = (round(115/screenScale),round(555/screenScale))
+            objTextChipsinplaynum.topleft = (round(115/screenScale),round(475/screenScale))
             flagChips = False
           if flagEntries:
             textEntriesnum = fontSideNum.render(format(numEntries, ","), True, WHITE)
             objTextEntriesnum = textEntriesnum.get_rect()
-            objTextEntriesnum.topleft = (round(115/screenScale),round(730/screenScale))
+            objTextEntriesnum.topleft = (round(115/screenScale),round(630/screenScale))
             flagEntries = False
           if flagStarting:
             textStartingstacknum = fontSideNum.render(format(numStarting, ","), True, WHITE)
             objTextStartingstacknum = textStartingstacknum.get_rect()
-            objTextStartingstacknum.topleft = (round(115/screenScale),round(905/screenScale))
+            objTextStartingstacknum.topleft = (round(115/screenScale),round(785/screenScale))
             flagStarting = False
           elif ((position[0] > objTextPlayernum.left and position[0] < objTextPlayernum.right) and (position[1] > objTextPlayernum.top and position[1] < objTextPlayernum.bottom)):
             flagPlayer = True
@@ -513,54 +513,54 @@ def main(lstBLINDS, lstLevels,title):
             if flagPlayer:
               textPlayernum = fontSideNum.render(format(temp_input, ","), True, BLACK)
               objTextPlayernum = textPlayernum.get_rect()
-              objTextPlayernum.topleft = (round(115/screenScale),round(205/screenScale))
+              objTextPlayernum.topleft = (round(115/screenScale),round(165/screenScale))
             elif flagAverage:
               textAveragenum = fontSideNum.render(format(temp_input, ","), True, BLACK)
               objTextAveragenum = textAveragenum.get_rect()
-              objTextAveragenum.topleft = (round(115/screenScale),round(380/screenScale))
+              objTextAveragenum.topleft = (round(115/screenScale),round(320/screenScale))
             elif flagChips:
               textChipsinplaynum = fontSideNum.render(format(temp_input, ","), True, BLACK)
               objTextChipsinplaynum = textChipsinplaynum.get_rect()
-              objTextChipsinplaynum.topleft = (round(115/screenScale),round(555/screenScale))
+              objTextChipsinplaynum.topleft = (round(115/screenScale),round(475/screenScale))
             elif flagEntries:
               textEntriesnum = fontSideNum.render(format(temp_input, ","), True, BLACK)
               objTextEntriesnum = textEntriesnum.get_rect()
-              objTextEntriesnum.topleft = (round(115/screenScale),round(730/screenScale))
+              objTextEntriesnum.topleft = (round(115/screenScale),round(630/screenScale))
             elif flagStarting:
               textStartingstacknum = fontSideNum.render(format(temp_input, ","), True, BLACK)
               objTextStartingstacknum = textStartingstacknum.get_rect()
-              objTextStartingstacknum.topleft = (round(115/screenScale),round(905/screenScale))
+              objTextStartingstacknum.topleft = (round(115/screenScale),round(785/screenScale))
         if event.key == K_RETURN:
           if flagPlayer:
             numPlayer = temp_input
             textPlayernum = fontSideNum.render(format(numPlayer, ","), True, WHITE)
             objTextPlayernum = textPlayernum.get_rect()
-            objTextPlayernum.topleft = (round(115/screenScale),round(205/screenScale))
+            objTextPlayernum.topleft = (round(115/screenScale),round(165/screenScale))
           elif flagAverage:
             numAverage = temp_input
             textAveragenum = fontSideNum.render(format(numAverage, ","), True, WHITE)
             objTextAveragenum = textAveragenum.get_rect()
-            objTextAveragenum.topleft = (round(115/screenScale),round(380/screenScale))
+            objTextAveragenum.topleft = (round(115/screenScale),round(320/screenScale))
           elif flagChips:
             numChips = temp_input
             textChipsinplaynum = fontSideNum.render(format(numChips, ","), True, WHITE)
             objTextChipsinplaynum = textChipsinplaynum.get_rect()
-            objTextChipsinplaynum.topleft = (round(115/screenScale),round(555/screenScale))
+            objTextChipsinplaynum.topleft = (round(115/screenScale),round(475/screenScale))
             if numPlayer > 0:
               numAverage = numChips // numPlayer
               textAveragenum = fontSideNum.render(format(numAverage, ","), True, WHITE)
               objTextAveragenum = textAveragenum.get_rect()
-              objTextAveragenum.topleft = (round(115/screenScale),round(380/screenScale))
+              objTextAveragenum.topleft = (round(115/screenScale),round(320/screenScale))
           elif flagEntries:
             numEntries = temp_input
             textEntriesnum = fontSideNum.render(format(numEntries, ","), True, WHITE)
             objTextEntriesnum = textEntriesnum.get_rect()
-            objTextEntriesnum.topleft = (round(115/screenScale),round(730/screenScale))
+            objTextEntriesnum.topleft = (round(115/screenScale),round(630/screenScale))
           elif flagStarting:
             numStarting = temp_input
             textStartingstacknum = fontSideNum.render(format(numStarting, ","), True, WHITE)
             objTextStartingstacknum = textStartingstacknum.get_rect()
-            objTextStartingstacknum.topleft = (round(115/screenScale),round(905/screenScale))
+            objTextStartingstacknum.topleft = (round(115/screenScale),round(785/screenScale))
           temp_input = 0
           flagPlayer, flagAverage, flagChips, flagEntries, flagStarting = False, False,False,False,False
         if event.key == K_RIGHT: ### 1분 뒤로
@@ -575,7 +575,7 @@ def main(lstBLINDS, lstLevels,title):
                   objTextPause.center = locMainTimer
                   pygame.draw.rect(surface, RED, rectPauseline, width=5)
                   pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
-                  surface.blit(tests, rectPause)
+                  surface.blit(pauseBox, rectPause)
                   surface.blit(textPause, objTextPause)
                   pygame.display.flip()
                   for event in pygame.event.get():
@@ -656,27 +656,27 @@ def main(lstBLINDS, lstLevels,title):
           if flagPlayer:
             textPlayernum = fontSideNum.render(format(numPlayer, ","), True, WHITE)
             objTextPlayernum = textPlayernum.get_rect()
-            objTextPlayernum.topleft = (round(115/screenScale),round(205/screenScale))
+            objTextPlayernum.topleft = (round(115/screenScale),round(165/screenScale))
             flagPlayer = False
           if flagAverage:
             textAveragenum = fontSideNum.render(format(numAverage, ","), True, WHITE)
             objTextAveragenum = textAveragenum.get_rect()
-            objTextAveragenum.topleft = (round(115/screenScale),round(380/screenScale))
+            objTextAveragenum.topleft = (round(115/screenScale),round(320/screenScale))
             flagAverage = False
           if flagChips:
             textChipsinplaynum = fontSideNum.render(format(numChips, ","), True, WHITE)
             objTextChipsinplaynum = textChipsinplaynum.get_rect()
-            objTextChipsinplaynum.topleft = (round(115/screenScale),round(555/screenScale))
+            objTextChipsinplaynum.topleft = (round(115/screenScale),round(475/screenScale))
             flagChips = False
           if flagEntries:
             textEntriesnum = fontSideNum.render(format(numEntries, ","), True, WHITE)
             objTextEntriesnum = textEntriesnum.get_rect()
-            objTextEntriesnum.topleft = (round(115/screenScale),round(730/screenScale))
+            objTextEntriesnum.topleft = (round(115/screenScale),round(630/screenScale))
             flagEntries = False
           if flagStarting:
             textStartingstacknum = fontSideNum.render(format(numStarting, ","), True, WHITE)
             objTextStartingstacknum = textStartingstacknum.get_rect()
-            objTextStartingstacknum.topleft = (round(115/screenScale),round(905/screenScale))
+            objTextStartingstacknum.topleft = (round(115/screenScale),round(785/screenScale))
             flagStarting = False
           elif ((position[0] > objTextPlayernum.left and position[0] < objTextPlayernum.right) and (position[1] > objTextPlayernum.top and position[1] < objTextPlayernum.bottom)):
             flagPlayer = True
@@ -725,7 +725,7 @@ def main(lstBLINDS, lstLevels,title):
                   objTextPause.center = locMainTimer
                   pygame.draw.rect(surface, RED, rectPauseline, width=5)
                   pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
-                  surface.blit(tests, rectPause)
+                  surface.blit(pauseBox, rectPause)
                   surface.blit(textPause, objTextPause)
                   pygame.display.flip()
                   time.sleep(0.1)

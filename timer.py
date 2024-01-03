@@ -283,22 +283,16 @@ def main(lstBLINDS, lstLevels,title):
             soundLevelup.play()
             pauseEvent = False
             flag = False
-            textBlind = fontBlind.render(format(LSTBLINDS[currLevel][0], ",")+" / "+format(LSTBLINDS[currLevel][1], ","), True, WHITE)
-            objTextBlind = textBlind.get_rect()
-            objTextBlind.centery = midpoint[1] + round(115/screenScale)
-            objTextBlind.right = midpoint[0] + round(350/screenScale)
+            textBlind.changeContent(font = fontBlind, content = format(LSTBLINDS[currLevel][0], ",")+" / "+format(LSTBLINDS[currLevel][1], ","))
             if LSTBLINDS[currLevel][2] != 0:
-              textBBAnte = fontBlind.render(format(LSTBLINDS[currLevel][2], ","), True, WHITE)
-              objTextBBAnte = textBBAnte.get_rect()
-              objTextBBAnte.centery = midpoint[1] + round(175/screenScale)
-              objTextBBAnte.right = midpoint[0] + round(350/screenScale)
+              textBBAnte.changeContent(font = fontBlind, content = format(LSTBLINDS[currLevel][2], ","))
           if event.key == ord('q'):
             running=False
           if event.key in K_NUM:
             if flagPlayer or flagEntries or flagAverage or flagChips or flagStarting:
               temp_input = temp_input*10 + int(event.key) - 48
               if flagPlayer:
-                textPlayernum = fontSideNum.render(format(temp_input, ","), True, BLACK)
+                textPlayernum.changeContent(font = fontSideNum, content = format(temp_input, ","))
                 objTextPlayernum = textPlayernum.get_rect()
                 objTextPlayernum.topleft = (round(115/screenScale),round(205/screenScale))
               elif flagAverage:
@@ -374,15 +368,9 @@ def main(lstBLINDS, lstLevels,title):
               try:
                 if LSTBLINDS[currLevel][0] == 0:
                   cntBreak+=1
-                  textCurrLevel = fontTitleTournament.render("BREAK", True, WHITE)
-                  textBlind = fontBlind.render("- / -", True, WHITE)
-                  objTextBlind = textBlind.get_rect()
-                  objTextBlind.centery = midpoint[1] + round(115/screenScale)
-                  objTextBlind.right = midpoint[0] + round(350/screenScale)
-                  textBBAnte = fontBlind.render("-", True, WHITE)
-                  objTextBBAnte = textBBAnte.get_rect()
-                  objTextBBAnte.centery = midpoint[1] + round(175/screenScale)
-                  objTextBBAnte.right = midpoint[0] + round(350/screenScale)
+                  textCurrLevel.changeContent(font = fontTitleTournament, content = "Break")
+                  textBlind.changeContent(font = fontBlind, content="- / -")
+                  textBBAnte.changeContent(font = fontBlind, content = "-")
                   if LSTBLINDS[currLevel+1][0] == 0:
                     temp_str1 = "- / -"
                     temp_str = "-"
@@ -399,19 +387,13 @@ def main(lstBLINDS, lstLevels,title):
                   objTextNextBBAntenum = textNextBBAntenum.get_rect()
                   objTextNextBBAntenum.topright = (midpoint[0]+round(240/screenScale),midpoint[1] + round(395/screenScale))
                 else:
-                  textCurrLevel = fontTitleTournament.render('Level '+str(currLevel-cntBreak), True, WHITE)
-                  textBlind = fontBlind.render(format(LSTBLINDS[currLevel][0], ",")+" / "+format(LSTBLINDS[currLevel][1], ","), True, WHITE)
-                  objTextBlind = textBlind.get_rect()
-                  objTextBlind.centery = midpoint[1] + round(115/screenScale)
-                  objTextBlind.right = midpoint[0] + round(350/screenScale)
+                  textCurrLevel.changeContent(font = fontTitleTournament, content = 'Level '+str(currLevel-cntBreak))
+                  textBlind.changeContent(font = fontBlind, content = format(LSTBLINDS[currLevel][0], ",")+" / "+format(LSTBLINDS[currLevel][1], ","))
                   if LSTBLINDS[currLevel][2] != 0:
                     temp_str = format(LSTBLINDS[currLevel][2], ",")
                   else:
                     temp_str = "-"
-                  textBBAnte = fontBlind.render(temp_str, True, WHITE)
-                  objTextBBAnte = textBBAnte.get_rect()
-                  objTextBBAnte.centery = midpoint[1] + round(175/screenScale)
-                  objTextBBAnte.right = midpoint[0] + round(350/screenScale)
+                  textBBAnte.changeContent(font = fontBlind, content = temp_str)
                   if LSTBLINDS[currLevel+1][0] == 0:
                     temp_str1 = "- / -"
                     temp_str = "-"
@@ -577,15 +559,9 @@ def main(lstBLINDS, lstLevels,title):
             try:
               if LSTBLINDS[currLevel][0] == 0:
                 cntBreak+=1
-                textCurrLevel = fontTitleTournament.render("BREAK", True, WHITE)
-                textBlind = fontBlind.render("- / -", True, WHITE)
-                objTextBlind = textBlind.get_rect()
-                objTextBlind.centery = midpoint[1] + round(115/screenScale)
-                objTextBlind.right = midpoint[0] + round(350/screenScale)
-                textBBAnte = fontBlind.render("-", True, WHITE)
-                objTextBBAnte = textBBAnte.get_rect()
-                objTextBBAnte.centery = midpoint[1] + round(175/screenScale)
-                objTextBBAnte.right = midpoint[0] + round(350/screenScale)
+                textCurrLevel.changeContent(font = fontTitleTournament, content = "Break")
+                textBlind.changeContent(font = fontBlind, content = "- / -")
+                textBBAnte.changeContent(font = fontBlind, content = "-")
                 if LSTBLINDS[currLevel+1][0] == 0:
                   temp_str1 = "- / -"
                   temp_str = "-"
@@ -602,19 +578,13 @@ def main(lstBLINDS, lstLevels,title):
                 objTextNextBBAntenum = textNextBBAntenum.get_rect()
                 objTextNextBBAntenum.topright = (midpoint[0]+round(240/screenScale),midpoint[1] + round(395/screenScale))
               else:
-                textCurrLevel = fontTitleTournament.render('Level '+str(currLevel-cntBreak), True, WHITE)
-                textBlind = fontBlind.render(format(LSTBLINDS[currLevel][0], ",")+" / "+format(LSTBLINDS[currLevel][1], ","), True, WHITE)
-                objTextBlind = textBlind.get_rect()
-                objTextBlind.centery = midpoint[1] + round(115/screenScale)
-                objTextBlind.right = midpoint[0] + round(350/screenScale)
+                textCurrLevel.changeContent(font = fontTitleTournament, content = 'Level '+str(currLevel-cntBreak))
+                textBlind.changeContent(font = fontBlind, content = format(LSTBLINDS[currLevel][0], ",")+" / "+format(LSTBLINDS[currLevel][1], ","))
                 if LSTBLINDS[currLevel][2] != 0:
                   temp_str = format(LSTBLINDS[currLevel][2], ",")
                 else:
                   temp_str = "-"
-                textBBAnte = fontBlind.render(temp_str, True, WHITE)
-                objTextBBAnte = textBBAnte.get_rect()
-                objTextBBAnte.centery = midpoint[1] + round(175/screenScale)
-                objTextBBAnte.right = midpoint[0] + round(350/screenScale)
+                textBBAnte.changeContent(font = fontBlind, content = temp_str)
                 if LSTBLINDS[currLevel+1][0] == 0:
                   temp_str1 = "- / -"
                   temp_str = "-"
@@ -680,29 +650,6 @@ def main(lstBLINDS, lstLevels,title):
     if(time.time() - start_time + pause_time > timer): ### 매 1초마다
       timer+=1
       min, sec, total, newLevel, min_break, sec_break = timeupdate(min, sec, total, 1, currLevel, soundLevelup,lstBreakIdx)
-      '''if total < 0: ### Level up 해야함
-        currLevel+=1
-        soundLevelup.play()
-        try:
-          if LSTLEVELS[currLevel] < 0: ### Break
-            cntBreak +=1
-            textCurrLevel = fontTitleTournament.render("BREAK", True, WHITE)
-            min, sec, total = -LSTLEVELS[currLevel]-1, 59, -LSTLEVELS[currLevel]*60-1
-          else:
-            min, sec, total = LSTLEVELS[currLevel]-1, 59, LSTLEVELS[currLevel]*60-1
-            textCurrLevel = fontTitleTournament.render('Level '+str(currLevel-cntBreak), True, WHITE)
-            textBlind = fontBlind.render(format(LSTBLINDS[currLevel][0], ",")+" / "+format(LSTBLINDS[currLevel][1], ","), True, WHITE)
-            objTextBlind = textBlind.get_rect()
-            objTextBlind.centery = midpoint[1] + round(115/screenScale)
-            objTextBlind.right = midpoint[0] + round(350/screenScale)
-            if LSTBLINDS[currLevel][2] != 0:
-              textBBAnte = fontBlind.render(format(LSTBLINDS[currLevel][2], ","), True, WHITE)
-              objTextBBAnte = textBBAnte.get_rect()
-              objTextBBAnte.centery = midpoint[1] + round(175/screenScale)
-              objTextBBAnte.right = midpoint[0] + round(350/screenScale)
-        except:
-          print("No levels left")
-        pass'''
       if newLevel != currLevel:
         currLevel = newLevel
         try:
@@ -723,15 +670,9 @@ def main(lstBLINDS, lstLevels,title):
                         running = False
           if LSTBLINDS[currLevel][0] == 0:
             cntBreak+=1
-            textCurrLevel = fontTitleTournament.render("BREAK", True, WHITE)
-            textBlind = fontBlind.render("- / -", True, WHITE)
-            objTextBlind = textBlind.get_rect()
-            objTextBlind.centery = midpoint[1] + round(115/screenScale)
-            objTextBlind.right = midpoint[0] + round(350/screenScale)
-            textBBAnte = fontBlind.render("-", True, WHITE)
-            objTextBBAnte = textBBAnte.get_rect()
-            objTextBBAnte.centery = midpoint[1] + round(175/screenScale)
-            objTextBBAnte.right = midpoint[0] + round(350/screenScale)
+            textCurrLevel.changeContent(font = fontTitleTournament, content = "Break")
+            textBlind.changeContent(font = fontBlind, content = "- / -")
+            textBBAnte.changeContent(font = fontBlind, content = "-")
             if LSTBLINDS[currLevel+1][0] == 0:
               temp_str1 = "- / -"
               temp_str = "-"
@@ -748,19 +689,13 @@ def main(lstBLINDS, lstLevels,title):
             objTextNextBBAntenum = textNextBBAntenum.get_rect()
             objTextNextBBAntenum.topright = (midpoint[0]+round(240/screenScale),midpoint[1] + round(395/screenScale))
           else:
-            textCurrLevel = fontTitleTournament.render('Level '+str(currLevel-cntBreak), True, WHITE)
-            textBlind = fontBlind.render(format(LSTBLINDS[currLevel][0], ",")+" / "+format(LSTBLINDS[currLevel][1], ","), True, WHITE)
-            objTextBlind = textBlind.get_rect()
-            objTextBlind.centery = midpoint[1] + round(115/screenScale)
-            objTextBlind.right = midpoint[0] + round(350/screenScale)
+            textCurrLevel.changeContent(font = fontTitleTournament, content = 'Level '+str(currLevel-cntBreak))
+            textBlind.changeContent(font = fontBlind, content = format(LSTBLINDS[currLevel][0], ",")+" / "+format(LSTBLINDS[currLevel][1], ","))
             if LSTBLINDS[currLevel][2] != 0:
               temp_str = format(LSTBLINDS[currLevel][2], ",")
             else:
               temp_str = "-"
-            textBBAnte = fontBlind.render(temp_str, True, WHITE)
-            objTextBBAnte = textBBAnte.get_rect()
-            objTextBBAnte.centery = midpoint[1] + round(175/screenScale)
-            objTextBBAnte.right = midpoint[0] + round(350/screenScale)
+            textBBAnte.changeContent(font = fontBlind, content = temp_str)
             if LSTBLINDS[currLevel+1][0] == 0:
               temp_str1 = "- / -"
               temp_str = "-"
@@ -787,12 +722,12 @@ def main(lstBLINDS, lstLevels,title):
     surface.blit(imgBackground,(0,0))
     surface.blit(textMainTimer.getText(), textMainTimer.getRect())
     surface.blit(textTitleTournament.getText(), textTitleTournament.getRect())
-    surface.blit(textCurrLevel, objTextCurrLevel)
-    surface.blit(textBlind, objTextBlind)
-    surface.blit(textTEXTBlind, objTextTEXTBlind)
-    surface.blit(textTEXTBBAnte, objTextTEXTBBAnte)
-    surface.blit(textBBAnte, objTextBBAnte)
-    surface.blit(textTEXTPlayer, objTextTEXTPlayer)
+    surface.blit(textCurrLevel.getText(), textCurrLevel.getRect())
+    surface.blit(textBlind.getText(), textBlind.getRect())
+    surface.blit(textTEXTBlind.getText(), textTEXTBlind.getRect())
+    surface.blit(textTEXTBBAnte.getText(), textTEXTBBAnte.getRect())
+    surface.blit(textBBAnte.getText(), objTextBBAnte.getRect())
+    surface.blit(textTEXTPlayer.getText(), textTEXTPlayer.getRect())
     if flagPlayer:
       pygame.draw.rect(surface, PALEGRAY, objTextPlayernum)
     surface.blit(textPlayernum, objTextPlayernum)
