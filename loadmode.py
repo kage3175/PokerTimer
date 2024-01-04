@@ -3,7 +3,7 @@ import pygame
 import ctypes
 from pygame.locals import *
 import os
-import timer_copy
+import timer
 
 WHITE = (255,255,255)
 BLACK = (0,0,0)
@@ -390,6 +390,6 @@ def main_load():
   if gotomain:
     return True
   elif flagTimer:
-    timer_copy.main(lstBlind, lstLevel, title)
+    timer.main(lstBlind, lstLevel, title)
   else: return False
 ##################### End of main_load
