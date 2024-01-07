@@ -4,6 +4,7 @@ import ctypes
 from pygame.locals import *
 import os
 import timer
+from TextObj import TextObj
 
 WHITE = (255,255,255)
 BLACK = (0,0,0)
@@ -97,7 +98,6 @@ def main_load():
     numFile = len(lst_blindfiles)
   except:
     print("Something wrong with opening doc folder")
-  #print(numFile)
   
   if numFile==0:
     flagEmpty = True
@@ -135,44 +135,20 @@ def main_load():
       tempRectOutline = pygame.Rect(0,0,round(1000/screenScale),round(BOXHEIGHT/screenScale))
       tempRectOutline.topleft = (round(525/screenScale), round((100+cnt*BOXINTERVAL)/screenScale))
       lstRectBackgrounds.insert(0,(tempRect, tempRectOutline))
-
       cnt+=1
-  
-  '''for obj in lstBlindObjs:
-    print(obj.getTitle(), obj.getType(), obj.getNumBlinds(), obj.getLstDurations(), obj.getLstBlinds())'''
+  #### End of reading files
 
 #region texts  
 
-  textEmpty = fontEmpty.render("There is no saved blind settings", True, WHITE)
-  objEmpty = textEmpty.get_rect()
-  objEmpty.center = midpoint
-  textNext = fontButton.render("Next", True, BLACK)
-  objNext = textNext.get_rect()
-  objNext.center = (midpoint[0] + round(300/screenScale), round(1030/screenScale))
-  textBack = fontButton.render("Back", True, BLACK)
-  objBack = textBack.get_rect()
-  objBack.center = (midpoint[0] - round(300/screenScale), round(1030/screenScale))
-  #textSetting = fontEmpty.render("Blind Setting", True, BLACK)
-  #objSetting = textSetting.get_rect()
-  #objSetting.center = (midpoint[0], round(100/screenScale))
-  textSavenGo = fontButton.render("Save & Go", True, BLACK)
-  objSavenGo = textNext.get_rect()
-  objSavenGo.center = (midpoint[0] + round(300/screenScale), round(1030/screenScale))
-  textSettingLevel = fontSup.render("Level", True, WHITE)
-  objSettingLevel = textSettingLevel.get_rect()
-  objSettingLevel.center = (midpoint[0]-round(400/screenScale), round(90/screenScale))
-  textSettingBB = fontSup.render("BB", True, WHITE)
-  objSBB = textSettingBB.get_rect()
-  objSBB.center = (midpoint[0] - round(225/screenScale), round(90/screenScale))
-  textSettingSB = fontSup.render("SB", True, WHITE)
-  objSSB = textSettingSB.get_rect()
-  objSSB.center = (midpoint[0] - round(50/screenScale), round(90/screenScale))
-  textSettingAnte = fontSup.render("Ante", True, WHITE)
-  objSAnte = textSettingAnte.get_rect()
-  objSAnte.center = (midpoint[0] + round(125/screenScale), round(90/screenScale))
-  textSettingDur = fontSup.render("Duration", True, WHITE)
-  objSDur = textSettingDur.get_rect()
-  objSDur.center = (midpoint[0] + round(300/screenScale), round(90/screenScale))
+  textEmpty = TextObj(font= fontEmpty, content="There is no saved blind settings", position=midpoint, relative="center", color=WHITE)
+  textNext = TextObj(font= fontButton, content="Next", position=(midpoint[0] + round(300/screenScale), round(1030/screenScale)), relative="center", color=BLACK)
+  textBack = TextObj(font = fontButton, content="Back", color=BLACK, relative="center", position=(midpoint[0] - round(300/screenScale), round(1030/screenScale)))
+  textSavenGo = TextObj(font=fontButton, content="Next", color=BLACK, relative="center", position=(midpoint[0] + round(300/screenScale), round(1030/screenScale)))
+  textSettingLevel = TextObj(font = fontSup, content="Level", color=WHITE, relative="center", position = (midpoint[0]-round(400/screenScale), round(90/screenScale)))
+  textSettingBB = TextObj(font = fontSup, content="BB", color=WHITE, relative="center", position=(midpoint[0] - round(225/screenScale), round(90/screenScale)))
+  textSettingSB = TextObj(font = fontSup, content="SB", color=WHITE, relative="center", position=(midpoint[0] - round(50/screenScale), round(90/screenScale)))
+  textSettingAnte = TextObj(font = fontSup, content="Ante", color=WHITE, relative="center", position=(midpoint[0] + round(125/screenScale), round(90/screenScale)))
+  textSettingDur = TextObj(font = fontSup, content="Duration", color=WHITE, relative="center", position=(midpoint[0] + round(300/screenScale), round(90/screenScale)))
 
 #endregion
 
@@ -180,11 +156,8 @@ def main_load():
   rectNext.center = (midpoint[0] + round(300/screenScale), round(1030/screenScale))
   rectBack = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
   rectBack.center = (midpoint[0] - round(300/screenScale), round(1030/screenScale))
-  #rectSetting = pygame.Rect(0,0,round(2200/screenScale), round(200/screenScale))
   rectSettings = pygame.Rect(0,0,round(2200/screenScale), round(120/screenScale))
   rectDelete = pygame.Rect(0,0,round(20/screenScale), round(20/screenScale))
-
-  #print(lst_blindfiles)
 
   running = True
 
@@ -193,7 +166,6 @@ def main_load():
   flagNext = False
   flagTimer = False
   title=""
-
 
   while running:
     if not flagNext:
@@ -205,7 +177,6 @@ def main_load():
         if event.type == MOUSEBUTTONDOWN:
           if event.button == 1:# Left Click
             position = pygame.mouse.get_pos()
-            
             if(rectNext.left<=position[0]<=rectNext.right and rectNext.top <= position[1] <= rectNext.bottom): #Next Button
               flagNext = True
               objControl = lstBlindObjs[selected]
@@ -289,7 +260,7 @@ def main_load():
                 lstRectBlinds[i][j].top = lstRectBlinds[i][j].top+round(SCRLLFACTOR / screenScale)
       screen.blit(imgBackground, (0,0))
       if flagEmpty:
-        screen.blit(textEmpty, objEmpty)
+        screen.blit(textEmpty.getText(), textEmpty.getRect())
       else:
         for i in range(numFile):
           if 0< lstRectBackgrounds[i][0].bottom < (CUTLINE)/screenScale:
@@ -302,10 +273,10 @@ def main_load():
               screen.blit(lstTextBlinds[i][j], lstRectBlinds[i][j])
       pygame.draw.rect(screen, PALEGRAY, rectNext)
       pygame.draw.rect(screen, GRAY, rectNext, width = 4)
-      screen.blit(textNext, objNext)
+      screen.blit(textNext.getText(), textNext.getRect())
       pygame.draw.rect(screen, PALEGRAY, rectBack)
       pygame.draw.rect(screen, GRAY, rectBack, width = 4)
-      screen.blit(textBack, objBack)
+      screen.blit(textBack.getText(), textBack.getRect())
       pygame.draw.line(screen,WHITE, (0,round(CUTLINE/screenScale)), (round(2048/screenScale),round(CUTLINE/screenScale)))
       pygame.display.flip()
       time.sleep(0.05)
@@ -349,8 +320,6 @@ def main_load():
                 else:
                   lstBlind.append(item[2:5])
       screen.blit(imgBackground, (0,0))
-      #pygame.draw.rect(screen,WHITE,rectSetting)
-      #screen.blit(textSetting, objSetting)
       
       for i in range(lstBlindObjs[selected].getNumBlinds()):
         tempbox = lstBoxBlinds[i][1][0]
@@ -371,18 +340,19 @@ def main_load():
       pygame.draw.line(screen,WHITE, (0,round(CUTLINE/screenScale)), (round(2048/screenScale),round(CUTLINE/screenScale)))
       pygame.draw.rect(screen, PALEGRAY, rectNext)
       pygame.draw.rect(screen, GRAY, rectNext, width = 4)
-      screen.blit(textSavenGo, objSavenGo)
+      screen.blit(textSavenGo.getText(), textSavenGo.getRect())
       pygame.draw.rect(screen, PALEGRAY, rectBack)
       pygame.draw.rect(screen, GRAY, rectBack, width = 4)
-      screen.blit(textBack, objBack)
+      screen.blit(textBack.getText(), textBack.getRect())
       pygame.draw.line(screen,WHITE, (0,round(CUTLINE/screenScale)), (round(2048/screenScale),round(CUTLINE/screenScale)))
-      screen.blit(textSettingLevel, objSettingLevel)
-      screen.blit(textSettingBB, objSBB)
-      screen.blit(textSettingAnte, objSAnte)
-      screen.blit(textSettingSB, objSSB)
-      screen.blit(textSettingDur, objSDur)
+      screen.blit(textSettingLevel.getText(), textSettingLevel.getRect())
+      screen.blit(textSettingBB.getText(), textSettingBB.getRect())
+      screen.blit(textSettingAnte.getText(), textSettingAnte.getRect())
+      screen.blit(textSettingSB.getText(), textSettingSB.getRect())
+      screen.blit(textSettingDur.getText(), textSettingDur.getRect())
       pygame.display.flip()
       time.sleep(0.05)
+  #### End of main While
 
 
 
