@@ -30,6 +30,8 @@ class TextObj:
       self.rect.right = position
     elif relative == "left":
       self.rect.left = position
+    elif relative == "top":
+      self.rect.top = position
   def getRect(self):
     return self.rect
   def changeColor(self, color):

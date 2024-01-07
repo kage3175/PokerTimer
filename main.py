@@ -65,7 +65,6 @@ def main():
             #print("Load")
             mode = 1
             running = False
-            pass
       screen.blit(imgBackground,(0,0))
       pygame.draw.rect(screen, PALEGRAY, rectSave)
       pygame.draw.rect(screen, GRAY, rectSaveOutline, width = 4)
