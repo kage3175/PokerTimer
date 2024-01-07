@@ -339,6 +339,18 @@ def main_load():
                   lstBlind.append(0)
                 else:
                   lstBlind.append(item[2:5])
+            else:
+              cntBreak, cntLvl = 0, 0
+              for boxblinds in lstBoxBlinds:
+                cntLvl += 1
+                if lstBoxBlinds[i][0] == 0:
+                  cntBreak+=1
+                if 120/screenScale<tempbox.bottom<(CUTLINE)/screenScale:
+                  if lstBoxBlinds[i][0] == 0:
+                    if lstBoxBlinds[i][1][1].getRect().left <= position[0] <= lstBoxBlinds[i][1][1].getRect().right and lstBoxBlinds[i][1][1].getRect().top <= position[1]<= lstBoxBlinds[i][1][1].getRect().bottom:
+                      lstBoxBlinds[i][1][1].changeContent(font = fontBox, content = str(cntLvl))
+                      ### 작업 해야 함
+              pass
       #### End of event for loop
                          
       screen.blit(imgBackground, (0,0))
