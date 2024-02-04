@@ -6,6 +6,7 @@ class TextObj:
     self.position = position
     self.relative = relative
     self.color = color
+    self.clicked = False
     if relative == "topleft":
       self.rect.topleft = position
     elif relative == "center":
@@ -56,3 +57,5 @@ class TextObj:
     return self.content
   def getText(self):
     return self.text
+  def click(self):
+    self.clicked=not self.clicked

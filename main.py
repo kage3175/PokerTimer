@@ -53,6 +53,7 @@ def main():
           if event.key == ord('q'):
             running = False
             mode = 0
+            flagRun=False
           elif event.key == K_SPACE:
             pass
         if event.type == MOUSEBUTTONDOWN:

@@ -204,38 +204,6 @@ def main_load():
                 isbreak = 0 if tempLst[i][0] == 0 else 1
                 level = level+1 if tempLst[i][0] == 1 else level
                 tempLst2 = [isbreak,[tempBox, lvl, dur, bb, sb, ante]]
-                '''if tempLst[i][0] == 0: #Break
-                  box = TextObj(font = fontBox, content = "Break", color=BLACK, relative="center", position=(midpoint[0]-round(400/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale)))
-                  lvl = TextObj(font = fontBox, content = str(level), color=BLACK, relative= "center", position=(midpoint[0]-round(400/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale)))
-                  dur = TextObj(font = fontBox, color=BLACK, content=str(tempLst[i][1]), relative="center", position=(midpoint[0] + round(300/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale)))
-                  bb = TextObj(font = fontBox, color=BLACK, content=str(tempLst[i][2]), relative="center", position=(midpoint[0] - round(225/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale)))
-                  sb = TextObj(font = fontBox, color=BLACK, content=str(tempLst[i][3]), relative="center", position=(midpoint[0] - round(50/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale)))
-                  ante = TextObj(font = fontBox, color=BLACK, content=str(tempLst[i][4]), relative="center", position=(midpoint[0] + round(125/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale)))
-                  temptext1 = fontBox.render("Break", True, BLACK)
-                  objtemp1 = temptext1.get_rect()
-                  objtemp1.center = (midpoint[0]-round(400/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale))
-                  temptext2 = fontBox.render(str(tempLst[i][1]), True, BLACK) # Duration
-                  objtemp2 = temptext2.get_rect()
-                  objtemp2.center = (midpoint[0] + round(300/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale))
-                  tempLst2 = [0,[tempBox,[temptext1,objtemp1], [temptext2,objtemp2]]]
-                  #[0, [박스, Lvl, Duration, BB, SB, Ante]]
-                else: #Blind
-                  temptext1 = fontBox.render(str(level), True, BLACK) # Level
-                  objtemp1 = temptext1.get_rect()
-                  objtemp1.center = (midpoint[0]-round(400/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale))
-                  temptext2 = fontBox.render(str(tempLst[i][1]), True, BLACK) # Duration
-                  objtemp2 = temptext2.get_rect()
-                  objtemp2.center = (midpoint[0] + round(300/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale))
-                  temptext3 = fontBox.render(str(tempLst[i][2]), True, BLACK) # BB
-                  objtemp3 = temptext3.get_rect()
-                  objtemp3.center = (midpoint[0] - round(225/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale))
-                  temptext4 = fontBox.render(str(tempLst[i][3]), True, BLACK) # SB
-                  objtemp4 = temptext4.get_rect()
-                  objtemp4.center = (midpoint[0] - round(50/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale))
-                  temptext5 = fontBox.render(str(tempLst[i][4]), True, BLACK) # Ante
-                  objtemp5 = temptext5.get_rect()
-                  objtemp5.center = (midpoint[0] + round(125/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale))
-                  tempLst2 = [1,[tempBox,[temptext1,objtemp1], [temptext2,objtemp2], [temptext3,objtemp3], [temptext4, objtemp4], [temptext5, objtemp5]]]'''
                   
                 lstBoxBlinds.insert(0,tempLst2)
                 cnt+=1
@@ -326,7 +294,8 @@ def main_load():
                 lstBoxBlinds[i][1][j+1].changePosition(relative = "top", position = lstBoxBlinds[i][1][j+1].getRect().top + f*round(SCRLLFACTOR / screenScale)) 
           if event.button == 1: ## 클릭
             position = pygame.mouse.get_pos()
-            if(rectNext.left<=position[0]<=rectNext.right and rectNext.top<=position[1]<=rectNext.bottom):
+            print(position)
+            if(rectNext.left<=position[0]<=rectNext.right and rectNext.top<=position[1]<=rectNext.bottom): # Next 버튼 눌렀을 때 flagTimer true로
               flagTimer = True
               running = False
               templst = lstBlindObjs[selected].getLstBlinds()
@@ -339,18 +308,26 @@ def main_load():
                   lstBlind.append(0)
                 else:
                   lstBlind.append(item[2:5])
-            else:
+            elif(rectBack.left<=position[0]<=rectBack.right and rectBack.top<=position[1]<=rectBack.bottom): # Back 버튼
+              flagNext=False
+              gotomain = True
+              continue
+            else: #
               cntBreak, cntLvl = 0, 0
+              #tempLst2 = [isbreak,[tempBox, lvl, dur, bb, sb, ante]]
               for boxblinds in lstBoxBlinds:
-                cntLvl += 1
-                if lstBoxBlinds[i][0] == 0:
+                if boxblinds[0] == 0:
                   cntBreak+=1
-                if 120/screenScale<tempbox.bottom<(CUTLINE)/screenScale:
-                  if lstBoxBlinds[i][0] == 0:
-                    if lstBoxBlinds[i][1][1].getRect().left <= position[0] <= lstBoxBlinds[i][1][1].getRect().right and lstBoxBlinds[i][1][1].getRect().top <= position[1]<= lstBoxBlinds[i][1][1].getRect().bottom:
-                      lstBoxBlinds[i][1][1].changeContent(font = fontBox, content = str(cntLvl))
+                else:
+                  cntLvl+=1
+                  boxblinds[1][1].changeContent(font = fontBox, content = str(cntLvl))
+                if 120/screenScale<boxblinds[1][0].bottom<(CUTLINE)/screenScale:
+                  if boxblinds[1][0] == 0: #break인 경우
+                    if boxblinds[1][0].getRect().left <= position[0] <= boxblinds[1][0].getRect().right and boxblinds[1][0].getRect().top <= position[1]<= boxblinds[1][0].getRect().bottom:
+                      boxblinds[1][1].changeContent(font = fontBox, content = str(cntLvl))
+                      boxblinds[0] = 1
                       ### 작업 해야 함
-              pass
+              #pass
       #### End of event for loop
                          
       screen.blit(imgBackground, (0,0))
@@ -393,5 +370,6 @@ def main_load():
     return True
   elif flagTimer:
     timer.main(lstBlind, lstLevel, title)
-  else: return False
+  else: 
+    return False
 ##################### End of main_load
