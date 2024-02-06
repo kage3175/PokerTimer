@@ -58,6 +58,8 @@ class BlindFile:
     self.filename = name
   def getFilename(self):
     return self.filename
+  def changeLstBlinds(self, idx1, idx2, content):
+    self.lstBlinds[idx1][idx2] = content
   
 class BlindBox:
   def __init__(self) -> None:
@@ -100,6 +102,22 @@ def processAscii(key):
   else:
     return 0
 #### End of processAscii
+  
+def updateFile(objControl):
+  outfile = open('./doc/'+objControl.getFilename(), "w")
+  print(objControl.getTitle(), file=outfile)
+  print(objControl.getType(), file= outfile)
+  templst = objControl.getLstDurations()
+  print(str(objControl.getNumBlinds()), file=outfile)
+  for i in range(len(templst)):
+    print(str(templst[i]) + ",", end = "", file=outfile)
+  print("", file=outfile)
+  templst = objControl.getLstBlinds()
+  for i in range(objControl.getNumBlinds()-1):
+    print("("+str(templst[i][0])+","+str(templst[i][1])+","+str(templst[i][2])+","+str(templst[i][3])+ ","+str(templst[i][4])+")",end="$", file=outfile)
+  i = objControl.getNumBlinds()-1
+  print("("+str(templst[i][0])+","+str(templst[i][1])+","+str(templst[i][2])+","+str(templst[i][3])+ ","+str(templst[i][4])+")",end="", file=outfile)
+  outfile.close()
 
 def main_load():
   pygame.init()
@@ -203,6 +221,7 @@ def main_load():
   selectedIdx = -1
   temp_input = 0
   objControl = None
+  flagFirst = False
 
   while running:
     if not flagNext:
@@ -216,8 +235,9 @@ def main_load():
             position = pygame.mouse.get_pos()
             if(rectNext.left<=position[0]<=rectNext.right and rectNext.top <= position[1] <= rectNext.bottom): #Next Button
               flagNext = True
+              flagFirst = True
               objControl = lstBlindObjs[selected]
-              #print(objControl.getLstBlinds())
+              print(objControl.getLstBlinds())
               tempLst = objControl.getLstBlinds()
               level = 1
               cnt = 0
@@ -240,7 +260,7 @@ def main_load():
                 lstBoxBlinds.append(tempLst2)
                 cnt+=1
               
-              outfile = open('./doc/'+objControl.getFilename(), "w")
+              '''outfile = open('./doc/'+objControl.getFilename(), "w")
               print(objControl.getTitle(), file=outfile)
               print(objControl.getType(), file= outfile)
               templst = objControl.getLstDurations()
@@ -253,7 +273,8 @@ def main_load():
                 print("("+str(templst[i][0])+","+str(templst[i][1])+","+str(templst[i][2])+","+str(templst[i][3])+ ","+str(templst[i][4])+")",end="$", file=outfile)
               i = objControl.getNumBlinds()-1
               print("("+str(templst[i][0])+","+str(templst[i][1])+","+str(templst[i][2])+","+str(templst[i][3])+ ","+str(templst[i][4])+")",end="", file=outfile)
-              outfile.close()
+              outfile.close()'''
+              updateFile(objControl)
             elif(rectBack.left<=position[0]<=rectBack.right and rectBack.top <= position[1] <= rectBack.bottom): #Back Button
               running = False
               gotomain = True
@@ -308,6 +329,9 @@ def main_load():
     else: #Next 눌렀을 때
       if selected == -1:
         flagNext = False
+      elif flagFirst:
+        flagFirst = False
+        objControl = lstBlindObjs[selected]
 
       ##### KeyBoard events
       for event in pygame.event.get():
@@ -322,6 +346,7 @@ def main_load():
               lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str(temp_input))
           elif event.key == K_RETURN:
             if selectedIdx != -1:
+              objControl.changeLstBlinds(selectedIdx, lstBoxBlinds[selectedIdx][2] - 1, temp_input)
               lstBoxBlinds[selectedIdx][2] = 0
               selectedIdx = -1
               temp_input = 0
@@ -338,12 +363,14 @@ def main_load():
                 boxblinds[1][j+1].changePosition(relative = "top", position = (boxblinds[1][j+1].getRect().centerx, boxblinds[1][j+1].getRect().top + f*round(SCRLLFACTOR / screenScale))) 
           if event.button == 1: ## 클릭
             if selectedIdx != -1:
+              objControl.changeLstBlinds(selectedIdx, lstBoxBlinds[selectedIdx][2] - 1, temp_input)
               lstBoxBlinds[selectedIdx][2] = 0
               selectedIdx = -1
               temp_input = 0
             position = pygame.mouse.get_pos()
             if(rectNext.left<=position[0]<=rectNext.right and rectNext.top<=position[1]<=rectNext.bottom): # Next 버튼 눌렀을 때 flagTimer true로
-
+              #print(objControl.getLstBlinds())
+              updateFile(objControl)
 
               '''
               변경내용 바꾸고 저장하기 해야함
