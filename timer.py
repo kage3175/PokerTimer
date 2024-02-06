@@ -560,18 +560,18 @@ def main(lstBLINDS, lstLevels,title):
         currLevel = newLevel
         try:
           if LSTLEVELS[currLevel]==0: ### End of blind
-                while running:
-                  textPause.changeContent(font = fontPause, content = "No more blinds")
-                  pygame.draw.rect(surface, RED, rectPauseline, width=5)
-                  pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
-                  surface.blit(pauseBox, rectPause)
-                  surface.blit(textPause.getText(), textPause.getRect())
-                  pygame.display.flip()
-                  time.sleep(0.1)
-                  for event in pygame.event.get():
-                    if event.type == KEYDOWN:
-                      if event.key == ord('q'):
-                        running = False
+            while running:
+              textPause.changeContent(font = fontPause, content = "No more blinds")
+              pygame.draw.rect(surface, RED, rectPauseline, width=5)
+              pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
+              surface.blit(pauseBox, rectPause)
+              surface.blit(textPause.getText(), textPause.getRect())
+              pygame.display.flip()
+              time.sleep(0.1)
+              for event in pygame.event.get():
+                if event.type == KEYDOWN:
+                  if event.key == ord('q'):
+                    running = False
           if LSTBLINDS[currLevel][0] == 0: #Break
             cntBreak+=1
             textCurrLevel.changeColor(BRIGHTRED)
