@@ -32,7 +32,9 @@ class TextObj:
     elif relative == "left":
       self.rect.left = position
     elif relative == "top":
-      self.rect.top = position
+      self.rect.top = position[1]
+      self.rect.centerx=position[0]
+    self.position = position
   def getRect(self):
     return self.rect
   def changeColor(self, color):
@@ -53,9 +55,14 @@ class TextObj:
       self.rect.left = self.position[1]
     elif self.relative == "topright":
       self.rect.topright = self.position
+    elif self.relative == "top":
+      self.rect.centerx = self.position[0]
+      self.rect.top = self.position[1]
   def getContent(self):
     return self.content
   def getText(self):
     return self.text
   def click(self):
     self.clicked=not self.clicked
+  def getPos(self):
+    return self.position

@@ -205,7 +205,7 @@ def main_load():
                 level = level+1 if tempLst[i][0] == 1 else level
                 tempLst2 = [isbreak,[tempBox, lvl, dur, bb, sb, ante]]
                   
-                lstBoxBlinds.insert(0,tempLst2)
+                lstBoxBlinds.append(tempLst2)
                 cnt+=1
               
               outfile = open('./doc/'+objControl.getFilename(), "w")
@@ -285,13 +285,13 @@ def main_load():
             gotomain = False
         elif event.type == MOUSEBUTTONDOWN:
           if event.button == 4 or event.button == 5:
-            f = -1 if (event.button == 4) else 1
+            f = -1 if (event.button == 5) else 1
             
-            for i in range(lstBlindObjs[selected].getNumBlinds()):
+            for boxblinds in lstBoxBlinds:
               #tempLst2 = [isbreak,[tempBox, lvl, dur, bb, sb, ante]]
-              lstBoxBlinds[i][1][0].top = lstBoxBlinds[i][1][0].top + f*round(SCRLLFACTOR / screenScale) #박스
+              boxblinds[1][0].top = boxblinds[1][0].top + f*round(SCRLLFACTOR / screenScale) #박스
               for j in range(5):
-                lstBoxBlinds[i][1][j+1].changePosition(relative = "top", position = lstBoxBlinds[i][1][j+1].getRect().top + f*round(SCRLLFACTOR / screenScale)) 
+                boxblinds[1][j+1].changePosition(relative = "top", position = (boxblinds[1][j+1].getRect().centerx, boxblinds[1][j+1].getRect().top + f*round(SCRLLFACTOR / screenScale))) 
           if event.button == 1: ## 클릭
             position = pygame.mouse.get_pos()
             print(position)
@@ -313,17 +313,21 @@ def main_load():
               gotomain = True
               continue
             else: #
+              
               cntBreak, cntLvl = 0, 0
               #tempLst2 = [isbreak,[tempBox, lvl, dur, bb, sb, ante]]
               for boxblinds in lstBoxBlinds:
+                #print(1)
                 if boxblinds[0] == 0:
                   cntBreak+=1
                 else:
                   cntLvl+=1
                   boxblinds[1][1].changeContent(font = fontBox, content = str(cntLvl))
-                if 120/screenScale<boxblinds[1][0].bottom<(CUTLINE)/screenScale:
-                  if boxblinds[1][0] == 0: #break인 경우
-                    if boxblinds[1][0].getRect().left <= position[0] <= boxblinds[1][0].getRect().right and boxblinds[1][0].getRect().top <= position[1]<= boxblinds[1][0].getRect().bottom:
+                  #print(str(cntLvl))
+                if 120/screenScale<boxblinds[1][0].bottom<(CUTLINE)/screenScale: # 화면 안에 나오는 애들 중
+                  if boxblinds[0] == 0: #break인 경우
+                    if boxblinds[1][1].getRect().left <= position[0] <= boxblinds[1][1].getRect().right and boxblinds[1][1].getRect().top <= position[1]<= boxblinds[1][1].getRect().bottom:
+                      cntLvl+=1
                       boxblinds[1][1].changeContent(font = fontBox, content = str(cntLvl))
                       boxblinds[0] = 1
                       ### 작업 해야 함
@@ -332,18 +336,18 @@ def main_load():
                          
       screen.blit(imgBackground, (0,0))
       
-      for i in range(lstBlindObjs[selected].getNumBlinds()):
-        tempbox = lstBoxBlinds[i][1][0]
+      for boxblinds in lstBoxBlinds:
+        tempbox = boxblinds[1][0]
         if 120/screenScale<tempbox.bottom<(CUTLINE)/screenScale:
           
-          if lstBoxBlinds[i][0] == 0: #Break
+          if boxblinds[0] == 0: #Break
             pygame.draw.rect(screen,WHITE, tempbox)
             pygame.draw.rect(screen,BLACK, tempbox, width=4)
-            blitText(screen, lstBoxBlinds[i][1][1], lstBoxBlinds[i][1][2])
+            blitText(screen, boxblinds[1][1], boxblinds[1][2])
           else:
             pygame.draw.rect(screen,GRAY, tempbox)
             pygame.draw.rect(screen,BLACK, tempbox, width=4)
-            blitText(screen, lstBoxBlinds[i][1][1], lstBoxBlinds[i][1][2],lstBoxBlinds[i][1][3],lstBoxBlinds[i][1][4],lstBoxBlinds[i][1][5])
+            blitText(screen, boxblinds[1][1], boxblinds[1][2],boxblinds[1][3],boxblinds[1][4],boxblinds[1][5])
       pygame.draw.rect(screen, DARKGRAY, rectSettings)
       pygame.draw.line(screen, BLACK, (0,round(120/screenScale)), (round(2200/screenScale),round(120/screenScale)), width=5)
       pygame.draw.line(screen,WHITE, (0,round(CUTLINE/screenScale)), (round(2048/screenScale),round(CUTLINE/screenScale)))
