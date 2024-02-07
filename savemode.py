@@ -217,20 +217,20 @@ def main_save():
               '''else: # 글자 클릭했는지 확인
                 
                 cntBreak, cntLvl = 0, 0
-                #tempLst2 = [isbreak,[tempBox, lvl, dur, bb, sb, ante]]
+                #tempLst2 = [isbreak,[tempBox], [lvl, dur, bb, sb, ante]]
                 cntIdx = 0
                 for i in range(len(lstBoxs)):
                   if lstBoxs[0] == 0:
                     cntBreak+=1
                   elif lstBoxs[0] == 1:
                     cntLvl+=1
-                    boxblinds[1][1].changeContent(font = fontBox, content = str(cntLvl))
-                  if 120/screenScale<boxblinds[1][0].bottom<(CUTLINE)/screenScale: # 화면 안에 나오는 애들 중
-                    if boxblinds[0] == 0: #break인 경우
-                      if mouseInRect(boxblinds[1][1].getRect(), position):
+                    lstBoxs[i][2][0].changeContent(font = fontBox, content = str(cntLvl))
+                  if 120/screenScale<lstBoxs[i][1][0].bottom<(CUTLINE)/screenScale: # 화면 안에 나오는 애들 중
+                    if lstBoxs[i][0] == 0: #break인 경우
+                      if mouseInRect(lstBoxs[i][1][0].getRect(), position):
                         cntLvl+=1
-                        boxblinds[1][1].changeContent(font = fontBox, content = str(cntLvl))
-                        boxblinds[0] = 1
+                        lstBoxs[i][1][0].changeContent(font = fontBox, content = str(cntLvl))
+                        lstBoxs[i][0] = 1 ###여까지함
                         objControl.changeBlinds(cntIdx, False)
                         ### 작업 해야 함
                     else: # Level인 경우
