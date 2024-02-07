@@ -4,6 +4,7 @@ import time
 import random
 import ctypes
 import os
+from TextObj import TextObj
 
 FONTPATH = {'NGothicR' : './font/NanumGothic.ttf', 'NSquareR' : './font/NanumSquareR.ttf'}
 TESTMIN, TESTSEC, TESTTOTAL = 10,0,600
@@ -19,70 +20,12 @@ PALEGRAY = (180,180,180)
 YELLOW = (220,220,90)
 K_NUM = [K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9]
 
-class TextObj:
-  def __init__(self, font, content = "",position = (0,0), relative = "topleft", color = (0,0,0)) -> None:
-    self.content = content
-    self.text = font.render(content, True, color)
-    self.rect = self.text.get_rect()
-    self.position = position
-    self.relative = relative
-    self.color = color
-    if relative == "topleft":
-      self.rect.topleft = position
-    elif relative == "center":
-      self.rect.center = position
-    elif relative == "rcenter":
-      self.rect.centery = position[0]
-      self.rect.right = position[1]
-    elif relative == "lcenter":
-      self.rect.centery = position[0]
-      self.rect.left = position[1]
-    elif relative == "topright":
-      self.rect.topright = position
-  def changePosition(self, relative = "topleft", position = (0,0)):
-    self.relative = relative
-    if relative == "topleft":
-      self.rect.topleft = position
-    elif relative == "bottom":
-      self.rect.bottom = position
-    elif relative == "center":
-      self.rect.center = position
-    elif relative == "right":
-      self.rect.right = position
-    elif relative == "left":
-      self.rect.left = position
-  def getRect(self):
-    return self.rect
-  def changeColor(self, color):
-    self.color = color
-  def changeContent(self, font, content = ""):
-    self.content = content
-    self.text = font.render(content, True, self.color)
-    self.rect = self.text.get_rect()
-    if self.relative == "topleft":
-      self.rect.topleft = self.position
-    elif self.relative == "center":
-      self.rect.center = self.position
-    elif self.relative == "rcenter":
-      self.rect.centery = self.position[0]
-      self.rect.right = self.position[1]
-    elif self.relative == "lcenter":
-      self.rect.centery = self.position[0]
-      self.rect.left = self.position[1]
-    elif self.relative == "topright":
-      self.rect.topright = self.position
-  def getContent(self):
-    return self.content
-  def getText(self):
-    return self.text
-
-
 
 def timeupdate(minute, second, total, amount, currLevel, soundlvlup, lstBreakIdx):
   global LSTLEVELS, LSTBLINDS
   level = currLevel
   if total < amount:
-    minute, second, total, level = levelupdate(minute, second, total, amount, currLevel, soundlvlup)
+    minute, second, total, level = levelupdate(minute, second, total, amount, currLevel, soundlvlup, 1)
   elif amount >= 0:
     if second < amount:
       minute -= 1
@@ -93,7 +36,15 @@ def timeupdate(minute, second, total, amount, currLevel, soundlvlup, lstBreakIdx
       total -= amount
     
   else: #### amount가 음수일 때, 즉 시간을 증가시킬 때
-    pass
+    if LSTLEVELS[currLevel]*60 < total-amount:
+      minute, second, total, level = levelupdate(minute, second, total, amount, currLevel, soundlvlup, -1)
+    elif second-amount >= 60:
+      minute += 1
+      second = second +60 + amount
+      total -=amount
+    else:
+      second-=amount
+      total-=amount
   min_break, sec_break = minute,second
   i = lstBreakIdx[level]
   temp = level+1
@@ -101,19 +52,32 @@ def timeupdate(minute, second, total, amount, currLevel, soundlvlup, lstBreakIdx
     min_break +=LSTLEVELS[temp]
     temp+=1
   return minute, second, total, level, min_break, sec_break
+#### End of timeupdate function
 
 def makeTimerString(min, sec, total):
   return str(min).zfill(2) + ':' + str(sec).zfill(2)
+#### End of makeTimerString function
 
-def levelupdate(minute, second, total, amount, currLevel, soundlvlup):
+def levelupdate(minute, second, total, amount, currLevel, soundlvlup, updown):
   global LSTLEVELS, LSTBLINDS
   soundlvlup.play()
-  level = currLevel+1
-  min, sec, tot = minute + LSTLEVELS[level], second, total + LSTLEVELS[level] * 60
-  min -= 1
-  sec = second + 60 - amount
-  tot -= amount
-  return min, sec,tot,level 
+  level = currLevel+updown
+  if updown > 0:
+    min, sec, tot = minute + LSTLEVELS[level], second, total + LSTLEVELS[level] * 60
+    min -= 1
+    sec = second + 60 - amount
+    tot -= amount
+  else:
+    min, sec = minute + LSTLEVELS[level] + updown, second
+    tot = min*60+sec
+  return min, sec,tot,level
+#### End of levelupdate function
+
+def blitText(surface, *textobjs):
+  for text in textobjs:
+    surface.blit(text.getText(), text.getRect())
+  pass
+#### End of blitText function
 
 def main(lstBLINDS, lstLevels,title):
   global LSTLEVELS, LSTBLINDS
@@ -242,44 +206,19 @@ def main(lstBLINDS, lstLevels,title):
     if pauseEvent:
       flag = True
       surface.blit(imgBackground,(0,0))
-      surface.blit(textMainTimer.getText(), textMainTimer.getRect())
-      surface.blit(textTitleTournament.getText(), textTitleTournament.getRect())
-      surface.blit(textCurrLevel.getText(), textCurrLevel.getRect())
-      surface.blit(textBlind.getText(), textBlind.getRect())
-      surface.blit(textTEXTBlind.getText(), textTEXTBlind.getRect())
-      surface.blit(textTEXTBBAnte.getText(), textTEXTBBAnte.getRect())
-      surface.blit(textBBAnte.getText(), textBBAnte.getRect())
-      surface.blit(textTEXTPlayer.getText(), textTEXTPlayer.getRect())
       if flagPlayer:
         pygame.draw.rect(surface, PALEGRAY, textPlayernum.getRect())
-      surface.blit(textPlayernum.getText(), textPlayernum.getRect())
-      surface.blit(textAverage.getText(), textAverage.getRect())
       if flagAverage:
         pygame.draw.rect(surface, PALEGRAY, textAveragenum.getRect())
-      surface.blit(textAveragenum.getText(), textAveragenum.getRect())
-      surface.blit(textChipsinplay.getText(), textChipsinplay.getRect())
       if flagChips:
         pygame.draw.rect(surface, PALEGRAY, textChipsinplaynum.getRect())
-      surface.blit(textChipsinplaynum.getText(), textChipsinplaynum.getRect())
-      surface.blit(textEntries.getText(), textEntries.getRect())
       if flagEntries:
         pygame.draw.rect(surface, PALEGRAY, textEntriesnum.getRect())
-      surface.blit(textEntriesnum.getText(), textEntriesnum.getRect())
-      surface.blit(textStartingstack.getText(), textStartingstack.getRect())
-      surface.blit(textTimeBreak.getText(), textTimeBreak.getRect())
-      surface.blit(textTimeBreaknum.getText(), textTimeBreaknum.getRect())
       if flagStarting:
         pygame.draw.rect(surface, PALEGRAY, textStartingstacknum.getRect())
-      surface.blit(textStartingstacknum.getText(), textStartingstacknum.getRect())
-      surface.blit(textNextLevel.getText(), textNextLevel.getRect())
-      surface.blit(textNextBlind.getText(), textNextBlind.getRect())
-      surface.blit(textNextBBAnte.getText(), textNextBBAnte.getRect())
-      surface.blit(textNextBlindnum.getText(), textNextBlindnum.getRect())
-      surface.blit(textNextBBAntenum.getText(), textNextBBAntenum.getRect())
+      blitText(surface, textMainTimer, textTitleTournament, textCurrLevel, textBlind, textTEXTBlind, textTEXTBBAnte, textBBAnte, textTEXTPlayer, textPlayernum, textAverage, textAveragenum, textChipsinplay, textChipsinplaynum, textEntries, textEntriesnum, textStartingstack, textStartingstacknum, textTimeBreak, textTimeBreaknum, textNextLevel, textNextBlind, textNextBBAnte, textNextBlindnum, textNextBBAntenum)
       pygame.draw.rect(surface, WHITE, rectMainTimer, width=3)
-      #pygame.draw.rect(surface, RED, rectMidPoint)
       pygame.draw.rect(surface, WHITE, rectCurrBlind, width=3)
-      #pygame.draw.rect(surface, WHITE, rectPause)
       pygame.draw.rect(surface, RED, rectPauseline, width=5)
       pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
       surface.blit(pauseBox, rectPause)
@@ -578,6 +517,8 @@ def main(lstBLINDS, lstLevels,title):
           textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
           strBreakTimer = makeTimerString(min_break,sec_break,total)
           textTimeBreaknum.changeContent(font = fontSideNum, content = strBreakTimer)
+        if event.key == K_LEFT: # 1분 당기기
+          pass
       elif event.type == MOUSEBUTTONDOWN:
           position = pygame.mouse.get_pos()
           temp_input = 0
@@ -619,18 +560,18 @@ def main(lstBLINDS, lstLevels,title):
         currLevel = newLevel
         try:
           if LSTLEVELS[currLevel]==0: ### End of blind
-                while running:
-                  textPause.changeContent(font = fontPause, content = "No more blinds")
-                  pygame.draw.rect(surface, RED, rectPauseline, width=5)
-                  pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
-                  surface.blit(pauseBox, rectPause)
-                  surface.blit(textPause.getText(), textPause.getRect())
-                  pygame.display.flip()
-                  time.sleep(0.1)
-                  for event in pygame.event.get():
-                    if event.type == KEYDOWN:
-                      if event.key == ord('q'):
-                        running = False
+            while running:
+              textPause.changeContent(font = fontPause, content = "No more blinds")
+              pygame.draw.rect(surface, RED, rectPauseline, width=5)
+              pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
+              surface.blit(pauseBox, rectPause)
+              surface.blit(textPause.getText(), textPause.getRect())
+              pygame.display.flip()
+              time.sleep(0.1)
+              for event in pygame.event.get():
+                if event.type == KEYDOWN:
+                  if event.key == ord('q'):
+                    running = False
           if LSTBLINDS[currLevel][0] == 0: #Break
             cntBreak+=1
             textCurrLevel.changeColor(BRIGHTRED)
@@ -674,7 +615,18 @@ def main(lstBLINDS, lstLevels,title):
       strBreakTimer = makeTimerString(min_break,sec_break,total)
       textTimeBreaknum.changeContent(font = fontSideNum, content = strBreakTimer)
     surface.blit(imgBackground,(0,0))
-    surface.blit(textMainTimer.getText(), textMainTimer.getRect())
+    if flagPlayer:
+      pygame.draw.rect(surface, PALEGRAY, textPlayernum.getRect())
+    if flagStarting:
+      pygame.draw.rect(surface, PALEGRAY, textStartingstacknum.getRect())
+    if flagEntries:
+      pygame.draw.rect(surface, PALEGRAY, textEntriesnum.getRect())
+    if flagChips:
+      pygame.draw.rect(surface, PALEGRAY, textChipsinplaynum.getRect())
+    if flagAverage:
+      pygame.draw.rect(surface, PALEGRAY, textAveragenum.getRect())
+    blitText(surface, textMainTimer, textTitleTournament,textCurrLevel,textBlind,textTEXTBlind,textTEXTBBAnte,textBBAnte,textTEXTPlayer,textPlayernum,textAverage,textAveragenum,textChipsinplay,textChipsinplaynum,textEntries,textEntriesnum,textStartingstack,textTimeBreak,textTimeBreaknum,textStartingstacknum,textNextLevel,textNextBlind,textNextBBAnte,textNextBBAntenum,textNextBlindnum)
+    '''surface.blit(textMainTimer.getText(), textMainTimer.getRect())
     surface.blit(textTitleTournament.getText(), textTitleTournament.getRect())
     surface.blit(textCurrLevel.getText(), textCurrLevel.getRect())
     surface.blit(textBlind.getText(), textBlind.getRect())
@@ -682,38 +634,30 @@ def main(lstBLINDS, lstLevels,title):
     surface.blit(textTEXTBBAnte.getText(), textTEXTBBAnte.getRect())
     surface.blit(textBBAnte.getText(), textBBAnte.getRect())
     surface.blit(textTEXTPlayer.getText(), textTEXTPlayer.getRect())
-    if flagPlayer:
-      pygame.draw.rect(surface, PALEGRAY, textPlayernum.getRect())
     surface.blit(textPlayernum.getText(), textPlayernum.getRect())
     surface.blit(textAverage.getText(), textAverage.getRect())
-    if flagAverage:
-      pygame.draw.rect(surface, PALEGRAY, textAveragenum.getRect())
+    
     surface.blit(textAveragenum.getText(), textAveragenum.getRect())
     surface.blit(textChipsinplay.getText(), textChipsinplay.getRect())
-    if flagChips:
-      pygame.draw.rect(surface, PALEGRAY, textChipsinplaynum.getRect())
+    
     surface.blit(textChipsinplaynum.getText(), textChipsinplaynum.getRect())
     surface.blit(textEntries.getText(), textEntries.getRect())
-    if flagEntries:
-      pygame.draw.rect(surface, PALEGRAY, textEntriesnum.getRect())
     surface.blit(textEntriesnum.getText(), textEntriesnum.getRect())
     surface.blit(textStartingstack.getText(), textStartingstack.getRect())
     surface.blit(textTimeBreak.getText(), textTimeBreak.getRect())
     surface.blit(textTimeBreaknum.getText(), textTimeBreaknum.getRect())
-    if flagStarting:
-      pygame.draw.rect(surface, PALEGRAY, textStartingstacknum.getRect())
+    
     surface.blit(textStartingstacknum.getText(), textStartingstacknum.getRect())
     surface.blit(textNextLevel.getText(), textNextLevel.getRect())
     surface.blit(textNextBlind.getText(), textNextBlind.getRect())
     surface.blit(textNextBBAnte.getText(), textNextBBAnte.getRect())
     surface.blit(textNextBlindnum.getText(), textNextBlindnum.getRect())
-    surface.blit(textNextBBAntenum.getText(), textNextBBAntenum.getRect())
+    surface.blit(textNextBBAntenum.getText(), textNextBBAntenum.getRect())'''
     pygame.draw.rect(surface, WHITE, rectMainTimer, width=3)
-    #pygame.draw.rect(surface, RED, rectMidPoint)
     pygame.draw.rect(surface, WHITE, rectCurrBlind, width=3)
     pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
     pygame.display.flip()
     time.sleep(0.05)
   soundLevelup.stop()
   pygame.quit()
-#main()
+#### End of main function
