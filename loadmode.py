@@ -7,8 +7,6 @@ import timer
 from ClassObjs import *
 import tkinter as tk
 
-K_NUM = [K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9, K_KP0, K_KP1, K_KP2, K_KP3, K_KP4, K_KP5, K_KP6, K_KP7, K_KP8, K_KP9]
-
 WHITE = (255,255,255)
 BLACK = (0,0,0)
 PALEGRAY = (150,150,150)
@@ -29,32 +27,6 @@ TK_VAL = False
 def mouseInRect(rectObj, position):
   return rectObj.left <= position[0] <= rectObj.right and rectObj.top <= position[1]<= rectObj.bottom
 
-def processAscii(key):
-  if key in [K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9]:
-    return int(key) - 48
-  elif key == K_KP0:
-    return 0
-  elif key == K_KP1:
-    return 1
-  elif key == K_KP2:
-    return 2
-  elif key == K_KP3:
-    return 3
-  elif key == K_KP4:
-    return 4
-  elif key == K_KP5:
-    return 5
-  elif key == K_KP6:
-    return 6
-  elif key == K_KP7:
-    return 7
-  elif key == K_KP8:
-    return 8
-  elif key == K_KP9:
-    return 9
-  else:
-    return 0
-#### End of processAscii
   
 def confirmQuit():
   window = tk.Tk()

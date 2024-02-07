@@ -8,10 +8,7 @@ from ClassObjs import *
 import datetime
 import tkinter as tk
 
-K_NUM = [K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9, K_KP0, K_KP1, K_KP2, K_KP3, K_KP4, K_KP5, K_KP6, K_KP7, K_KP8, K_KP9]
-BANNED = ["\\", "/", ":", "*", "?", "<", ">", "\"", "|", "left ctrl", "right ctrl", "tab", "`", "+"]
-SHIFT = ["left shift", "right shift"]
-STRNUM = ["1", "2", "3","4","5","6","7","8","9","0"]
+
 
 WHITE = (255,255,255)
 BLACK = (0,0,0)
@@ -103,6 +100,8 @@ def main_save():
     title = ""
     flagNext = False
     objControl = None
+    selectedIdx = -1
+    temp_input = 0
 
     while running:
       if TK_VAL:
@@ -159,6 +158,7 @@ def main_save():
                 else:
                   title = tempstr
                   flagNext = True
+                  lstBoxs = [[2, [plusBox], [textPlus], 0]] # PlusBox가 항상 마지막 인덱스
 
         screen.blit(imgBackground, (0,0))
         pygame.draw.rect(screen, PALEGRAY, rectNext)
@@ -172,12 +172,20 @@ def main_save():
 
       else: ############################################################## 제목 입력 끝난 다음
         objControl = BlindFile()
-        ### box = [isbreak,[rectBoxs], [lvl, dur, bb, sb, ante]]   Break이면 isBreak 0, lvl이면 1 기타(Plus 등)는 2
-        lstBoxs = [[2, [plusBox], [textPlus]]] # PlusBox가 항상 마지막 인덱스
+        ### box = [isbreak,[rectBoxs], [lvl, dur, bb, sb, ante], clickedIdx]   Break이면 isBreak 0, lvl이면 1 기타(Plus 등)는 2
         for event in pygame.event.get():
           if event.type == KEYDOWN:
             if event.key == ord('q'):
               confirmQuit()
+            elif event.key in K_NUM or event.key == K_BACKSPACE:
+              if selectedIdx != -1:
+                temp_input = (temp_input*10 + processAscii(event.key)) if (event.key in K_NUM) else (temp_input//10)
+                lstBoxs[selectedIdx][2][lstBoxs[selectedIdx][3]].changeContent(font = fontBox, content = str(temp_input))
+            elif pygame.key.name(event.key) == "return" or pygame.key.name(event.key) == "enter":
+              if selectedIdx != -1:
+                lstBoxs[selectedIdx][3] = 0
+                selectedIdx = -1
+                temp_input = 0
           if event.type == MOUSEBUTTONDOWN:
             position = pygame.mouse.get_pos()
             if event.button == 4 or event.button == 5:
@@ -193,7 +201,11 @@ def main_save():
                   for textObj in lstObj[2]:
                     textObj.changePosition(relative = "top", position = (textObj.getRect().centerx, textObj.getRect().top + f*round(SCRLLFACTOR / screenScale))) 
             if event.button == 1:
-              if mouseInRect(rectNext, position):
+              if selectedIdx != -1:
+                lstBoxs[selectedIdx][3] = 0
+                selectedIdx = -1
+                temp_input = 0
+              elif mouseInRect(rectNext, position):
                 print("Next")
                 '''
                 해야함
@@ -208,83 +220,86 @@ def main_save():
                 flagShift = False
                 textEntryTitle.changeContent(font = fontEntry, content = "Enter the Title")
                 textEntryTitle.changeColor(PALEGRAY)
-              elif mouseInRect(lstBoxs[-1][1][0], position): ### plusBox 누른경우
-                pass
                 '''
                 해야함
 
                 '''
-              '''else: # 글자 클릭했는지 확인
+              else: # 글자 클릭했는지 확인
                 
                 cntBreak, cntLvl = 0, 0
-                #tempLst2 = [isbreak,[tempBox], [lvl, dur, bb, sb, ante]]
-                cntIdx = 0
+                #tempLst2 = [isbreak,[tempBox], [lvl, dur, bb, sb, ante], clickedIdx]
                 for i in range(len(lstBoxs)):
-                  if lstBoxs[0] == 0:
+                  if lstBoxs[i][0] == 0:
                     cntBreak+=1
-                  elif lstBoxs[0] == 1:
+                  elif lstBoxs[i][0] == 1:
                     cntLvl+=1
                     lstBoxs[i][2][0].changeContent(font = fontBox, content = str(cntLvl))
                   if 120/screenScale<lstBoxs[i][1][0].bottom<(CUTLINE)/screenScale: # 화면 안에 나오는 애들 중
                     if lstBoxs[i][0] == 0: #break인 경우
-                      if mouseInRect(lstBoxs[i][1][0].getRect(), position):
+                      if mouseInRect(lstBoxs[i][2][0].getRect(), position):
                         cntLvl+=1
-                        lstBoxs[i][1][0].changeContent(font = fontBox, content = str(cntLvl))
-                        lstBoxs[i][0] = 1 ###여까지함
-                        objControl.changeBlinds(cntIdx, False)
-                        ### 작업 해야 함
-                    else: # Level인 경우
-                      if mouseInRect(boxblinds[1][1].getRect(), position): # Lvl
+                        lstBoxs[i][2][0].changeContent(font = fontBox, content = str(cntLvl))
+                        lstBoxs[i][0] = 1
+                    elif lstBoxs[i][0] == 1: # Level인 경우
+                      if mouseInRect(lstBoxs[i][2][0].getRect(), position): # Lvl
                         cntBreak+=1
-                        boxblinds[1][1].changeContent(font = fontBox, content = "Break")
-                        for i in range(3):
-                          boxblinds[1][i+3].changeContent(font = fontBox, content = "0")
-                        boxblinds[0] = 0
-                        objControl.changeBlinds(cntIdx, True)
+                        lstBoxs[i][2][0].changeContent(font = fontBox, content = "Break")
+                        for j in range(3):
+                          lstBoxs[i][2][j+2].changeContent(font = fontBox, content = "0")
+                        lstBoxs[i][0] = 0
                         cntLvl-=1
-                      elif mouseInRect(boxblinds[1][2].getRect(), position): # Duration
-                        boxblinds[2] = 2
-                        selectedIdx = cntIdx
-                      elif mouseInRect(boxblinds[1][3].getRect(), position): # bb
-                        boxblinds[2] = 3
-                        selectedIdx = cntIdx
-                      elif mouseInRect(boxblinds[1][4].getRect(), position): # sb
-                        boxblinds[2] = 4
-                        selectedIdx = cntIdx
-                      elif mouseInRect(boxblinds[1][5].getRect(), position): # ante
-                        boxblinds[2] = 5
-                        selectedIdx = cntIdx
-                  cntIdx += 1
-                if 120/screenScale<plusBox.bottom<(CUTLINE)/screenScale:
-                  if mouseInRect(plusBox, position):
-                    tempBox = pygame.Rect(0,0,round(900/screenScale),round(50/screenScale))
-                    tempBox.center = plusBox.center
-                    lvl = TextObj(font = fontBox, content=str(cntLvl+1), color=BLACK, relative="center", position=(midpoint[0] - round(400/screenScale), tempBox.centery))
-                    dur = TextObj(font = fontBox, content='10', color=BLACK, relative="center", position=(midpoint[0] + round(300/screenScale), tempBox.centery))
-                    bb = TextObj(font = fontBox, content='0', color=BLACK, relative="center", position=(midpoint[0] - round(225/screenScale), tempBox.centery))
+                      elif mouseInRect(lstBoxs[i][2][1].getRect(), position): # Duration
+                        lstBoxs[i][3] = 1
+                        selectedIdx = i
+                      elif mouseInRect(lstBoxs[i][2][2].getRect(), position): # bb
+                        lstBoxs[i][3] = 2
+                        selectedIdx = i
+                      elif mouseInRect(lstBoxs[i][2][3].getRect(), position): # sb
+                        lstBoxs[i][3] = 3
+                        selectedIdx = i
+                      elif mouseInRect(lstBoxs[i][2][4].getRect(), position): # ante
+                        lstBoxs[i][3] = 4
+                        selectedIdx = i
+                    else: # PlusBox
+                      if 120/screenScale<lstBoxs[i][1][0].bottom<(CUTLINE)/screenScale and mouseInRect(lstBoxs[i][1][0], position):
+                        tempBox = pygame.Rect(0,0,round(900/screenScale),round(50/screenScale))
+                        tempBox.center = lstBoxs[i][1][0].center
+                        lvl = TextObj(font = fontBox, content=str(cntLvl+1), color=BLACK, relative="center", position=(midpoint[0] - round(400/screenScale), tempBox.centery))
+                        dur = TextObj(font = fontBox, content='10', color=BLACK, relative="center", position=(midpoint[0] + round(300/screenScale), tempBox.centery))
+                        bb = TextObj(font = fontBox, content='0', color=BLACK, relative="center", position=(midpoint[0] - round(225/screenScale), tempBox.centery))
 
-                    sb = TextObj(font = fontBox, content='0', color=BLACK, relative="center", position=(midpoint[0] - round(50/screenScale), tempBox.centery))
-                    ante = TextObj(font = fontBox, content='0', color=BLACK, relative="center", position=(midpoint[0] + round(125/screenScale), tempBox.centery))
-                    lstBoxBlinds.append([1,[tempBox, lvl, dur, bb, sb, ante], 0])
-                    plusBox.top = plusBox.top + BLINDINTERVAL/screenScale
-                    textPlus.changePosition(relative="top", position=(textPlus.getRect().centerx,textPlus.getRect().top + BLINDINTERVAL/screenScale))
-                    objControl.addLevel()'''
+                        sb = TextObj(font = fontBox, content='0', color=BLACK, relative="center", position=(midpoint[0] - round(50/screenScale), tempBox.centery))
+                        ante = TextObj(font = fontBox, content='0', color=BLACK, relative="center", position=(midpoint[0] + round(125/screenScale), tempBox.centery))
+                        lstBoxs[i][1][0].top = lstBoxs[i][1][0].top + BLINDINTERVAL/screenScale
+                        lstBoxs[i][2][0].changePosition(relative="top", position=(lstBoxs[i][2][0].getRect().centerx,lstBoxs[i][2][0].getRect().top + BLINDINTERVAL/screenScale))
+                        templst = lstBoxs.pop()
+                        lstBoxs.append([1,[tempBox], [lvl, dur, bb, sb, ante], 0])
+                        lstBoxs.append(templst)
         screen.blit(imgBackground, (0,0))
         pygame.draw.rect(screen, PALEGRAY, rectNext)
         pygame.draw.rect(screen, GRAY, rectNext, width = 4)
         pygame.draw.rect(screen, PALEGRAY, rectBack)
         pygame.draw.rect(screen, GRAY, rectBack, width = 4)
         blitText(screen, textNext, textBack)
+        for i in range(len(lstBoxs)):
+          if 120/screenScale<lstBoxs[i][1][0].bottom<(CUTLINE)/screenScale:
+            
+            if lstBoxs[i][0] == 0:
+              pygame.draw.rect(screen, WHITE, lstBoxs[i][1][0])
+              pygame.draw.rect(screen, BLACK, lstBoxs[i][1][0], width=4)
+              screen.blit(lstBoxs[i][2][0].getText(), lstBoxs[i][2][0].getRect())
+            else:
+              for rect in lstBoxs[i][1]:
+                pygame.draw.rect(screen, GRAY, rect)
+                pygame.draw.rect(screen, BLACK, rect, width=4)
+              for text in lstBoxs[i][2]:
+                screen.blit(text.getText(), text.getRect())
+              if lstBoxs[i][3] != 0: # 무언가 클릭됐을 때
+                pygame.draw.rect(screen, WHITE, lstBoxs[i][2][lstBoxs[i][3]].getRect())
+                blitText(screen, lstBoxs[i][2][lstBoxs[i][3]])
         pygame.draw.rect(screen, DARKGRAY, rectSettings)
         pygame.draw.line(screen, BLACK, (0,round(120/screenScale)), (round(2200/screenScale),round(120/screenScale)), width=5)
         pygame.draw.line(screen,WHITE, (0,round(CUTLINE/screenScale)), (round(2048/screenScale),round(CUTLINE/screenScale)))
-        for i in range(len(lstBoxs)):
-          if 120/screenScale<lstBoxs[i][1][0].bottom<(CUTLINE)/screenScale:
-            for rect in lstBoxs[i][1]:
-              pygame.draw.rect(screen, GRAY, rect)
-              pygame.draw.rect(screen, BLACK, rect, width=4)
-            for text in lstBoxs[i][2]:
-              screen.blit(text.getText(), text.getRect())
         blitText(screen, textSettingLevel, textSettingBB, textSettingAnte, textSettingDur, textSettingSB, textPlus)
         pygame.display.flip()
 

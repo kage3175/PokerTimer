@@ -1,4 +1,9 @@
+from pygame.locals import *
 
+K_NUM = [K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9, K_KP0, K_KP1, K_KP2, K_KP3, K_KP4, K_KP5, K_KP6, K_KP7, K_KP8, K_KP9]
+BANNED = ["\\", "/", ":", "*", "?", "<", ">", "\"", "|", "left ctrl", "right ctrl", "tab", "`", "+", "up", "down", "right", "left", "enter"]
+SHIFT = ["left shift", "right shift"]
+STRNUM = ["1", "2", "3","4","5","6","7","8","9","0"]
 
 class TextObj:
   def __init__(self, font, content = "",position = (0,0), relative = "topleft", color = (0,0,0)) -> None:
@@ -135,6 +140,9 @@ class BlindFile:
     #### lstInfo = [Dur, BB, SB, Ante]
     self.lstBlinds.append([1,10,0,0,0])
     self.numBlinds += 1
+  def appendLevel(self, lstInfo):
+    self.lstBlinds.append(lstInfo)
+    self.numBlinds += 1
   def deleteLevel(self, idx):
     try:
       self.lstBlinds.pop(idx)
@@ -175,3 +183,30 @@ def updateFile(objControl):
   print("("+str(templst[i][0])+","+str(templst[i][1])+","+str(templst[i][2])+","+str(templst[i][3])+ ","+str(templst[i][4])+")",end="", file=outfile)
   outfile.close()
 #### End of updateFile function
+  
+def processAscii(key):
+  if key in [K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9]:
+    return int(key) - 48
+  elif key == K_KP0:
+    return 0
+  elif key == K_KP1:
+    return 1
+  elif key == K_KP2:
+    return 2
+  elif key == K_KP3:
+    return 3
+  elif key == K_KP4:
+    return 4
+  elif key == K_KP5:
+    return 5
+  elif key == K_KP6:
+    return 6
+  elif key == K_KP7:
+    return 7
+  elif key == K_KP8:
+    return 8
+  elif key == K_KP9:
+    return 9
+  else:
+    return 0
+#### End of processAscii
