@@ -626,33 +626,6 @@ def main(lstBLINDS, lstLevels,title):
     if flagAverage:
       pygame.draw.rect(surface, PALEGRAY, textAveragenum.getRect())
     blitText(surface, textMainTimer, textTitleTournament,textCurrLevel,textBlind,textTEXTBlind,textTEXTBBAnte,textBBAnte,textTEXTPlayer,textPlayernum,textAverage,textAveragenum,textChipsinplay,textChipsinplaynum,textEntries,textEntriesnum,textStartingstack,textTimeBreak,textTimeBreaknum,textStartingstacknum,textNextLevel,textNextBlind,textNextBBAnte,textNextBBAntenum,textNextBlindnum)
-    '''surface.blit(textMainTimer.getText(), textMainTimer.getRect())
-    surface.blit(textTitleTournament.getText(), textTitleTournament.getRect())
-    surface.blit(textCurrLevel.getText(), textCurrLevel.getRect())
-    surface.blit(textBlind.getText(), textBlind.getRect())
-    surface.blit(textTEXTBlind.getText(), textTEXTBlind.getRect())
-    surface.blit(textTEXTBBAnte.getText(), textTEXTBBAnte.getRect())
-    surface.blit(textBBAnte.getText(), textBBAnte.getRect())
-    surface.blit(textTEXTPlayer.getText(), textTEXTPlayer.getRect())
-    surface.blit(textPlayernum.getText(), textPlayernum.getRect())
-    surface.blit(textAverage.getText(), textAverage.getRect())
-    
-    surface.blit(textAveragenum.getText(), textAveragenum.getRect())
-    surface.blit(textChipsinplay.getText(), textChipsinplay.getRect())
-    
-    surface.blit(textChipsinplaynum.getText(), textChipsinplaynum.getRect())
-    surface.blit(textEntries.getText(), textEntries.getRect())
-    surface.blit(textEntriesnum.getText(), textEntriesnum.getRect())
-    surface.blit(textStartingstack.getText(), textStartingstack.getRect())
-    surface.blit(textTimeBreak.getText(), textTimeBreak.getRect())
-    surface.blit(textTimeBreaknum.getText(), textTimeBreaknum.getRect())
-    
-    surface.blit(textStartingstacknum.getText(), textStartingstacknum.getRect())
-    surface.blit(textNextLevel.getText(), textNextLevel.getRect())
-    surface.blit(textNextBlind.getText(), textNextBlind.getRect())
-    surface.blit(textNextBBAnte.getText(), textNextBBAnte.getRect())
-    surface.blit(textNextBlindnum.getText(), textNextBlindnum.getRect())
-    surface.blit(textNextBBAntenum.getText(), textNextBBAntenum.getRect())'''
     pygame.draw.rect(surface, WHITE, rectMainTimer, width=3)
     pygame.draw.rect(surface, WHITE, rectCurrBlind, width=3)
     pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)

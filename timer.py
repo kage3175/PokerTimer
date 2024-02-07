@@ -60,15 +60,20 @@ def makeTimerString(min, sec, total):
 
 def levelupdate(minute, second, total, amount, currLevel, soundlvlup, updown):
   global LSTLEVELS, LSTBLINDS
+  amount_min = -amount // 60
   soundlvlup.play()
-  level = currLevel+updown
-  if updown > 0:
+  level = (currLevel+updown) if (currLevel+updown >= 0) else (0)
+  if updown > 0: # RIGHT 키 눌러서 다음 블라인드로 넘어갈 때
     min, sec, tot = minute + LSTLEVELS[level], second, total + LSTLEVELS[level] * 60
     min -= 1
     sec = second + 60 - amount
     tot -= amount
   else:
-    min, sec = minute + LSTLEVELS[level] + updown, second
+    if level == 0: ## 최초 레벨일 때
+      min, sec = LSTLEVELS[1], 0
+      level = 1
+    else:
+      min, sec = amount_min - 1, second
     tot = min*60+sec
   return min, sec,tot,level
 #### End of levelupdate function
@@ -455,25 +460,25 @@ def main(lstBLINDS, lstLevels,title):
             textStartingstacknum.changeContent(font = fontSideNum, content = format(numStarting, ","))
           temp_input = 0
           flagPlayer, flagAverage, flagChips, flagEntries, flagStarting = False, False,False,False,False
-        if event.key == K_RIGHT: ### 1분 뒤로
-          #print(currLevel)
-          min, sec, total, newLevel, min_break, sec_break = timeupdate(min, sec, total, 60, currLevel, soundLevelup,lstBreakIdx)
+        if event.key == K_RIGHT or event.key == K_LEFT: ### 1분 뒤로
+          factor = 60 if event.key == K_RIGHT else -60
+          min, sec, total, newLevel, min_break, sec_break = timeupdate(min, sec, total, factor, currLevel, soundLevelup,lstBreakIdx)
           if newLevel != currLevel:
             currLevel = newLevel
             if LSTLEVELS[currLevel]==0: ### End of blind
-                while running:
-                  textPause.changeContent(font = fontPause, content = "No more blinds")
-                  pygame.draw.rect(surface, RED, rectPauseline, width=5)
-                  pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
-                  surface.blit(pauseBox, rectPause)
-                  surface.blit(textPause.getText(), textPause.getRect())
-                  pygame.display.flip()
-                  for event in pygame.event.get():
-                    if event.type == KEYDOWN:
-                      if event.key == ord('q'):
-                        currLevel-=1
-                        running = False
-                  time.sleep(0.1)
+              while running:
+                textPause.changeContent(font = fontPause, content = "No more blinds")
+                pygame.draw.rect(surface, RED, rectPauseline, width=5)
+                pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
+                surface.blit(pauseBox, rectPause)
+                surface.blit(textPause.getText(), textPause.getRect())
+                pygame.display.flip()
+                for event in pygame.event.get():
+                  if event.type == KEYDOWN:
+                    if event.key == ord('q'):
+                      currLevel-=1
+                      running = False
+                time.sleep(0.1)
             try:
               if LSTBLINDS[currLevel][0] == 0:
                 cntBreak+=1
@@ -481,17 +486,6 @@ def main(lstBLINDS, lstLevels,title):
                 textCurrLevel.changeContent(font = fontTitleTournament, content = "Break")
                 textBlind.changeContent(font = fontBlind, content = "- / -")
                 textBBAnte.changeContent(font = fontBlind, content = "-")
-                if LSTBLINDS[currLevel+1][0] == 0:
-                  temp_str1 = "- / -"
-                  temp_str = "-"
-                else:
-                  temp_str1 = format(LSTBLINDS[currLevel+1][0], ",") + " / " + format(LSTBLINDS[currLevel+1][1], ",")
-                  if LSTBLINDS[currLevel+1][2] != 0:
-                    temp_str = format(LSTBLINDS[currLevel+1][2], ",")
-                  else:
-                    temp_str = "-"
-                textNextBlindnum.changeContent(font = fontNextLevelnum, content = temp_str1)
-                textNextBBAntenum.changeContent(font = fontNextLevelnum, content = temp_str)
               else:
                 textCurrLevel.changeContent(font = fontTitleTournament, content = 'Level '+str(currLevel-cntBreak))
                 textBlind.changeContent(font = fontBlind, content = format(LSTBLINDS[currLevel][0], ",")+" / "+format(LSTBLINDS[currLevel][1], ","))
@@ -500,25 +494,24 @@ def main(lstBLINDS, lstLevels,title):
                 else:
                   temp_str = "-"
                 textBBAnte.changeContent(font = fontBlind, content = temp_str)
-                if LSTBLINDS[currLevel+1][0] == 0:
-                  temp_str1 = "- / -"
-                  temp_str = "-"
+              if LSTBLINDS[currLevel+1][0] == 0:
+                temp_str1 = "- / -"
+                temp_str = "-"
+              else:
+                temp_str1 = format(LSTBLINDS[currLevel+1][0], ",") + " / " + format(LSTBLINDS[currLevel+1][1], ",")
+                if LSTBLINDS[currLevel+1][2] != 0:
+                  temp_str = format(LSTBLINDS[currLevel+1][2], ",")
                 else:
-                  temp_str1 = format(LSTBLINDS[currLevel+1][0], ",") + " / " + format(LSTBLINDS[currLevel+1][1], ",")
-                  if LSTBLINDS[currLevel+1][2] != 0:
-                    temp_str = format(LSTBLINDS[currLevel+1][2], ",")
-                  else:
-                    temp_str = "-"
-                textNextBlindnum.changeContent(font = fontNextLevelnum, content = temp_str1)
-                textNextBBAntenum.changeContent(font = fontNextLevelnum, content = temp_str)
+                  temp_str = "-"
+              textNextBlindnum.changeContent(font = fontNextLevelnum, content = temp_str1)
+              textNextBBAntenum.changeContent(font = fontNextLevelnum, content = temp_str)
             except:
               print("No levels left")
           strTimer = makeTimerString(min, sec, total)
           textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
           strBreakTimer = makeTimerString(min_break,sec_break,total)
           textTimeBreaknum.changeContent(font = fontSideNum, content = strBreakTimer)
-        if event.key == K_LEFT: # 1분 당기기
-          pass
+        
       elif event.type == MOUSEBUTTONDOWN:
           position = pygame.mouse.get_pos()
           temp_input = 0
@@ -626,33 +619,6 @@ def main(lstBLINDS, lstLevels,title):
     if flagAverage:
       pygame.draw.rect(surface, PALEGRAY, textAveragenum.getRect())
     blitText(surface, textMainTimer, textTitleTournament,textCurrLevel,textBlind,textTEXTBlind,textTEXTBBAnte,textBBAnte,textTEXTPlayer,textPlayernum,textAverage,textAveragenum,textChipsinplay,textChipsinplaynum,textEntries,textEntriesnum,textStartingstack,textTimeBreak,textTimeBreaknum,textStartingstacknum,textNextLevel,textNextBlind,textNextBBAnte,textNextBBAntenum,textNextBlindnum)
-    '''surface.blit(textMainTimer.getText(), textMainTimer.getRect())
-    surface.blit(textTitleTournament.getText(), textTitleTournament.getRect())
-    surface.blit(textCurrLevel.getText(), textCurrLevel.getRect())
-    surface.blit(textBlind.getText(), textBlind.getRect())
-    surface.blit(textTEXTBlind.getText(), textTEXTBlind.getRect())
-    surface.blit(textTEXTBBAnte.getText(), textTEXTBBAnte.getRect())
-    surface.blit(textBBAnte.getText(), textBBAnte.getRect())
-    surface.blit(textTEXTPlayer.getText(), textTEXTPlayer.getRect())
-    surface.blit(textPlayernum.getText(), textPlayernum.getRect())
-    surface.blit(textAverage.getText(), textAverage.getRect())
-    
-    surface.blit(textAveragenum.getText(), textAveragenum.getRect())
-    surface.blit(textChipsinplay.getText(), textChipsinplay.getRect())
-    
-    surface.blit(textChipsinplaynum.getText(), textChipsinplaynum.getRect())
-    surface.blit(textEntries.getText(), textEntries.getRect())
-    surface.blit(textEntriesnum.getText(), textEntriesnum.getRect())
-    surface.blit(textStartingstack.getText(), textStartingstack.getRect())
-    surface.blit(textTimeBreak.getText(), textTimeBreak.getRect())
-    surface.blit(textTimeBreaknum.getText(), textTimeBreaknum.getRect())
-    
-    surface.blit(textStartingstacknum.getText(), textStartingstacknum.getRect())
-    surface.blit(textNextLevel.getText(), textNextLevel.getRect())
-    surface.blit(textNextBlind.getText(), textNextBlind.getRect())
-    surface.blit(textNextBBAnte.getText(), textNextBBAnte.getRect())
-    surface.blit(textNextBlindnum.getText(), textNextBlindnum.getRect())
-    surface.blit(textNextBBAntenum.getText(), textNextBBAntenum.getRect())'''
     pygame.draw.rect(surface, WHITE, rectMainTimer, width=3)
     pygame.draw.rect(surface, WHITE, rectCurrBlind, width=3)
     pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
