@@ -525,7 +525,11 @@ def main_load():
   if gotomain:
     return True
   elif flagTimer:
-    timer.main(lstBlind, lstLevel, title)
+    r = True
+    while r:
+      flag = timer.main(lstBlind, lstLevel, title, True)
+      if flag == 0:
+        r = False
   else: 
     return False
   

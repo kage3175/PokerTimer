@@ -84,7 +84,7 @@ def blitText(surface, *textobjs):
   pass
 #### End of blitText function
 
-def main(lstBLINDS, lstLevels,title):
+def main(lstBLINDS, lstLevels,title, isLoad):
   global LSTLEVELS, LSTBLINDS
   LSTLEVELS = lstLevels
   LSTLEVELS.append(100)
@@ -206,6 +206,7 @@ def main(lstBLINDS, lstLevels,title):
   pauseEvent = True
   pause_start = time.time()
   pause_time = 0
+  flagback = "quit"
 
   while running:
     if pauseEvent:
@@ -430,6 +431,11 @@ def main(lstBLINDS, lstLevels,title):
             elif flagStarting:
               textStartingstacknum.changeColor(BLACK)
               textStartingstacknum.changeContent(font = fontSideNum, content = format(temp_input, ","))
+          elif event.key == K_BACKSPACE:
+            if isLoad:
+              flagback = "load"
+            else:
+              flagback = "save"
         if event.key == K_RETURN:
           if flagPlayer:
             numPlayer = temp_input
@@ -626,4 +632,10 @@ def main(lstBLINDS, lstLevels,title):
     time.sleep(0.05)
   soundLevelup.stop()
   pygame.quit()
+  if flagback == "load":
+    return 1
+  elif flagback == "save":
+    return 2
+  else:
+    return 0
 #### End of main function
