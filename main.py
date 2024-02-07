@@ -3,11 +3,32 @@ import pygame
 import ctypes
 from pygame.locals import *
 import loadmode, savemode
+import tkinter as tk
 
 WHITE = (255,255,255)
 BLACK = (0,0,0)
 PALEGRAY = (150,150,150)
 GRAY = (200,200,200)
+TK_VAL = False
+
+def confirmQuit():
+  window = tk.Tk()
+  window.title('Quit?')
+  window.geometry("500x160+200+200")
+  window.configure(bg = 'white')
+  window.resizable(False, False)
+  label = tk.Label(window, font = ("Arial", 25), bg = 'white', text = "Are you sure to Quit?")
+  label.place(x=100, y=20)
+  yesB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "Yes", command = lambda: close_window(window, True))
+  yesB.place(x = 40, y = 80)
+  noB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "No", command = lambda: close_window(window, False))
+  noB.place(x = 280, y = 80)
+  window.mainloop()
+
+def close_window(window, isQuit):
+  global TK_VAL
+  TK_VAL = isQuit
+  window.destroy()
 
 
 def main():
@@ -48,19 +69,21 @@ def main():
     mode = 0
     running = True
     while running:
+      if TK_VAL:
+        running = False
+        mode = 0
+        flagRun=False
       for event in pygame.event.get():
         if event.type == KEYDOWN:
           if event.key == ord('q'):
-            running = False
-            mode = 0
-            flagRun=False
+            confirmQuit()
           elif event.key == K_SPACE:
             pass
         if event.type == MOUSEBUTTONDOWN:
           position = pygame.mouse.get_pos()
           #print(position)
           if(rectSave.left<=position[0]<=rectSave.right and rectSave.top <= position[1] <= rectSave.bottom):
-            print("Save")
+            #print("Save")
             mode = 2
             running = False
           if(rectLoad.left<=position[0]<=rectLoad.right and rectLoad.top <= position[1] <= rectLoad.bottom):

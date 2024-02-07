@@ -1,10 +1,9 @@
 import pygame
 from pygame.locals import *
 import time
-import random
 import ctypes
-import os
 from ClassObjs import TextObj
+import tkinter as tk
 
 FONTPATH = {'NGothicR' : './font/NanumGothic.ttf', 'NSquareR' : './font/NanumSquareR.ttf'}
 TESTMIN, TESTSEC, TESTTOTAL = 10,0,600
@@ -19,6 +18,8 @@ BACKGROUND = (20,20,90)
 PALEGRAY = (180,180,180)
 YELLOW = (220,220,90)
 K_NUM = [K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9]
+
+TK_VAL = False
 
 
 def timeupdate(minute, second, total, amount, currLevel, soundlvlup, lstBreakIdx):
@@ -83,6 +84,25 @@ def blitText(surface, *textobjs):
     surface.blit(text.getText(), text.getRect())
   pass
 #### End of blitText function
+
+def confirmQuit():
+  window = tk.Tk()
+  window.title('Quit?')
+  window.geometry("500x160+200+200")
+  window.configure(bg = 'white')
+  window.resizable(False, False)
+  label = tk.Label(window, font = ("Arial", 25), bg = 'white', text = "Are you sure to Quit?")
+  label.place(x=100, y=20)
+  yesB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "Yes", command = lambda: close_window(window, True))
+  yesB.place(x = 40, y = 80)
+  noB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "No", command = lambda: close_window(window, False))
+  noB.place(x = 280, y = 80)
+  window.mainloop()
+
+def close_window(window, isQuit):
+  global TK_VAL
+  TK_VAL = isQuit
+  window.destroy()
 
 def main(lstBLINDS, lstLevels,title, isLoad):
   global LSTLEVELS, LSTBLINDS
@@ -209,6 +229,9 @@ def main(lstBLINDS, lstLevels,title, isLoad):
   flagback = "quit"
 
   while running:
+    if TK_VAL:
+      running = False
+      continue
     if pauseEvent:
       flag = True
       surface.blit(imgBackground,(0,0))
@@ -245,7 +268,7 @@ def main(lstBLINDS, lstLevels,title, isLoad):
             if LSTBLINDS[currLevel][2] != 0:
               textBBAnte.changeContent(font = fontBlind, content = format(LSTBLINDS[currLevel][2], ","))
           if event.key == ord('q'):
-            running=False
+            confirmQuit()
           if event.key in K_NUM or event.key == K_BACKSPACE:
             if flagPlayer or flagEntries or flagAverage or flagChips or flagStarting:
               temp_input = (temp_input*10 + int(event.key) - 48) if (event.key in K_NUM) else (temp_input//10)
@@ -310,7 +333,7 @@ def main(lstBLINDS, lstLevels,title, isLoad):
                   for event in pygame.event.get():
                     if event.type == KEYDOWN:
                       if event.key == ord('q'):
-                        running = False
+                        confirmQuit()
                   time.sleep(0.1)
                   
               try:
@@ -402,7 +425,7 @@ def main(lstBLINDS, lstLevels,title, isLoad):
         running = False
       elif event.type == KEYDOWN:
         if event.key == ord('q'):
-          running = False
+          confirmQuit()
         if event.key == K_ESCAPE:
           surface = pygame.display.set_mode((500,500))
         if event.key == K_SPACE:
@@ -484,7 +507,7 @@ def main(lstBLINDS, lstLevels,title, isLoad):
                   if event.type == KEYDOWN:
                     if event.key == ord('q'):
                       currLevel-=1
-                      running = False
+                      confirmQuit()
                 time.sleep(0.1)
             try:
               if LSTBLINDS[currLevel][0] == 0:
@@ -571,7 +594,7 @@ def main(lstBLINDS, lstLevels,title, isLoad):
               for event in pygame.event.get():
                 if event.type == KEYDOWN:
                   if event.key == ord('q'):
-                    running = False
+                    confirmQuit()
           if LSTBLINDS[currLevel][0] == 0: #Break
             cntBreak+=1
             textCurrLevel.changeColor(BRIGHTRED)

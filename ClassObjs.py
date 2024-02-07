@@ -1,3 +1,5 @@
+
+
 class TextObj:
   def __init__(self, font, content = "",position = (0,0), relative = "topleft", color = (0,0,0)) -> None:
     self.content = content
@@ -7,6 +9,7 @@ class TextObj:
     self.relative = relative
     self.color = color
     self.clicked = False
+    self.font = font
     if relative == "topleft":
       self.rect.topleft = position
     elif relative == "center":
@@ -39,10 +42,28 @@ class TextObj:
     return self.rect
   def changeColor(self, color):
     self.color = color
+    self.text = self.font.render(self.content, True, self.color)
+    self.rect = self.text.get_rect()
+    if self.relative == "topleft":
+      self.rect.topleft = self.position
+    elif self.relative == "center":
+      self.rect.center = self.position
+    elif self.relative == "rcenter":
+      self.rect.centery = self.position[0]
+      self.rect.right = self.position[1]
+    elif self.relative == "lcenter":
+      self.rect.centery = self.position[0]
+      self.rect.left = self.position[1]
+    elif self.relative == "topright":
+      self.rect.topright = self.position
+    elif self.relative == "top":
+      self.rect.centerx = self.position[0]
+      self.rect.top = self.position[1]
   def changeContent(self, font, content = ""):
     self.content = content
     self.text = font.render(content, True, self.color)
     self.rect = self.text.get_rect()
+    self.font = font
     if self.relative == "topleft":
       self.rect.topleft = self.position
     elif self.relative == "center":
@@ -126,6 +147,10 @@ class BlindFile:
         self.lstBlinds[idx][i+2] = 0
     else:
       self.lstBlinds[idx][0] = 1
+  def setTitle(self, title):
+    self.title = title
+  def setType(self, type):
+    self.type = type
 #### End of BlindFile Class
 
 def blitText(surface, *textobjs):

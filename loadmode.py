@@ -5,6 +5,8 @@ from pygame.locals import *
 import os
 import timer
 from ClassObjs import *
+import tkinter as tk
+
 K_NUM = [K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9, K_KP0, K_KP1, K_KP2, K_KP3, K_KP4, K_KP5, K_KP6, K_KP7, K_KP8, K_KP9]
 
 WHITE = (255,255,255)
@@ -21,7 +23,8 @@ BOXHEIGHT = 210
 SCRLLFACTOR = 25
 BOXINTERVAL = 240
 BLINDINTERVAL = 60
-  
+
+TK_VAL = False
 
 def mouseInRect(rectObj, position):
   return rectObj.left <= position[0] <= rectObj.right and rectObj.top <= position[1]<= rectObj.bottom
@@ -52,8 +55,28 @@ def processAscii(key):
   else:
     return 0
 #### End of processAscii
+  
+def confirmQuit():
+  window = tk.Tk()
+  window.title('Quit?')
+  window.geometry("500x160+200+200")
+  window.configure(bg = 'white')
+  window.resizable(False, False)
+  label = tk.Label(window, font = ("Arial", 25), bg = 'white', text = "Are you sure to Quit?")
+  label.place(x=100, y=20)
+  yesB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "Yes", command = lambda: close_window(window, True))
+  yesB.place(x = 40, y = 80)
+  noB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "No", command = lambda: close_window(window, False))
+  noB.place(x = 280, y = 80)
+  window.mainloop()
+
+def close_window(window, isQuit):
+  global TK_VAL
+  TK_VAL = isQuit
+  window.destroy()
 
 def main_load():
+  global TK_VAL
   user32 = ctypes.windll.user32
   screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)  # 해상도 구하기
   midpoint = screensize[0] / 2, screensize[1] / 2 # 화면 중앙점
@@ -165,12 +188,18 @@ def main_load():
     flagFirst = False
 
     while running:
+      if TK_VAL:
+        running = False
+        gotomain = False
+        continue
       if not flagNext:
         for event in pygame.event.get():
           if event.type == KEYDOWN:
             if event.key == ord('q'):
-              running = False
-              gotomain = False
+              confirmQuit()
+              if TK_VAL:
+                running = False
+                gotomain = False
           if event.type == MOUSEBUTTONDOWN:
             if event.button == 1:# Left Click
               position = pygame.mouse.get_pos()
@@ -233,14 +262,14 @@ def main_load():
                       lstTag[i] = True
                       selected = i
                       break
-            elif event.button == 4: #scroll up
+            elif event.button == 4 and lstRectBackgrounds[-1][0].bottom >= (CUTLINE - 100)/screenScale: #scroll up
               #print("Scrllup")
               for i in range(numFile):
                 lstRectBackgrounds[i][0].top = lstRectBackgrounds[i][0].top-round(SCRLLFACTOR / screenScale)
                 lstRectBackgrounds[i][1].top = lstRectBackgrounds[i][1].top-round(SCRLLFACTOR / screenScale)
                 for j in range(3):
                   lstRectBlinds[i][j].top = lstRectBlinds[i][j].top-round(SCRLLFACTOR / screenScale)
-            elif event.button == 5:
+            elif event.button == 5 and lstRectBackgrounds[0][0].top <= 99/screenScale:
               for i in range(numFile):
                 lstRectBackgrounds[i][0].top = lstRectBackgrounds[i][0].top+round(SCRLLFACTOR / screenScale)
                 lstRectBackgrounds[i][1].top = lstRectBackgrounds[i][1].top+round(SCRLLFACTOR / screenScale)
@@ -282,8 +311,10 @@ def main_load():
           if event.type == KEYDOWN:
             #print(event.key)
             if event.key == ord('q'):
-              running = False
-              gotomain = False
+              confirmQuit()
+              if TK_VAL:
+                running = False
+                gotomain = False
             elif event.key in K_NUM or event.key == K_BACKSPACE:
               if selectedIdx != -1:
                 temp_input = (temp_input*10 + processAscii(event.key)) if (event.key in K_NUM) else (temp_input//10)
@@ -298,15 +329,20 @@ def main_load():
           ###### MOUSE BUTTON DOWN Events    
           elif event.type == MOUSEBUTTONDOWN:
             if event.button == 4 or event.button == 5:
-              f = -1 if (event.button == 5) else 1
-              
-              for boxblinds in lstBoxBlinds:
-                #tempLst2 = [isbreak,[tempBox, lvl, dur, bb, sb, ante]]
-                boxblinds[1][0].top = boxblinds[1][0].top + f*round(SCRLLFACTOR / screenScale) #박스
-                for j in range(5):
-                  boxblinds[1][j+1].changePosition(relative = "top", position = (boxblinds[1][j+1].getRect().centerx, boxblinds[1][j+1].getRect().top + f*round(SCRLLFACTOR / screenScale))) 
-              plusBox.top = plusBox.top + f*round(SCRLLFACTOR / screenScale)
-              textPlus.changePosition(relative = "top", position=(textPlus.getRect().centerx, textPlus.getRect().top + f*round(SCRLLFACTOR / screenScale)))
+              if event.button == 4 and lstBoxBlinds[0][1][0].top >= 130/screenScale:
+                pass
+              elif event.button == 5 and lstBoxBlinds[-1][1][0].bottom <= (CUTLINE - 100) / screenScale:
+                pass
+              else:
+                f = -1 if (event.button == 5) else 1
+                
+                for boxblinds in lstBoxBlinds:
+                  #tempLst2 = [isbreak,[tempBox, lvl, dur, bb, sb, ante]]
+                  boxblinds[1][0].top = boxblinds[1][0].top + f*round(SCRLLFACTOR / screenScale) #박스
+                  for j in range(5):
+                    boxblinds[1][j+1].changePosition(relative = "top", position = (boxblinds[1][j+1].getRect().centerx, boxblinds[1][j+1].getRect().top + f*round(SCRLLFACTOR / screenScale))) 
+                plusBox.top = plusBox.top + f*round(SCRLLFACTOR / screenScale)
+                textPlus.changePosition(relative = "top", position=(textPlus.getRect().centerx, textPlus.getRect().top + f*round(SCRLLFACTOR / screenScale)))
             if event.button == 1: ## 클릭
               if selectedIdx != -1:
                 objControl.changeLstBlinds(selectedIdx, lstBoxBlinds[selectedIdx][2] - 1, temp_input)
@@ -424,11 +460,7 @@ def main_load():
         pygame.draw.rect(screen, GRAY, rectBack, width = 4)
         screen.blit(textBack.getText(), textBack.getRect())
         pygame.draw.line(screen,WHITE, (0,round(CUTLINE/screenScale)), (round(2048/screenScale),round(CUTLINE/screenScale)))
-        screen.blit(textSettingLevel.getText(), textSettingLevel.getRect())
-        screen.blit(textSettingBB.getText(), textSettingBB.getRect())
-        screen.blit(textSettingAnte.getText(), textSettingAnte.getRect())
-        screen.blit(textSettingSB.getText(), textSettingSB.getRect())
-        screen.blit(textSettingDur.getText(), textSettingDur.getRect())
+        blitText(screen, textSettingLevel, textSettingBB, textSettingAnte, textSettingDur, textSettingSB)
         pygame.display.flip()
         time.sleep(0.05)
     #### End of main While
