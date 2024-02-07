@@ -4,7 +4,7 @@ import time
 import random
 import ctypes
 import os
-from TextObj import TextObj
+from ClassObjs import TextObj
 
 FONTPATH = {'NGothicR' : './font/NanumGothic.ttf', 'NSquareR' : './font/NanumSquareR.ttf'}
 TESTMIN, TESTSEC, TESTTOTAL = 10,0,600
@@ -436,6 +436,7 @@ def main(lstBLINDS, lstLevels,title, isLoad):
               flagback = "load"
             else:
               flagback = "save"
+            running = False
         if event.key == K_RETURN:
           if flagPlayer:
             numPlayer = temp_input
