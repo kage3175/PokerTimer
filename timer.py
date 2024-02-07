@@ -517,7 +517,7 @@ def main(lstBLINDS, lstLevels,title):
           textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
           strBreakTimer = makeTimerString(min_break,sec_break,total)
           textTimeBreaknum.changeContent(font = fontSideNum, content = strBreakTimer)
-        if event.key == K_LEFT:
+        if event.key == K_LEFT: # 1분 당기기
           pass
       elif event.type == MOUSEBUTTONDOWN:
           position = pygame.mouse.get_pos()
