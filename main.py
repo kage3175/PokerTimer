@@ -2,7 +2,7 @@ import time
 import pygame
 import ctypes
 from pygame.locals import *
-import loadmode
+import loadmode, savemode
 
 WHITE = (255,255,255)
 BLACK = (0,0,0)
@@ -61,7 +61,8 @@ def main():
           #print(position)
           if(rectSave.left<=position[0]<=rectSave.right and rectSave.top <= position[1] <= rectSave.bottom):
             print("Save")
-            
+            mode = 2
+            running = False
           if(rectLoad.left<=position[0]<=rectLoad.right and rectLoad.top <= position[1] <= rectLoad.bottom):
             #print("Load")
             mode = 1
@@ -78,8 +79,10 @@ def main():
     pygame.quit()
     if mode == 0:
       pass
-    elif mode == 1:
+    elif mode == 1: # Loadmode
       flagRun = loadmode.main_load()
+    elif mode == 2: # Savemode
+      flagRun = savemode.main_save()
 ################ End of main
 
 main()

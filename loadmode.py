@@ -21,67 +21,6 @@ BOXHEIGHT = 210
 SCRLLFACTOR = 25
 BOXINTERVAL = 240
 BLINDINTERVAL = 60
-
-
-class BlindFile:
-  def __init__(self) -> None:
-    self.title = ''
-    self.type = 0
-    self.numBlinds = 0
-    self.lstDurations = []
-    self.lstBlinds = []
-    self.filename = ""
-  def make(self, file):
-    self.title = file.readline().strip()
-    self.type = int(file.readline().strip())
-    self.numBlinds = int(file.readline().strip())
-    self.lstDurations = list(map(int, file.readline()[:-2].strip().split(",")))
-
-    temp_blinds = file.readline().strip().replace("(", "").replace(")","")
-    strlst_blinds = list(temp_blinds.split("$"))
-    for str_ in strlst_blinds:
-      temp_lst = list(map(int, str_.split(",")))
-      self.lstBlinds.append(temp_lst)
-  def getTitle(self):
-    return self.title
-  def getType(self):
-    return self.type
-  def getNumBlinds(self):
-    return self.numBlinds
-  def changeNumBlinds(self, num):
-    self.numBlinds += num
-  def getLstBlinds(self):
-    return self.lstBlinds
-  def getLstDurations(self):
-    return self.lstDurations
-  def updateLstDurations(self):
-    self.lstDurations=[]
-    for item in self.lstBlinds:
-      if item[0] == 1 and item[1] not in self.lstDurations and item[1] != 0:
-        self.lstDurations.append(item[1])
-    self.lstDurations.sort(reverse=True)
-  def putFilename(self, name):
-    self.filename = name
-  def getFilename(self):
-    return self.filename
-  def changeLstBlinds(self, idx1, idx2, content):
-    self.lstBlinds[idx1][idx2] = content
-  def addLevel(self):
-    #### lstInfo = [Dur, BB, SB, Ante]
-    self.lstBlinds.append([1,10,0,0,0])
-    self.numBlinds += 1
-  def deleteLevel(self, idx):
-    try:
-      self.lstBlinds.pop(idx)
-    except:
-      print("NotAvailableIdxError")
-  def changeBlinds(self, idx, isBreak):
-    if isBreak:
-      self.lstBlinds[idx][0] = 0
-      for i in range(3):
-        self.lstBlinds[idx][i+2] = 0
-    else:
-      self.lstBlinds[idx][0] = 1
   
 
 def mouseInRect(rectObj, position):
@@ -115,14 +54,22 @@ def processAscii(key):
 #### End of processAscii
 
 def main_load():
+  user32 = ctypes.windll.user32
+  screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)  # 해상도 구하기
+  midpoint = screensize[0] / 2, screensize[1] / 2 # 화면 중앙점
+  screenScale = 1152/screensize[1]
   r = True
+
   while r:
     r = False
     pygame.init()
-    user32 = ctypes.windll.user32
-    screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)  # 해상도 구하기
-    midpoint = screensize[0] / 2, screensize[1] / 2 # 화면 중앙점
-    screenScale = 1152/screensize[1]
+
+    fontTitle = pygame.font.Font('./font/NanumGothic.ttf', round(60/screenScale))
+    fontEmpty = pygame.font.Font('./font/NanumGothic.ttf', round(120/screenScale))
+    fontSup = pygame.font.Font('./font/NanumGothic.ttf', round(30/screenScale))
+    fontButton = pygame.font.Font('./font/NanumGothicBold.ttf', round(80/screenScale))
+    fontBox = pygame.font.Font('./font/NanumGothic.ttf', round(20/screenScale))
+    
     screen = pygame.display.set_mode()
     imgBackground = pygame.image.load("./img/background.jpg")
     imgBackground = pygame.transform.scale(imgBackground, screensize)
@@ -137,11 +84,7 @@ def main_load():
     selected = -1
     
     dictType = {1:"BB Ante", 2:"All Ante"}
-    fontTitle = pygame.font.Font('./font/NanumGothic.ttf', round(60/screenScale))
-    fontEmpty = pygame.font.Font('./font/NanumGothic.ttf', round(120/screenScale))
-    fontSup = pygame.font.Font('./font/NanumGothic.ttf', round(30/screenScale))
-    fontButton = pygame.font.Font('./font/NanumGothicBold.ttf', round(80/screenScale))
-    fontBox = pygame.font.Font('./font/NanumGothic.ttf', round(20/screenScale))
+    
 
     try:
       lst_blindfiles = os.listdir('./doc')

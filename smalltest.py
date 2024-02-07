@@ -1,2 +1,5 @@
-a= (1,2,3)
-print(a[1:3])
+import time
+import datetime
+
+d = datetime.datetime.now()
+print(d.year, d.month, d.day)
