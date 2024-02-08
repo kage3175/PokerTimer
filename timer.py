@@ -4,22 +4,16 @@ import time
 import ctypes
 from ClassObjs import TextObj
 import tkinter as tk
+from ClassObjs import *
 
 FONTPATH = {'NGothicR' : './font/NanumGothic.ttf', 'NSquareR' : './font/NanumSquareR.ttf'}
-TESTMIN, TESTSEC, TESTTOTAL = 10,0,600
 LSTLEVELS = []
 LSTBLINDS = []
 
-BLACK = (0,0,0)
-WHITE = (240,240,240)
-RED = (210,0,0)
-BRIGHTRED = (255,10,10)
-BACKGROUND = (20,20,90)
 PALEGRAY = (180,180,180)
-YELLOW = (220,220,90)
-K_NUM = [K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9]
 
 TK_VAL = False
+
 
 
 def timeupdate(minute, second, total, amount, currLevel, soundlvlup, lstBreakIdx):
@@ -88,7 +82,13 @@ def blitText(surface, *textobjs):
 def confirmQuit():
   window = tk.Tk()
   window.title('Quit?')
-  window.geometry("500x160+200+200")
+  screen_width = window.winfo_screenwidth()
+  screen_height = window.winfo_screenheight()
+  width,height = 500,160
+
+  x = (screen_width - width) // 2
+  y = (screen_height - height) // 2 - 50
+  window.geometry(f"{width}x{height}+{x}+{y}")
   window.configure(bg = 'white')
   window.resizable(False, False)
   label = tk.Label(window, font = ("Arial", 25), bg = 'white', text = "Are you sure to Quit?")
@@ -126,6 +126,9 @@ def main(lstBLINDS, lstLevels,title, isLoad):
   pauseBox.set_alpha(128)
   pauseBox.fill(YELLOW)
 
+  shutCenter = (screensize[0] - round(50/screenScale), round(50 /screenScale))
+  shutRadius = 17
+
   start_time = time.time()
   timer = 0
   pause_time = 0
@@ -146,7 +149,6 @@ def main(lstBLINDS, lstLevels,title, isLoad):
     min_break +=LSTLEVELS[temp]
     temp+=1
   strBreakTimer = makeTimerString(min_break,sec_break,total)
-  #print(lstBreakIdx)
 
   imgBackground = pygame.image.load("./img/background.jpg")
   imgBackground = pygame.transform.scale(imgBackground, screensize)
@@ -252,6 +254,8 @@ def main(lstBLINDS, lstLevels,title, isLoad):
       pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
       surface.blit(pauseBox, rectPause)
       surface.blit(textPause.getText(), textPause.getRect())
+      pygame.draw.circle(surface, RED, shutCenter, shutRadius)
+      pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = 2)
       pygame.display.flip()
       pause_time_to_add = pause_start - time.time()
       for event in pygame.event.get():
@@ -271,7 +275,7 @@ def main(lstBLINDS, lstLevels,title, isLoad):
             confirmQuit()
           if event.key in K_NUM or event.key == K_BACKSPACE:
             if flagPlayer or flagEntries or flagAverage or flagChips or flagStarting:
-              temp_input = (temp_input*10 + int(event.key) - 48) if (event.key in K_NUM) else (temp_input//10)
+              temp_input = (temp_input*10 + processAscii(event.key)) if (event.key in K_NUM) else (temp_input//10)
               if flagPlayer:
                 textPlayernum.changeColor(BLACK)
                 textPlayernum.changeContent(font = fontSideNum, content = format(temp_input, ","))
@@ -287,7 +291,7 @@ def main(lstBLINDS, lstLevels,title, isLoad):
               elif flagStarting:
                 textStartingstacknum.changeColor(BLACK)
                 textStartingstacknum.changeContent(font = fontSideNum, content = format(temp_input, ","))
-          if event.key == K_RETURN:
+          if pygame.key.name(event.key) == "return" or pygame.key.name(event.key) == "enter":
             if flagPlayer:
               numPlayer = temp_input
               textPlayernum.changeColor(WHITE)
@@ -318,7 +322,6 @@ def main(lstBLINDS, lstLevels,title, isLoad):
             temp_input = 0
             flagPlayer, flagAverage, flagChips, flagEntries, flagStarting = False, False,False,False,False
           if event.key == K_RIGHT: ### 1분 뒤로
-            #print(currLevel)
             min, sec, total, newLevel, min_break, sec_break = timeupdate(min, sec, total, 60, currLevel, soundLevelup,lstBreakIdx)
             if newLevel != currLevel:
               currLevel = newLevel
@@ -329,6 +332,8 @@ def main(lstBLINDS, lstLevels,title, isLoad):
                   pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
                   surface.blit(pauseBox, rectPause)
                   surface.blit(textPause.getText(), textPause.getRect())
+                  pygame.draw.circle(surface, RED, shutCenter, shutRadius)
+                  pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = 2)
                   pygame.display.flip()
                   for event in pygame.event.get():
                     if event.type == KEYDOWN:
@@ -380,41 +385,41 @@ def main(lstBLINDS, lstLevels,title, isLoad):
             strBreakTimer = makeTimerString(min_break,sec_break,total)
             textTimeBreaknum.changeContent(font = fontSideNum, content = strBreakTimer)
         elif event.type == MOUSEBUTTONDOWN:
-          position = pygame.mouse.get_pos()
-          temp_input = 0
-          if flagPlayer:
-            textPlayernum.changeColor(BLACK)
-            textPlayernum.changeContent(font = fontSideNum, content = format(numPlayer, ","))
-            flagPlayer = False
-          if flagAverage:
-            textAveragenum.changeColor(BLACK)
-            textAveragenum.changeContent(font = fontSideNum, content = format(numAverage, ","))
-            flagAverage = False
-          if flagChips:
-            textChipsinplaynum.changeColor(BLACK)
-            textChipsinplaynum.changeContent(font = fontSideNum, content = format(numChips, ","))
-            flagChips = False
-          if flagEntries:
-            textEntriesnum.changeColor(BLACK)
-            textEntriesnum.changeConten(font = fontSideNum, content = format(numEntries, ","))
-            flagEntries = False
-          if flagStarting:
-            textStartingstacknum.changeColor(BLACK)
-            textStartingstacknum.changeContent(font = fontSideNum, content = format(numStarting, ","))
-            flagStarting = False
-          elif ((position[0] > textPlayernum.getRect().left and position[0] < textPlayernum.getRect().right) and (position[1] > textPlayernum.getRect().top and position[1] < textPlayernum.getRect().bottom)):
-            flagPlayer = True
-          elif ((position[0] > textAveragenum.getRect().left and position[0] < textAveragenum.getRect().right) and (position[1] > textAveragenum.getRect().top and position[1] < textAveragenum.getRect().bottom)):
-            flagAverage = True
-          elif ((position[0] > textChipsinplaynum.getRect().left and position[0] < textChipsinplaynum.getRect().right) and (position[1] > textChipsinplaynum.getRect().top and position[1] < textChipsinplaynum.getRect().bottom)):
-            flagChips = True
-          elif ((position[0] > textEntriesnum.getRect().left and position[0] < textEntriesnum.getRect().right) and (position[1] > textEntriesnum.getRect().top and position[1] < textEntriesnum.getRect().bottom)):
-            flagEntries = True
-          elif ((position[0] > textStartingstacknum.getRect().left and position[0] < textStartingstacknum.getRect().right) and (position[1] > textStartingstacknum.getRect().top and position[1] < textStartingstacknum.getRect().bottom)):
-            flagStarting = True
-      time.sleep(0.05)
-      #pause_time+=pause_start-time.time()
-      #print(pause_time)
+          if event.button == 1:
+            position = pygame.mouse.get_pos()
+            temp_input = 0
+            if flagPlayer:
+              textPlayernum.changeColor(WHITE)
+              textPlayernum.changeContent(font = fontSideNum, content = format(numPlayer, ","))
+              flagPlayer = False
+            if flagAverage:
+              textAveragenum.changeColor(WHITE)
+              textAveragenum.changeContent(font = fontSideNum, content = format(numAverage, ","))
+              flagAverage = False
+            if flagChips:
+              textChipsinplaynum.changeColor(WHITE)
+              textChipsinplaynum.changeContent(font = fontSideNum, content = format(numChips, ","))
+              flagChips = False
+            if flagEntries:
+              textEntriesnum.changeColor(WHITE)
+              textEntriesnum.changeConten(font = fontSideNum, content = format(numEntries, ","))
+              flagEntries = False
+            if flagStarting:
+              textStartingstacknum.changeColor(WHITE)
+              textStartingstacknum.changeContent(font = fontSideNum, content = format(numStarting, ","))
+              flagStarting = False
+            elif ((position[0] > textPlayernum.getRect().left and position[0] < textPlayernum.getRect().right) and (position[1] > textPlayernum.getRect().top and position[1] < textPlayernum.getRect().bottom)):
+              flagPlayer = True
+            elif ((position[0] > textAveragenum.getRect().left and position[0] < textAveragenum.getRect().right) and (position[1] > textAveragenum.getRect().top and position[1] < textAveragenum.getRect().bottom)):
+              flagAverage = True
+            elif ((position[0] > textChipsinplaynum.getRect().left and position[0] < textChipsinplaynum.getRect().right) and (position[1] > textChipsinplaynum.getRect().top and position[1] < textChipsinplaynum.getRect().bottom)):
+              flagChips = True
+            elif ((position[0] > textEntriesnum.getRect().left and position[0] < textEntriesnum.getRect().right) and (position[1] > textEntriesnum.getRect().top and position[1] < textEntriesnum.getRect().bottom)):
+              flagEntries = True
+            elif ((position[0] > textStartingstacknum.getRect().left and position[0] < textStartingstacknum.getRect().right) and (position[1] > textStartingstacknum.getRect().top and position[1] < textStartingstacknum.getRect().bottom)):
+              flagStarting = True
+            elif (((position[0] - shutCenter[0]) ** 2 + (position[1] - shutCenter[1]) ** 2) ** 0.5 <= shutRadius):
+              confirmQuit()
       if flag:
         continue
       else:
@@ -438,7 +443,7 @@ def main(lstBLINDS, lstLevels,title, isLoad):
             
         if event.key in K_NUM or event.key == K_BACKSPACE:
           if flagPlayer or flagEntries or flagAverage or flagChips or flagStarting:
-            temp_input = (temp_input*10 + int(event.key) - 48) if (event.key in K_NUM) else (temp_input//10)
+            temp_input = (temp_input*10 + processAscii(event.key)) if (event.key in K_NUM) else (temp_input//10)
             if flagPlayer:
               textPlayernum.changeColor(BLACK)
               textPlayernum.changeContent(font = fontSideNum, content = format(temp_input, ","))
@@ -460,7 +465,7 @@ def main(lstBLINDS, lstLevels,title, isLoad):
             else:
               flagback = "save"
             running = False
-        if event.key == K_RETURN:
+        if pygame.key.name(event.key) == "return" or pygame.key.name(event.key) == "enter":
           if flagPlayer:
             numPlayer = temp_input
             textPlayernum.changeColor(WHITE)
@@ -502,6 +507,8 @@ def main(lstBLINDS, lstLevels,title, isLoad):
                 pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
                 surface.blit(pauseBox, rectPause)
                 surface.blit(textPause.getText(), textPause.getRect())
+                pygame.draw.circle(surface, RED, shutCenter, shutRadius)
+                pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = 2)
                 pygame.display.flip()
                 for event in pygame.event.get():
                   if event.type == KEYDOWN:
@@ -543,38 +550,41 @@ def main(lstBLINDS, lstLevels,title, isLoad):
           textTimeBreaknum.changeContent(font = fontSideNum, content = strBreakTimer)
         
       elif event.type == MOUSEBUTTONDOWN:
-          position = pygame.mouse.get_pos()
-          temp_input = 0
-          if flagPlayer:
-            textPlayernum.changeColor(WHITE)
-            textPlayernum.changeContent(font = fontSideNum, content = format(numPlayer, ","))
-            flagPlayer = False
-          if flagAverage:
-            textAveragenum.changeColor(WHITE)
-            textAveragenum.changeContent(font = fontSideNum, content = format(numAverage, ","))
-            flagAverage = False
-          if flagChips:
-            textChipsinplaynum.changeColor(WHITE)
-            textChipsinplaynum.changeContent(font = fontSideNum, content = format(numChips, ","))
-            flagChips = False
-          if flagEntries:
-            textEntriesnum.changeColor(WHITE)
-            textEntriesnum.changeContent(font = fontSideNum, content = format(numEntries, ","))
-            flagEntries = False
-          if flagStarting:
-            textStartingstacknum.changeColor(WHITE)
-            textStartingstacknum.changeContent(font = fontSideNum, content = format(numStarting, ","))
-            flagStarting = False
-          elif ((position[0] > textPlayernum.getRect().left and position[0] < textPlayernum.getRect().right) and (position[1] > textPlayernum.getRect().top and position[1] < textPlayernum.getRect().bottom)):
-            flagPlayer = True
-          elif ((position[0] > textAveragenum.getRect().left and position[0] < textAveragenum.getRect().right) and (position[1] > textAveragenum.getRect().top and position[1] < textAveragenum.getRect().bottom)):
-            flagAverage = True
-          elif ((position[0] > textChipsinplaynum.getRect().left and position[0] < textChipsinplaynum.getRect().right) and (position[1] > textChipsinplaynum.getRect().top and position[1] < textChipsinplaynum.getRect().bottom)):
-            flagChips = True
-          elif ((position[0] > textEntriesnum.getRect().left and position[0] < textEntriesnum.getRect().right) and (position[1] > textEntriesnum.getRect().top and position[1] < textEntriesnum.getRect().bottom)):
-            flagEntries = True
-          elif ((position[0] > textStartingstacknum.getRect().left and position[0] < textStartingstacknum.getRect().right) and (position[1] > textStartingstacknum.getRect().top and position[1] < textStartingstacknum.getRect().bottom)):
-            flagStarting = True
+          if event.button == 1:
+            position = pygame.mouse.get_pos()
+            temp_input = 0
+            if flagPlayer:
+              textPlayernum.changeColor(WHITE)
+              textPlayernum.changeContent(font = fontSideNum, content = format(numPlayer, ","))
+              flagPlayer = False
+            if flagAverage:
+              textAveragenum.changeColor(WHITE)
+              textAveragenum.changeContent(font = fontSideNum, content = format(numAverage, ","))
+              flagAverage = False
+            if flagChips:
+              textChipsinplaynum.changeColor(WHITE)
+              textChipsinplaynum.changeContent(font = fontSideNum, content = format(numChips, ","))
+              flagChips = False
+            if flagEntries:
+              textEntriesnum.changeColor(WHITE)
+              textEntriesnum.changeContent(font = fontSideNum, content = format(numEntries, ","))
+              flagEntries = False
+            if flagStarting:
+              textStartingstacknum.changeColor(WHITE)
+              textStartingstacknum.changeContent(font = fontSideNum, content = format(numStarting, ","))
+              flagStarting = False
+            elif ((position[0] > textPlayernum.getRect().left and position[0] < textPlayernum.getRect().right) and (position[1] > textPlayernum.getRect().top and position[1] < textPlayernum.getRect().bottom)):
+              flagPlayer = True
+            elif ((position[0] > textAveragenum.getRect().left and position[0] < textAveragenum.getRect().right) and (position[1] > textAveragenum.getRect().top and position[1] < textAveragenum.getRect().bottom)):
+              flagAverage = True
+            elif ((position[0] > textChipsinplaynum.getRect().left and position[0] < textChipsinplaynum.getRect().right) and (position[1] > textChipsinplaynum.getRect().top and position[1] < textChipsinplaynum.getRect().bottom)):
+              flagChips = True
+            elif ((position[0] > textEntriesnum.getRect().left and position[0] < textEntriesnum.getRect().right) and (position[1] > textEntriesnum.getRect().top and position[1] < textEntriesnum.getRect().bottom)):
+              flagEntries = True
+            elif ((position[0] > textStartingstacknum.getRect().left and position[0] < textStartingstacknum.getRect().right) and (position[1] > textStartingstacknum.getRect().top and position[1] < textStartingstacknum.getRect().bottom)):
+              flagStarting = True
+            elif (((position[0] - shutCenter[0]) ** 2 + (position[1] - shutCenter[1]) ** 2) ** 0.5 <= shutRadius):
+                confirmQuit()
     #####
     if(time.time() - start_time + pause_time > timer): ### 매 1초마다
       timer+=1
@@ -589,6 +599,8 @@ def main(lstBLINDS, lstLevels,title, isLoad):
               pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
               surface.blit(pauseBox, rectPause)
               surface.blit(textPause.getText(), textPause.getRect())
+              pygame.draw.circle(surface, RED, shutCenter, shutRadius)
+              pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = 2)
               pygame.display.flip()
               time.sleep(0.1)
               for event in pygame.event.get():
@@ -652,6 +664,8 @@ def main(lstBLINDS, lstLevels,title, isLoad):
     pygame.draw.rect(surface, WHITE, rectMainTimer, width=3)
     pygame.draw.rect(surface, WHITE, rectCurrBlind, width=3)
     pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
+    pygame.draw.circle(surface, RED, shutCenter, shutRadius)
+    pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = 2)
     pygame.display.flip()
     time.sleep(0.05)
   soundLevelup.stop()

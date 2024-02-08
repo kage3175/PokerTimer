@@ -4,25 +4,29 @@ import ctypes
 from pygame.locals import *
 import loadmode, savemode
 import tkinter as tk
+from ClassObjs import *
 
-WHITE = (255,255,255)
-BLACK = (0,0,0)
-PALEGRAY = (150,150,150)
-GRAY = (200,200,200)
+
 TK_VAL = False
 
 def confirmQuit():
   window = tk.Tk()
   window.title('Quit?')
-  window.geometry("500x160+200+200")
+  screen_width = window.winfo_screenwidth()
+  screen_height = window.winfo_screenheight()
+  width,height = 500,160
+
+  x = (screen_width - width) // 2
+  y = (screen_height - height) // 2 - 50
+  window.geometry(f"{width}x{height}+{x}+{y}")
   window.configure(bg = 'white')
   window.resizable(False, False)
   label = tk.Label(window, font = ("Arial", 25), bg = 'white', text = "Are you sure to Quit?")
-  label.place(x=100, y=20)
+  label.place(y=20, relx = 0.5, anchor='n')
   yesB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "Yes", command = lambda: close_window(window, True))
-  yesB.place(x = 40, y = 80)
+  yesB.place(y = 75, relx=0.25, anchor='n')
   noB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "No", command = lambda: close_window(window, False))
-  noB.place(x = 280, y = 80)
+  noB.place(y = 75, relx=0.75, anchor='n')
   window.mainloop()
 
 def close_window(window, isQuit):
@@ -43,6 +47,9 @@ def main():
     screen = pygame.display.set_mode()
     imgBackground = pygame.image.load("./img/background.jpg")
     imgBackground = pygame.transform.scale(imgBackground, screensize)
+
+    shutCenter = (screensize[0] - round(50/screenScale), round(50 /screenScale))
+    shutRadius = 17
 
     fontButton = pygame.font.Font('./font/NanumSquareB.ttf', round(100/screenScale))
 
@@ -81,22 +88,23 @@ def main():
             pass
         if event.type == MOUSEBUTTONDOWN:
           position = pygame.mouse.get_pos()
-          #print(position)
           if(rectSave.left<=position[0]<=rectSave.right and rectSave.top <= position[1] <= rectSave.bottom):
-            #print("Save")
             mode = 2
             running = False
-          if(rectLoad.left<=position[0]<=rectLoad.right and rectLoad.top <= position[1] <= rectLoad.bottom):
-            #print("Load")
+          elif(rectLoad.left<=position[0]<=rectLoad.right and rectLoad.top <= position[1] <= rectLoad.bottom):
             mode = 1
             running = False
+          elif (((position[0] - shutCenter[0]) ** 2 + (position[1] - shutCenter[1]) ** 2) ** 0.5 <= shutRadius):
+            confirmQuit()
       screen.blit(imgBackground,(0,0))
       pygame.draw.rect(screen, PALEGRAY, rectSave)
-      pygame.draw.rect(screen, GRAY, rectSaveOutline, width = 4)
+      pygame.draw.rect(screen, DARKGRAY, rectSaveOutline, width = 6)
       screen.blit(textSave, objSave)
       pygame.draw.rect(screen, PALEGRAY, rectLoad)
-      pygame.draw.rect(screen, GRAY, rectLoadOutline, width = 4)
+      pygame.draw.rect(screen, DARKGRAY, rectLoadOutline, width = 6)
       screen.blit(textLoad, objLoad)
+      pygame.draw.circle(screen, RED, shutCenter, shutRadius)
+      pygame.draw.circle(screen, BLACK, shutCenter, shutRadius, width = 2)
       pygame.display.flip()
 
     pygame.quit()
@@ -108,4 +116,5 @@ def main():
       flagRun = savemode.main_save()
 ################ End of main
 
-main()
+if __name__ == "__main__":
+  main()

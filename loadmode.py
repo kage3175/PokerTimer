@@ -7,20 +7,7 @@ import timer
 from ClassObjs import *
 import tkinter as tk
 
-WHITE = (255,255,255)
-BLACK = (0,0,0)
 PALEGRAY = (150,150,150)
-GRAY = (200,200,200)
-SELECTED = (200,50,50)
-DARKGRAY = (75,75,75)
-BLINDGRAY = (175,175,175)
-BREAKGRAY = (215,215,215)
-
-CUTLINE = 900
-BOXHEIGHT = 210
-SCRLLFACTOR = 25
-BOXINTERVAL = 240
-BLINDINTERVAL = 60
 
 TK_VAL = False
 
@@ -31,15 +18,21 @@ def mouseInRect(rectObj, position):
 def confirmQuit():
   window = tk.Tk()
   window.title('Quit?')
-  window.geometry("500x160+200+200")
+  screen_width = window.winfo_screenwidth()
+  screen_height = window.winfo_screenheight()
+  width,height = 500,160
+
+  x = (screen_width - width) // 2
+  y = (screen_height - height) // 2 - 50
+  window.geometry(f"{width}x{height}+{x}+{y}")
   window.configure(bg = 'white')
   window.resizable(False, False)
   label = tk.Label(window, font = ("Arial", 25), bg = 'white', text = "Are you sure to Quit?")
-  label.place(x=100, y=20)
+  label.place(y=20, relx = 0.5, anchor='n')
   yesB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "Yes", command = lambda: close_window(window, True))
-  yesB.place(x = 40, y = 80)
+  yesB.place(y = 75, relx=0.25, anchor='n')
   noB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "No", command = lambda: close_window(window, False))
-  noB.place(x = 280, y = 80)
+  noB.place(y = 75, relx=0.75, anchor='n')
   window.mainloop()
 
 def close_window(window, isQuit):
@@ -68,6 +61,9 @@ def main_load():
     screen = pygame.display.set_mode()
     imgBackground = pygame.image.load("./img/background.jpg")
     imgBackground = pygame.transform.scale(imgBackground, screensize)
+
+    shutCenter = (screensize[0] - round(50/screenScale), round(50 /screenScale))
+    shutRadius = 17
 
     flagEmpty = False
     lstBlindObjs = []
@@ -201,21 +197,6 @@ def main_load():
                     
                   lstBoxBlinds.append(tempLst2)
                   cnt+=1
-                
-                '''outfile = open('./doc/'+objControl.getFilename(), "w")
-                print(objControl.getTitle(), file=outfile)
-                print(objControl.getType(), file= outfile)
-                templst = objControl.getLstDurations()
-                print(str(objControl.getNumBlinds()), file=outfile)
-                for i in range(len(templst)):
-                  print(str(templst[i]) + ",", end = "", file=outfile)
-                print("", file=outfile)
-                templst = objControl.getLstBlinds()
-                for i in range(objControl.getNumBlinds()-1):
-                  print("("+str(templst[i][0])+","+str(templst[i][1])+","+str(templst[i][2])+","+str(templst[i][3])+ ","+str(templst[i][4])+")",end="$", file=outfile)
-                i = objControl.getNumBlinds()-1
-                print("("+str(templst[i][0])+","+str(templst[i][1])+","+str(templst[i][2])+","+str(templst[i][3])+ ","+str(templst[i][4])+")",end="", file=outfile)
-                outfile.close()'''
                 updateFile(objControl)
                 plusBox = pygame.Rect(0,0,round(900/screenScale),round(50/screenScale))
                 plusBox.center = (midpoint[0], round((150+cnt*BLINDINTERVAL)/screenScale))
@@ -223,6 +204,8 @@ def main_load():
               elif mouseInRect(rectBack, position): #Back Button
                 running = False
                 gotomain = True
+              elif (((position[0] - shutCenter[0]) ** 2 + (position[1] - shutCenter[1]) ** 2) ** 0.5 <= shutRadius):
+                confirmQuit()
               else:
                 for i in range(numFile):
                   box = (lstRectBackgrounds[i][0].left, lstRectBackgrounds[i][0].right, lstRectBackgrounds[i][0].top, lstRectBackgrounds[i][0].bottom)
@@ -267,8 +250,9 @@ def main_load():
         pygame.draw.rect(screen, GRAY, rectBack, width = 4)
         screen.blit(textBack.getText(), textBack.getRect())
         pygame.draw.line(screen,WHITE, (0,round(CUTLINE/screenScale)), (round(2048/screenScale),round(CUTLINE/screenScale)))
+        pygame.draw.circle(screen, RED, shutCenter, shutRadius)
+        pygame.draw.circle(screen, BLACK, shutCenter, shutRadius, width = 2)
         pygame.display.flip()
-        time.sleep(0.05)
 
         #####################
       else: #Next 눌렀을 때
@@ -343,6 +327,8 @@ def main_load():
                 gotomain = True
                 
                 continue
+              elif (((position[0] - shutCenter[0]) ** 2 + (position[1] - shutCenter[1]) ** 2) ** 0.5 <= shutRadius):
+                confirmQuit()
               else: # 글자 클릭했는지 확인
                 
                 cntBreak, cntLvl = 0, 0
@@ -398,7 +384,6 @@ def main_load():
                     plusBox.top = plusBox.top + BLINDINTERVAL/screenScale
                     textPlus.changePosition(relative="top", position=(textPlus.getRect().centerx,textPlus.getRect().top + BLINDINTERVAL/screenScale))
                     objControl.addLevel()
-                    print("+")
         #### End of event for loop
                           
         screen.blit(imgBackground, (0,0))
@@ -433,8 +418,9 @@ def main_load():
         screen.blit(textBack.getText(), textBack.getRect())
         pygame.draw.line(screen,WHITE, (0,round(CUTLINE/screenScale)), (round(2048/screenScale),round(CUTLINE/screenScale)))
         blitText(screen, textSettingLevel, textSettingBB, textSettingAnte, textSettingDur, textSettingSB)
+        pygame.draw.circle(screen, RED, shutCenter, shutRadius)
+        pygame.draw.circle(screen, BLACK, shutCenter, shutRadius, width = 2)
         pygame.display.flip()
-        time.sleep(0.05)
     #### End of main While
 
 

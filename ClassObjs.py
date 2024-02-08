@@ -1,9 +1,28 @@
 from pygame.locals import *
 
 K_NUM = [K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9, K_KP0, K_KP1, K_KP2, K_KP3, K_KP4, K_KP5, K_KP6, K_KP7, K_KP8, K_KP9]
-BANNED = ["\\", "/", ":", "*", "?", "<", ">", "\"", "|", "left ctrl", "right ctrl", "tab", "`", "+", "up", "down", "right", "left", "enter"]
+BANNED = ["\\", "/", ":", "*", "?", "<", ">", "\"", "|", "`", "+", "\'"]
 SHIFT = ["left shift", "right shift"]
 STRNUM = ["1", "2", "3","4","5","6","7","8","9","0"]
+
+WHITE = (240,240,240)
+BLACK = (0,0,0)
+PALEGRAY = (210,210,210)
+GRAY = (200,200,200)
+SELECTED = (200,50,50)
+DARKGRAY = (75,75,75)
+BLINDGRAY = (175,175,175)
+BREAKGRAY = (215,215,215)
+RED = (210,0,0)
+BRIGHTRED = (255,10,10)
+YELLOW = (220,220,90)
+
+
+CUTLINE = 900
+BOXHEIGHT = 210
+SCRLLFACTOR = 25
+BOXINTERVAL = 240
+BLINDINTERVAL = 60
 
 class TextObj:
   def __init__(self, font, content = "",position = (0,0), relative = "topleft", color = (0,0,0)) -> None:
@@ -159,6 +178,13 @@ class BlindFile:
     self.title = title
   def setType(self, type):
     self.type = type
+  def make_deNovo(self, filename, title, type, numBlinds, lstBlinds):
+    self.numBlinds = numBlinds
+    self.lstBlinds = lstBlinds
+    self.filename = filename
+    self.type = type
+    self.title = title
+    self.updateLstDurations()
 #### End of BlindFile Class
 
 def blitText(surface, *textobjs):
