@@ -1,0 +1,3 @@
+1. Load 모드 및 New Structure 모드에서 delete button 추가
+2. 일부 예외 상황시 Error Message 출력 기능(단, python으로 직접 실행시에만)
+3. PythonRawFile 폴더를 추가하여 .py 파일에 직접 접근 가능. 단, 해당 .py 파일들은 ATC_PolerTimer.exe의 실행에는 전혀 영향을 주지 않는다.

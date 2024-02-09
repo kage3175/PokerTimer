@@ -8,7 +8,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('./img/background.jpg', './img'), ('./sound/levelup.mp3', './sound'), ('./font/NanumGothic.ttf', './font'), ('./font/NanumGothicBold.ttf', './font'), ('./font/NanumGothicExtraBold.ttf', './font'), ('./font/NanumGothicLight.ttf', './font'), ('./font/NanumSquareB.ttf', './font'), ('./font/NanumSquareEB.ttf', './font'), ('./font/NanumSquareL.ttf', './font'), ('./font/NanumSquareR.ttf', './font'), ('./doc/test1.bld', './doc')],
+    datas=[],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
