@@ -165,8 +165,8 @@ class BlindFile:
   def deleteLevel(self, idx):
     try:
       self.lstBlinds.pop(idx)
-    except:
-      print("NotAvailableIdxError")
+    except Exception as e:
+      print("Error while deleting level in TextObj: ", e)
   def changeBlinds(self, idx, isBreak):
     if isBreak:
       self.lstBlinds[idx][0] = 0
@@ -193,7 +193,10 @@ def blitText(surface, *textobjs):
 #### End of blitText function
 
 def updateFile(objControl):
-  outfile = open('./doc/'+objControl.getFilename(), "w")
+  try:
+    outfile = open('./doc/'+objControl.getFilename(), "w")
+  except Exception as e:
+    print("Error while opening file at ./doc directory:", e)
   print(objControl.getTitle(), file=outfile)
   print(objControl.getType(), file= outfile)
   objControl.updateLstDurations()

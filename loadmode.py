@@ -80,8 +80,8 @@ def main_load():
     try:
       lst_blindfiles = os.listdir('./doc')
       numFile = len(lst_blindfiles)
-    except:
-      print("Something wrong with opening doc folder")
+    except Exception as e:
+      print("Error occured while opening and listdir: ", e)
     
     if numFile==0:
       flagEmpty = True
@@ -141,7 +141,6 @@ def main_load():
     rectBack = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
     rectBack.center = (midpoint[0] - round(300/screenScale), round(1030/screenScale))
     rectSettings = pygame.Rect(0,0,round(2200/screenScale), round(120/screenScale))
-    rectDelete = pygame.Rect(0,0,round(20/screenScale), round(20/screenScale))
 
     running = True
 
@@ -160,7 +159,7 @@ def main_load():
         running = False
         gotomain = False
         continue
-      if not flagNext:
+      if not flagNext: #### 아직 flag를 누르기 전, 그러니까 기존 Blind Structure에서 고르는 단계 
         for event in pygame.event.get():
           if event.type == KEYDOWN:
             if event.key == ord('q'):
@@ -183,6 +182,8 @@ def main_load():
                 for i in range(objControl.getNumBlinds()):
                   tempBox = pygame.Rect(0,0,round(900/screenScale),round(50/screenScale))
                   tempBox.center = (midpoint[0], round((150+cnt*BLINDINTERVAL)/screenScale))
+                  rectDelete = pygame.Rect(0,0,round(25/screenScale), round(25/screenScale))
+                  rectDelete.center = (midpoint[0] + round(480/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale))
                   if tempLst[i][0] == 0:
                     lvl = TextObj(font = fontBox, content = "Break", color=BLACK, relative="center", position=(midpoint[0]-round(400/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale)))
                   else:
@@ -193,7 +194,7 @@ def main_load():
                   ante = TextObj(font = fontBox, color=BLACK, content=str(tempLst[i][4]), relative="center", position=(midpoint[0] + round(125/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale)))
                   isbreak = 0 if tempLst[i][0] == 0 else 1
                   level = level+1 if tempLst[i][0] == 1 else level
-                  tempLst2 = [isbreak,[tempBox, lvl, dur, bb, sb, ante],0]
+                  tempLst2 = [isbreak,[tempBox, lvl, dur, bb, sb, ante],0, rectDelete]
                     
                   lstBoxBlinds.append(tempLst2)
                   cnt+=1
@@ -218,7 +219,6 @@ def main_load():
                       selected = i
                       break
             elif event.button == 4 and lstRectBackgrounds[-1][0].bottom >= (CUTLINE - 100)/screenScale: #scroll up
-              #print("Scrllup")
               for i in range(numFile):
                 lstRectBackgrounds[i][0].top = lstRectBackgrounds[i][0].top-round(SCRLLFACTOR / screenScale)
                 lstRectBackgrounds[i][1].top = lstRectBackgrounds[i][1].top-round(SCRLLFACTOR / screenScale)
@@ -255,7 +255,7 @@ def main_load():
         pygame.display.flip()
 
         #####################
-      else: #Next 눌렀을 때
+      else: #Next 눌렀을 때, Structure 수정 단계
         if selected == -1:
           flagNext = False
         elif flagFirst:
@@ -265,7 +265,6 @@ def main_load():
         ##### KeyBoard events
         for event in pygame.event.get():
           if event.type == KEYDOWN:
-            #print(event.key)
             if event.key == ord('q'):
               confirmQuit()
               if TK_VAL:
@@ -295,6 +294,7 @@ def main_load():
                 for boxblinds in lstBoxBlinds:
                   #tempLst2 = [isbreak,[tempBox, lvl, dur, bb, sb, ante]]
                   boxblinds[1][0].top = boxblinds[1][0].top + f*round(SCRLLFACTOR / screenScale) #박스
+                  boxblinds[3].top = boxblinds[3].top + f*round(SCRLLFACTOR / screenScale)
                   for j in range(5):
                     boxblinds[1][j+1].changePosition(relative = "top", position = (boxblinds[1][j+1].getRect().centerx, boxblinds[1][j+1].getRect().top + f*round(SCRLLFACTOR / screenScale))) 
                 plusBox.top = plusBox.top + f*round(SCRLLFACTOR / screenScale)
@@ -308,7 +308,6 @@ def main_load():
               position = pygame.mouse.get_pos()
               if mouseInRect(rectNext, position): # Next 버튼 눌렀을 때 flagTimer true로
 
-                #print(objControl.getLstBlinds())
                 updateFile(objControl)
                 flagTimer = True
                 running = False
@@ -333,15 +332,29 @@ def main_load():
                 
                 cntBreak, cntLvl = 0, 0
                 #tempLst2 = [isbreak,[tempBox, lvl, dur, bb, sb, ante]]
+                flagUp = False
                 cntIdx = 0
+                idxDelete = 0
                 for boxblinds in lstBoxBlinds:
+                  if flagUp:  #### delete 이벤트 발생으로 한 칸씩 위로 올려야할 때
+                    boxblinds[1][0].top = boxblinds[1][0].top - round(BLINDINTERVAL/screenScale) #박스
+                    boxblinds[3].top = boxblinds[3].top - round(BLINDINTERVAL/screenScale)
+                    for j in range(5):
+                      boxblinds[1][j+1].changePosition(relative = "top", position = (boxblinds[1][j+1].getRect().centerx, boxblinds[1][j+1].getRect().top - round(BLINDINTERVAL/screenScale))) 
                   if boxblinds[0] == 0:
                     cntBreak+=1
                   else:
                     cntLvl+=1
                     boxblinds[1][1].changeContent(font = fontBox, content = str(cntLvl))
                   if 120/screenScale<boxblinds[1][0].bottom<(CUTLINE)/screenScale: # 화면 안에 나오는 애들 중
-                    if boxblinds[0] == 0: #break인 경우
+                    if mouseInRect(boxblinds[3], position) and not flagUp:
+                      objControl.deleteLevel(cntIdx)
+                      idxDelete = cntIdx
+                      flagUp = True
+                      if boxblinds[0] == 1:
+                        cntLvl -= 1
+                      continue
+                    elif boxblinds[0] == 0: #break인 경우
                       if mouseInRect(boxblinds[1][1].getRect(), position):
                         cntLvl+=1
                         boxblinds[1][1].changeContent(font = fontBox, content = str(cntLvl))
@@ -370,19 +383,27 @@ def main_load():
                         boxblinds[2] = 5
                         selectedIdx = cntIdx
                   cntIdx += 1
+                if flagUp:
+                  plusBox.top = plusBox.top - round(BLINDINTERVAL/screenScale)
+                  textPlus.changePosition(relative = "top", position=(textPlus.getRect().centerx, textPlus.getRect().top - round(BLINDINTERVAL/screenScale)))
+                  flagUp = False
+                  lstBoxBlinds.pop(idxDelete)
+                  
                 if 120/screenScale<plusBox.bottom<(CUTLINE)/screenScale:
                   if mouseInRect(plusBox, position):
                     tempBox = pygame.Rect(0,0,round(900/screenScale),round(50/screenScale))
                     tempBox.center = plusBox.center
+                    rectDelete = pygame.Rect(0,0,round(25/screenScale), round(25/screenScale))
+                    rectDelete.center = (midpoint[0] + round(480/screenScale), round((150+cnt*BLINDINTERVAL)/screenScale))
                     lvl = TextObj(font = fontBox, content=str(cntLvl+1), color=BLACK, relative="center", position=(midpoint[0] - round(400/screenScale), tempBox.centery))
                     dur = TextObj(font = fontBox, content='10', color=BLACK, relative="center", position=(midpoint[0] + round(300/screenScale), tempBox.centery))
                     bb = TextObj(font = fontBox, content='0', color=BLACK, relative="center", position=(midpoint[0] - round(225/screenScale), tempBox.centery))
 
                     sb = TextObj(font = fontBox, content='0', color=BLACK, relative="center", position=(midpoint[0] - round(50/screenScale), tempBox.centery))
                     ante = TextObj(font = fontBox, content='0', color=BLACK, relative="center", position=(midpoint[0] + round(125/screenScale), tempBox.centery))
-                    lstBoxBlinds.append([1,[tempBox, lvl, dur, bb, sb, ante], 0])
-                    plusBox.top = plusBox.top + BLINDINTERVAL/screenScale
-                    textPlus.changePosition(relative="top", position=(textPlus.getRect().centerx,textPlus.getRect().top + BLINDINTERVAL/screenScale))
+                    lstBoxBlinds.append([1,[tempBox, lvl, dur, bb, sb, ante], 0, rectDelete])
+                    plusBox.top = plusBox.top + round(BLINDINTERVAL/screenScale)
+                    textPlus.changePosition(relative="top", position=(textPlus.getRect().centerx,textPlus.getRect().top + round(BLINDINTERVAL/screenScale)))
                     objControl.addLevel()
         #### End of event for loop
                           
@@ -402,6 +423,8 @@ def main_load():
               if boxblinds[2] != 0: # 무언가 클릭됐을 때
                 pygame.draw.rect(screen, WHITE, boxblinds[1][boxblinds[2]].getRect())
                 blitText(screen, boxblinds[1][boxblinds[2]])
+            pygame.draw.rect(screen, RED, boxblinds[3])  ### Delete button
+            pygame.draw.rect(screen, BLACK, boxblinds[3], width = 3)
         #### End of for loop printing boxes on screen
         if 120/screenScale<plusBox.bottom<(CUTLINE)/screenScale:
           pygame.draw.rect(screen, GRAY, plusBox)

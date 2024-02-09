@@ -208,7 +208,11 @@ def main_save():
                   for rect in lstObj[1]:
                     rect.top = rect.top + f*round(SCRLLFACTOR / screenScale) #박스
                   for textObj in lstObj[2]:
-                    textObj.changePosition(relative = "top", position = (textObj.getRect().centerx, textObj.getRect().top + f*round(SCRLLFACTOR / screenScale))) 
+                    textObj.changePosition(relative = "top", position = (textObj.getRect().centerx, textObj.getRect().top + f*round(SCRLLFACTOR / screenScale)))
+                  try:
+                    lstObj[4].top = lstObj[4].top + f*round(SCRLLFACTOR / screenScale)
+                  except:
+                    pass
             if event.button == 1:
               if selectedIdx != -1:
                 lstBoxs[selectedIdx][3] = 0
@@ -258,14 +262,34 @@ def main_save():
               else: # 글자 클릭했는지 확인
                 
                 cntBreak, cntLvl = 0, 0
-                #tempLst2 = [isbreak,[tempBox], [lvl, dur, bb, sb, ante], clickedIdx]
+                flagUp = False
+                idxDelete = 0
+                #tempLst2 = [isbreak,[tempBox], [lvl, dur, bb, sb, ante], clickedIdx, rectDelete]
                 for i in range(len(lstBoxs)):
+                  if flagUp:
+                    try:
+                      lstBoxs[i][4].top = lstBoxs[i][4].top - round(BLINDINTERVAL/screenScale)
+                      lstBoxs[i][1][0].top = lstBoxs[i][1][0].top - round(BLINDINTERVAL/screenScale) #박스
+                      
+                      for j in range(5):
+                        lstBoxs[i][2][j].changePosition(relative = "top", position = (lstBoxs[i][2][j].getRect().centerx, lstBoxs[i][2][j].getRect().top - round(BLINDINTERVAL/screenScale)))
+                    except:  #### plusBox의 케이스
+                      pass
                   if lstBoxs[i][0] == 0:
                     cntBreak+=1
                   elif lstBoxs[i][0] == 1:
                     cntLvl+=1
                     lstBoxs[i][2][0].changeContent(font = fontBox, content = str(cntLvl))
                   if 120/screenScale<lstBoxs[i][1][0].bottom<(CUTLINE)/screenScale: # 화면 안에 나오는 애들 중
+                    try:
+                      if mouseInRect(lstBoxs[i][4], position) and not flagUp:
+                        flagUp = True
+                        idxDelete = i
+                        if lstBoxs[i][0] == 1:
+                          cntLvl -= 1
+                        continue
+                    except:   ### plusBox인 경우는 오류가 나니까
+                      pass
                     if lstBoxs[i][0] == 0: #break인 경우
                       if mouseInRect(lstBoxs[i][2][0].getRect(), position):
                         cntLvl+=1
@@ -295,6 +319,8 @@ def main_save():
                       if 120/screenScale<lstBoxs[i][1][0].bottom<(CUTLINE)/screenScale and mouseInRect(lstBoxs[i][1][0], position):
                         tempBox = pygame.Rect(0,0,round(900/screenScale),round(50/screenScale))
                         tempBox.center = lstBoxs[i][1][0].center
+                        rectDelete = pygame.Rect(0,0,round(25/screenScale), round(25/screenScale))
+                        rectDelete.center = (tempBox.centerx + round(480/screenScale), tempBox.centery)
                         lvl = TextObj(font = fontBox, content=str(cntLvl+1), color=BLACK, relative="center", position=(midpoint[0] - round(400/screenScale), tempBox.centery))
                         dur = TextObj(font = fontBox, content='10', color=BLACK, relative="center", position=(midpoint[0] + round(300/screenScale), tempBox.centery))
                         bb = TextObj(font = fontBox, content='0', color=BLACK, relative="center", position=(midpoint[0] - round(225/screenScale), tempBox.centery))
@@ -304,8 +330,13 @@ def main_save():
                         lstBoxs[i][1][0].top = lstBoxs[i][1][0].top + BLINDINTERVAL/screenScale
                         lstBoxs[i][2][0].changePosition(relative="top", position=(lstBoxs[i][2][0].getRect().centerx,lstBoxs[i][2][0].getRect().top + BLINDINTERVAL/screenScale))
                         templst = lstBoxs.pop()
-                        lstBoxs.append([1,[tempBox], [lvl, dur, bb, sb, ante], 0])
+                        lstBoxs.append([1,[tempBox], [lvl, dur, bb, sb, ante], 0, rectDelete])
                         lstBoxs.append(templst)
+                if flagUp:
+                  lstBoxs[-1][1][0].top = lstBoxs[-1][1][0].top - round(BLINDINTERVAL/screenScale)
+                  lstBoxs[-1][2][0].changePosition(relative = "top", position=(lstBoxs[-1][2][0].getRect().centerx, lstBoxs[-1][2][0].getRect().top - round(BLINDINTERVAL/screenScale)))
+                  flagUp = False
+                  lstBoxs.pop(idxDelete)
         screen.blit(imgBackground, (0,0))
         pygame.draw.rect(screen, PALEGRAY, rectNext)
         pygame.draw.rect(screen, GRAY, rectNext, width = 4)
@@ -328,6 +359,11 @@ def main_save():
               if lstBoxs[i][3] != 0: # 무언가 클릭됐을 때
                 pygame.draw.rect(screen, WHITE, lstBoxs[i][2][lstBoxs[i][3]].getRect())
                 blitText(screen, lstBoxs[i][2][lstBoxs[i][3]])
+            try:
+              pygame.draw.rect(screen, RED, lstBoxs[i][4])  ### Delete button
+              pygame.draw.rect(screen, BLACK, lstBoxs[i][4], width = 3)
+            except:
+              pass
         pygame.draw.rect(screen, DARKGRAY, rectSettings)
         pygame.draw.line(screen, BLACK, (0,round(120/screenScale)), (round(2200/screenScale),round(120/screenScale)), width=5)
         pygame.draw.line(screen,WHITE, (0,round(CUTLINE/screenScale)), (round(2048/screenScale),round(CUTLINE/screenScale)))
