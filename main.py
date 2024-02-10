@@ -83,12 +83,14 @@ def main():
     rectSettings = imgSettings.get_rect()
     rectSettings.center = locSettings
     rectBar = imgBar.get_rect()
-    rectBar.center = midpoint
+    rectBar.center = (midpoint[0] + round(100/screenScale), midpoint[1])
 
     mode = 0
     running = True
     flagSettings = False
     barMove = False
+
+    vol = 0.5
     while running:
       if TK_VAL:
         running = False
@@ -100,6 +102,9 @@ def main():
             confirmQuit()
           elif event.key == K_SPACE:
             pass
+          if event.key == ord('b') and flagSettings:
+            flagSettings = False
+            barMove = False
         if event.type == MOUSEBUTTONDOWN and event.button == 1:
           position = pygame.mouse.get_pos()
           if not flagSettings:
@@ -113,6 +118,10 @@ def main():
               confirmQuit()
             elif mouseInRect(rectSettings, position):
               flagSettings = True
+              settingfile = open("./doc/settings", "r")
+              vol = float(settingfile.readline().replace("\n", ""))
+              settingfile.close()
+              rectBar.centerx = midpoint[0] - round(400/screenScale) + round(vol * 1000)
           else:
             pygame.mouse.get_rel()
             if mouseInRect(rectBar, position):
@@ -122,12 +131,16 @@ def main():
           if x:
             mx, my = pygame.mouse.get_rel()
             rectBar.x += mx
-            if rectBar.centerx < midpoint[0] - 500:
-              rectBar.centerx = midpoint[0] - 500
-            if rectBar.centerx > midpoint[0] + 500:
-              rectBar.centerx = midpoint[0] + 500
-        elif event.type == MOUSEMOTION and flagSettings and barMove:
+            if rectBar.centerx < midpoint[0] - round(400/screenScale):
+              rectBar.centerx = midpoint[0] - round(400/screenScale)
+            if rectBar.centerx > midpoint[0] + round(600/screenScale):
+              rectBar.centerx = midpoint[0] + round(600/screenScale)
+        elif event.type == MOUSEBUTTONUP and flagSettings and barMove:
           barMove = False
+          vol = (rectBar.centerx - midpoint[0] + 400/screenScale) / float(1000)
+          outfile = open("./doc/settings", "w")
+          outfile.write(str(vol))
+          outfile.close()
 
       screen.blit(imgBackground,(0,0))
       if not flagSettings:
@@ -141,18 +154,21 @@ def main():
         pygame.draw.circle(screen, BLACK, shutCenter, shutRadius, width = 2)
         screen.blit(imgSettings, rectSettings)
       else:
-        pygame.draw.line(screen, WHITE, (midpoint[0] - round(500/screenScale), midpoint[1]), (midpoint[0] + round(500/screenScale), midpoint[1]), width=4)
+        pygame.draw.line(screen, WHITE, (midpoint[0] - round(400/screenScale), midpoint[1]), (midpoint[0] + round(600/screenScale), midpoint[1]), width=4)
         screen.blit(imgBar, rectBar)
       pygame.display.flip()
       clock.tick(FPS)
 
     pygame.quit()
+    settingfile = open("./doc/settings", "r")
+    vol = float(settingfile.readline().replace("\n", ""))
+    settingfile.close()
     if mode == 0:
       pass
     elif mode == 1: # Loadmode
-      flagRun = loadmode.main_load()
+      flagRun = loadmode.main_load(vol)
     elif mode == 2: # Savemode
-      flagRun = savemode.main_save()
+      flagRun = savemode.main_save(vol)
 ################ End of main
 
 if __name__ == "__main__":

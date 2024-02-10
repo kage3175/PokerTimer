@@ -1,2 +1,3 @@
-1. savemode lstBoxs를 파일형태로 저장하는 기능 추가해야...
-2. pyinstaller 이용한 패키지
+1. main setting에서 back button 추가하기
+2. Load mode에서 structure delete 버튼 추가하기
+3

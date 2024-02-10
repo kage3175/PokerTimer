@@ -104,7 +104,7 @@ def close_window(window, isQuit):
   TK_VAL = isQuit
   window.destroy()
 
-def main(lstBLINDS, lstLevels,title, isLoad):
+def main(lstBLINDS, lstLevels,title, isLoad, vol):
   global LSTLEVELS, LSTBLINDS
   LSTLEVELS = lstLevels
   LSTLEVELS.append(100)
@@ -122,6 +122,8 @@ def main(lstBLINDS, lstLevels,title, isLoad):
   screenScale = 1152/screensize[1]
   surface = pygame.display.set_mode(screensize, FULLSCREEN)
   soundLevelup = pygame.mixer.Sound("./sound/levelup.mp3")
+  soundLevelup.set_volume(vol)
+
   pauseBox = pygame.Surface((round(800/screenScale),round(100/screenScale)))
   pauseBox.set_alpha(128)
   pauseBox.fill(YELLOW)

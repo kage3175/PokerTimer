@@ -40,7 +40,7 @@ def close_window(window, isQuit):
   TK_VAL = isQuit
   window.destroy()
 
-def main_load():
+def main_load(vol):
   global TK_VAL
   user32 = ctypes.windll.user32
   screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)  # 해상도 구하기
@@ -79,7 +79,7 @@ def main_load():
 
     try:
       lst_blindfiles = os.listdir('./doc')
-      numFile = len(lst_blindfiles)
+      numFile = len(lst_blindfiles) -1  ## Setting 하나 빼야함
     except Exception as e:
       print("Error occured while opening and listdir: ", e)
     
@@ -89,6 +89,8 @@ def main_load():
       lstTag = [False for _ in range(numFile)]
       cnt = 0
       for name in lst_blindfiles:
+        if name[-4] != ".":
+          continue
         file = open('./doc/'+name, "r")
         obj = BlindFile()
         obj.make(file)
@@ -452,7 +454,7 @@ def main_load():
     if gotomain:
       return True
     elif flagTimer:
-      flag = timer.main(lstBlind, lstLevel, title, True)
+      flag = timer.main(lstBlind, lstLevel, title, True, vol)
       if flag == 0:
         r = False
       else: r = True

@@ -51,7 +51,7 @@ def caution(text = "Caution"):
   yesB.place(y = 75, relx=0.5, anchor='n')
   window.mainloop()
 
-def main_save():
+def main_save(vol):
   r = True
   
   while r:
@@ -377,7 +377,7 @@ def main_save():
     if gotomain:
       return True
     if flagTimer:
-      flag=timer.main(lstBlind, lstLevel, title, False)
+      flag=timer.main(lstBlind, lstLevel, title, False, vol)
       if flag == 0:
         r = False
       else: r = True
