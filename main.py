@@ -34,12 +34,16 @@ def close_window(window, isQuit):
   TK_VAL = isQuit
   window.destroy()
 
+def mouseInRect(rectObj, position):
+  return rectObj.left <= position[0] <= rectObj.right and rectObj.top <= position[1]<= rectObj.bottom
+
 
 def main():
   flagRun = True
   while flagRun:
 
     pygame.init()
+    clock = pygame.time.Clock()
     user32 = ctypes.windll.user32
     screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)  # 해상도 구하기
     midpoint = screensize[0] / 2, screensize[1] / 2 # 화면 중앙점
@@ -47,6 +51,9 @@ def main():
     screen = pygame.display.set_mode()
     imgBackground = pygame.image.load("./img/background.jpg")
     imgBackground = pygame.transform.scale(imgBackground, screensize)
+    imgSettings = pygame.image.load("./img/settings.png")
+    imgSettings = pygame.transform.scale(imgSettings,(round(100/screenScale),round(100/screenScale)))
+    imgBar = pygame.image.load("./img/test.png")
 
     shutCenter = (screensize[0] - round(50/screenScale), round(50 /screenScale))
     shutRadius = 17
@@ -55,6 +62,7 @@ def main():
 
     locSave = (midpoint[0], midpoint[1] - round(200/screenScale))
     locLoad = (midpoint[0], midpoint[1] + round(200/screenScale))
+    locSettings = (screensize[0] - round(70 /screenScale), screensize[1] - round(70 / screenScale))
 
     textSave = fontButton.render("New Structure", True, BLACK)
     objSave = textSave.get_rect()
@@ -72,9 +80,15 @@ def main():
     rectLoad.center = locLoad
     rectLoadOutline = pygame.Rect(0,0,round(800/screenScale),round(300/screenScale))
     rectLoadOutline.center = locLoad
+    rectSettings = imgSettings.get_rect()
+    rectSettings.center = locSettings
+    rectBar = imgBar.get_rect()
+    rectBar.center = midpoint
 
     mode = 0
     running = True
+    flagSettings = False
+    barMove = False
     while running:
       if TK_VAL:
         running = False
@@ -86,26 +100,51 @@ def main():
             confirmQuit()
           elif event.key == K_SPACE:
             pass
-        if event.type == MOUSEBUTTONDOWN:
+        if event.type == MOUSEBUTTONDOWN and event.button == 1:
           position = pygame.mouse.get_pos()
-          if(rectSave.left<=position[0]<=rectSave.right and rectSave.top <= position[1] <= rectSave.bottom):
-            mode = 2
-            running = False
-          elif(rectLoad.left<=position[0]<=rectLoad.right and rectLoad.top <= position[1] <= rectLoad.bottom):
-            mode = 1
-            running = False
-          elif (((position[0] - shutCenter[0]) ** 2 + (position[1] - shutCenter[1]) ** 2) ** 0.5 <= shutRadius):
-            confirmQuit()
+          if not flagSettings:
+            if mouseInRect(rectSave, position):
+              mode = 2
+              running = False
+            elif mouseInRect(rectLoad, position):
+              mode = 1
+              running = False
+            elif (((position[0] - shutCenter[0]) ** 2 + (position[1] - shutCenter[1]) ** 2) ** 0.5 <= shutRadius):
+              confirmQuit()
+            elif mouseInRect(rectSettings, position):
+              flagSettings = True
+          else:
+            pygame.mouse.get_rel()
+            if mouseInRect(rectBar, position):
+              barMove = True
+        elif event.type == MOUSEMOTION and flagSettings and barMove:
+          x,y,z = pygame.mouse.get_pressed()
+          if x:
+            mx, my = pygame.mouse.get_rel()
+            rectBar.x += mx
+            if rectBar.centerx < midpoint[0] - 500:
+              rectBar.centerx = midpoint[0] - 500
+            if rectBar.centerx > midpoint[0] + 500:
+              rectBar.centerx = midpoint[0] + 500
+        elif event.type == MOUSEMOTION and flagSettings and barMove:
+          barMove = False
+
       screen.blit(imgBackground,(0,0))
-      pygame.draw.rect(screen, PALEGRAY, rectSave)
-      pygame.draw.rect(screen, DARKGRAY, rectSaveOutline, width = 6)
-      screen.blit(textSave, objSave)
-      pygame.draw.rect(screen, PALEGRAY, rectLoad)
-      pygame.draw.rect(screen, DARKGRAY, rectLoadOutline, width = 6)
-      screen.blit(textLoad, objLoad)
-      pygame.draw.circle(screen, RED, shutCenter, shutRadius)
-      pygame.draw.circle(screen, BLACK, shutCenter, shutRadius, width = 2)
+      if not flagSettings:
+        pygame.draw.rect(screen, PALEGRAY, rectSave)
+        pygame.draw.rect(screen, DARKGRAY, rectSaveOutline, width = 6)
+        screen.blit(textSave, objSave)
+        pygame.draw.rect(screen, PALEGRAY, rectLoad)
+        pygame.draw.rect(screen, DARKGRAY, rectLoadOutline, width = 6)
+        screen.blit(textLoad, objLoad)
+        pygame.draw.circle(screen, RED, shutCenter, shutRadius)
+        pygame.draw.circle(screen, BLACK, shutCenter, shutRadius, width = 2)
+        screen.blit(imgSettings, rectSettings)
+      else:
+        pygame.draw.line(screen, WHITE, (midpoint[0] - round(500/screenScale), midpoint[1]), (midpoint[0] + round(500/screenScale), midpoint[1]), width=4)
+        screen.blit(imgBar, rectBar)
       pygame.display.flip()
+      clock.tick(FPS)
 
     pygame.quit()
     if mode == 0:
