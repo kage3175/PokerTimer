@@ -239,4 +239,7 @@ def processAscii(key):
     return 9
   else:
     return 0
+  
+def mouseInRect(rectObj, position):
+  return rectObj.left <= position[0] <= rectObj.right and rectObj.top <= position[1]<= rectObj.bottom
 #### End of processAscii

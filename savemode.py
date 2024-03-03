@@ -11,9 +11,6 @@ import tkinter as tk
 TK_VAL = False
 
 
-def mouseInRect(rectObj, position):
-  return rectObj.left <= position[0] <= rectObj.right and rectObj.top <= position[1]<= rectObj.bottom
-
 def confirmQuit():
   window = tk.Tk()
   window.title('Quit?')

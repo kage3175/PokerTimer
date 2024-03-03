@@ -34,10 +34,6 @@ def close_window(window, isQuit):
   TK_VAL = isQuit
   window.destroy()
 
-def mouseInRect(rectObj, position):
-  return rectObj.left <= position[0] <= rectObj.right and rectObj.top <= position[1]<= rectObj.bottom
-
-
 def main():
   flagRun = True
   while flagRun:
@@ -55,10 +51,14 @@ def main():
     imgSettings = pygame.transform.scale(imgSettings,(round(100/screenScale),round(100/screenScale)))
     imgBar = pygame.image.load("./img/test.png")
 
+    soundLevelup = pygame.mixer.Sound("./sound/levelup.mp3")
+    
+
     shutCenter = (screensize[0] - round(50/screenScale), round(50 /screenScale))
     shutRadius = 17
 
     fontButton = pygame.font.Font('./font/NanumSquareB.ttf', round(100/screenScale))
+    fontVolume = pygame.font.Font('./font/NanumGothic.ttf', round(80/screenScale))
 
     locSave = (midpoint[0], midpoint[1] - round(200/screenScale))
     locLoad = (midpoint[0], midpoint[1] + round(200/screenScale))
@@ -70,6 +70,11 @@ def main():
     textLoad = fontButton.render("Load", True, BLACK)
     objLoad = textLoad.get_rect()
     objLoad.center = locLoad
+    textVol = fontVolume.render("Volume", True, WHITE)
+    objVol = textVol.get_rect()
+    objVol.center = (midpoint[0] - round(600/screenScale), midpoint[1])
+    textNext = TextObj(font = fontButton, content="Save", position=(midpoint[0] + round(300/screenScale), round(1030/screenScale)), relative="center", color=BLACK)
+    textBack = TextObj(font = fontButton, content="Back", color=BLACK, relative="center", position=(midpoint[0] - round(300/screenScale), round(1030/screenScale)))
 
 
     rectSave = pygame.Rect(0,0,round(800/screenScale),round(300/screenScale))
@@ -84,6 +89,10 @@ def main():
     rectSettings.center = locSettings
     rectBar = imgBar.get_rect()
     rectBar.center = (midpoint[0] + round(100/screenScale), midpoint[1])
+    rectNext = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
+    rectNext.center = (midpoint[0] + round(300/screenScale), round(1030/screenScale))
+    rectBack = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
+    rectBack.center = (midpoint[0] - round(300/screenScale), round(1030/screenScale))
 
     mode = 0
     running = True
@@ -100,11 +109,6 @@ def main():
         if event.type == KEYDOWN:
           if event.key == ord('q'):
             confirmQuit()
-          elif event.key == K_SPACE:
-            pass
-          if event.key == ord('b') and flagSettings:
-            flagSettings = False
-            barMove = False
         if event.type == MOUSEBUTTONDOWN and event.button == 1:
           position = pygame.mouse.get_pos()
           if not flagSettings:
@@ -122,10 +126,21 @@ def main():
               vol = float(settingfile.readline().replace("\n", ""))
               settingfile.close()
               rectBar.centerx = midpoint[0] - round(400/screenScale) + round(vol * 1000)
+              soundLevelup.set_volume(vol)
           else:
             pygame.mouse.get_rel()
             if mouseInRect(rectBar, position):
               barMove = True
+            elif mouseInRect(rectNext, position):
+              flagSettings = False
+              barMove = False
+              vol = (rectBar.centerx - midpoint[0] + 400/screenScale) / float(1000)
+              outfile = open("./doc/settings", "w")
+              outfile.write(str(vol))
+              outfile.close()
+            elif mouseInRect(rectBack, position):
+              flagSettings = False
+              barMove = False
         elif event.type == MOUSEMOTION and flagSettings and barMove:
           x,y,z = pygame.mouse.get_pressed()
           if x:
@@ -138,10 +153,8 @@ def main():
         elif event.type == MOUSEBUTTONUP and flagSettings and barMove:
           barMove = False
           vol = (rectBar.centerx - midpoint[0] + 400/screenScale) / float(1000)
-          outfile = open("./doc/settings", "w")
-          outfile.write(str(vol))
-          outfile.close()
-
+          soundLevelup.set_volume(vol)
+          soundLevelup.play()
       screen.blit(imgBackground,(0,0))
       if not flagSettings:
         pygame.draw.rect(screen, PALEGRAY, rectSave)
@@ -156,9 +169,17 @@ def main():
       else:
         pygame.draw.line(screen, WHITE, (midpoint[0] - round(400/screenScale), midpoint[1]), (midpoint[0] + round(600/screenScale), midpoint[1]), width=4)
         screen.blit(imgBar, rectBar)
+        screen.blit(textVol, objVol)
+        pygame.draw.rect(screen, PALEGRAY, rectNext)
+        pygame.draw.rect(screen, DARKGRAY, rectNext, width = 4)
+        screen.blit(textNext.getText(), textNext.getRect())
+        pygame.draw.rect(screen, PALEGRAY, rectBack)
+        pygame.draw.rect(screen, DARKGRAY, rectBack, width = 4)
+        screen.blit(textBack.getText(), textBack.getRect())
       pygame.display.flip()
       clock.tick(FPS)
 
+    soundLevelup.stop()
     pygame.quit()
     settingfile = open("./doc/settings", "r")
     vol = float(settingfile.readline().replace("\n", ""))
