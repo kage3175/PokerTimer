@@ -183,15 +183,45 @@ def main_save(vol):
           if event.type == KEYDOWN:
             if event.key == ord('q'):
               confirmQuit()
-            elif event.key in K_NUM or event.key == K_BACKSPACE:
-              if selectedIdx != -1:
+            elif selectedIdx != -1:
+              if event.key in K_NUM or event.key == K_BACKSPACE:
                 temp_input = (temp_input*10 + processAscii(event.key)) if (event.key in K_NUM) else (temp_input//10)
                 lstBoxs[selectedIdx][2][lstBoxs[selectedIdx][3]].changeContent(font = fontBox, content = str(temp_input))
-            elif pygame.key.name(event.key) == "return" or pygame.key.name(event.key) == "enter":
-              if selectedIdx != -1:
+              elif pygame.key.name(event.key) == "return" or pygame.key.name(event.key) == "enter":
                 lstBoxs[selectedIdx][3] = 0
                 selectedIdx = -1
                 temp_input = 0
+              elif event.key == K_TAB:
+                if selectedIdx == len(lstBoxs)-1 and lstBoxs[selectedIdx][3] == 1:
+                  pass
+                elif lstBoxs[selectedIdx][3] != 1: #Duration이 선택된게 아닌 경우
+                  lstBoxs[selectedIdx][2][lstBoxs[selectedIdx][3]].changeContent(font = fontBox, content = str(temp_input))
+                  if lstBoxs[selectedIdx][3] != 4:
+                    lstBoxs[selectedIdx][3] = lstBoxs[selectedIdx][3] + 1
+                  else:
+                    lstBoxs[selectedIdx][3] = 1
+                  temp_input = 0
+                else: #Duration이 선택됐던 경우
+                  temp_input = 1 if (temp_input == 0) else temp_input
+                  lstBoxs[selectedIdx][2][lstBoxs[selectedIdx][3]].changeContent(font = fontBox, content = str(temp_input))
+                  lstBoxs[selectedIdx][3] = 0
+                  selectedIdx += 1
+                  f = -1
+                  for lstObj in lstBoxs:
+                    for rect in lstObj[1]:
+                      rect.top = rect.top + f*round(BLINDINTERVAL / screenScale) #박스
+                    for textObj in lstObj[2]:
+                      textObj.changePosition(relative = "top", position = (textObj.getRect().centerx, textObj.getRect().top + f*round(BLINDINTERVAL / screenScale)))
+                    try:
+                      lstObj[4].top = lstObj[4].top + f*round(BLINDINTERVAL / screenScale)
+                    except:
+                      pass
+                  if lstBoxs[selectedIdx][0] == 0: #Break
+                    lstBoxs[selectedIdx][3] = 1
+                    temp_input = 0
+                  else:
+                    lstBoxs[selectedIdx][3] = 2
+                    temp_input = 0
           if event.type == MOUSEBUTTONDOWN:
             position = pygame.mouse.get_pos()
             if event.button == 4 or event.button == 5:
@@ -292,6 +322,9 @@ def main_save(vol):
                         cntLvl+=1
                         lstBoxs[i][2][0].changeContent(font = fontBox, content = str(cntLvl))
                         lstBoxs[i][0] = 1
+                      elif mouseInRect(lstBoxs[i][2][1].getRect(), position): #Break Duration
+                        lstBoxs[i][3] = 1
+                        selectedIdx = i
                     elif lstBoxs[i][0] == 1: # Level인 경우
                       if mouseInRect(lstBoxs[i][2][0].getRect(), position): # Lvl
                         cntBreak+=1
@@ -343,10 +376,14 @@ def main_save(vol):
         for i in range(len(lstBoxs)):
           if 120/screenScale<lstBoxs[i][1][0].bottom<(CUTLINE)/screenScale:
             
-            if lstBoxs[i][0] == 0:
+            if lstBoxs[i][0] == 0: #Break의 경우
               pygame.draw.rect(screen, WHITE, lstBoxs[i][1][0])
               pygame.draw.rect(screen, BLACK, lstBoxs[i][1][0], width=4)
-              screen.blit(lstBoxs[i][2][0].getText(), lstBoxs[i][2][0].getRect())
+              
+              #screen.blit(lstBoxs[i][2][0].getText(), lstBoxs[i][2][0].getRect())
+              if lstBoxs[i][3] != 0:
+                pygame.draw.rect(screen, GRAY, lstBoxs[i][2][lstBoxs[i][3]].getRect())
+              blitText(screen, lstBoxs[i][2][0], lstBoxs[i][2][1])
             else:
               for rect in lstBoxs[i][1]:
                 pygame.draw.rect(screen, GRAY, rect)
