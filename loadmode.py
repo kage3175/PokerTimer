@@ -103,7 +103,6 @@ def main_load(vol):
 
     try:
       lst_blindfiles = os.listdir('./doc')
-      print(lst_blindfiles)
       numFile = len(lst_blindfiles) -1  ## Setting 하나 빼야함
     except Exception as e:
       print("Error occured while opening and listdir: ", e)
@@ -138,8 +137,8 @@ def main_load(vol):
         objDurations = tempDurations.get_rect()
         objDurations.topleft = (round(550/screenScale), round((220+cnt*BOXINTERVAL)/screenScale))
 
-        lstTextBlinds.append((tempTitle,tempType, tempDurations))
-        lstRectBlinds.append((objTemp,objType, objDurations))
+        lstTextBlinds.append([tempTitle,tempType, tempDurations])
+        lstRectBlinds.append([objTemp,objType, objDurations])
 
         tempRect = pygame.Rect(0,0,round(1000/screenScale),round(BOXHEIGHT/screenScale))
         tempRect.topleft = (round(525/screenScale), round((100+cnt*BOXINTERVAL)/screenScale))
@@ -190,6 +189,7 @@ def main_load(vol):
     flagTyping = False
     fixIdx = 0
     flagShift = False
+    temp_topleft = (0,0)
 
     while running:
       if TK_VAL:
@@ -208,16 +208,19 @@ def main_load(vol):
               key = pygame.key.name(event.key)
               key = " " if (key == "space") else key
               key = key[1] if (key[0] == "[") else key
-              if key == "return":
+              if key == "return" or key == "enter":
+                lstBlindObjs[fixIdx].setTitle(temp_input)
+                updateFile(lstBlindObjs[fixIdx])
                 temp_input = 0
                 lstTag[fixIdx] = False
                 flagTyping = False
-                fixIdx = -1
-              elif key == "enter":
-                ################################################ 작업해야함
-                pass
+                fixIdx = -1      
               elif event.key == K_BACKSPACE:
                 temp_input = '' if (temp_input == '') else temp_input[:-1]
+                tempTitle = fontTitle.render(temp_input, True, BLACK)
+                lstTextBlinds[fixIdx][0] = tempTitle
+                lstRectBlinds[fixIdx][0] = tempTitle.get_rect()
+                lstRectBlinds[fixIdx][0].topleft = temp_topleft
               elif key in SHIFT:
                 flagShift = True
               elif len(key) > 1:
@@ -227,9 +230,16 @@ def main_load(vol):
                   key = "_" if (key == "-") else key
                   if key in STRNUM:
                     key = ""
-                  key = key.capitalize()
+                  key = key.capitalize()        
                 temp_input = temp_input + key
-
+                tempTitle = fontTitle.render(temp_input, True, BLACK)
+                lstTextBlinds[fixIdx][0] = tempTitle
+                lstRectBlinds[fixIdx][0] = tempTitle.get_rect()
+                lstRectBlinds[fixIdx][0].topleft = temp_topleft
+          if event.type == KEYUP:
+            key = pygame.key.name(event.key)
+            if key in SHIFT:
+              flagShift = False
           if event.type == MOUSEBUTTONDOWN:
             if event.button == 1:# Left Click
               position = pygame.mouse.get_pos()
@@ -246,7 +256,6 @@ def main_load(vol):
                     lst_blindfiles.remove('settings')
                     os.remove('./doc/'+lst_blindfiles[right_clicked])
                     lst_blindfiles = os.listdir('./doc')
-                    print(right_clicked, numFile)
                     for i in range(right_clicked, numFile):
                       lstRectBackgrounds[i][0].top = lstRectBackgrounds[i][0].top-round(BOXINTERVAL / screenScale)
                       lstRectBackgrounds[i][1].top = lstRectBackgrounds[i][1].top-round(BOXINTERVAL / screenScale)
@@ -255,6 +264,7 @@ def main_load(vol):
                   right_clicked = -1
                 elif mouseInRect(rectMenuRename, position):
                   flagTyping = True
+                  temp_topleft = lstRectBlinds[right_clicked][0].topleft
                   #lstTextBlinds.append((tempTitle,tempType, tempDurations))
                   #lstRectBlinds.append((objTemp,objType, objDurations))
                   temp_input = ''
@@ -288,6 +298,13 @@ def main_load(vol):
 
 
                 #########################################
+              elif flagTyping:
+                lstBlindObjs[fixIdx].setTitle(temp_input)
+                updateFile(lstBlindObjs[fixIdx])
+                temp_input = 0
+                lstTag[fixIdx] = False
+                flagTyping = False
+                fixIdx = -1  
               elif mouseInRect(rectNext, position): #Next Button
                 flagNext = True
                 flagFirst = True
