@@ -10,6 +10,7 @@ import tkinter as tk
 PALEGRAY = (150,150,150)
 
 TK_VAL = False
+TK_VAL_DEL = False
 
   
 def confirmQuit():
@@ -32,13 +33,39 @@ def confirmQuit():
   noB.place(y = 75, relx=0.75, anchor='n')
   window.mainloop()
 
+def confirmDelete():
+  window = tk.Tk()
+  window.title('Quit?')
+  screen_width = window.winfo_screenwidth()
+  screen_height = window.winfo_screenheight()
+  width,height = 500,160
+
+  x = (screen_width - width) // 2
+  y = (screen_height - height) // 2 - 50
+  window.geometry(f"{width}x{height}+{x}+{y}")
+  window.configure(bg = 'white')
+  window.resizable(False, False)
+  label = tk.Label(window, font = ("Arial", 25), bg = 'white', text = "Are you sure to Delete?")
+  label.place(y=20, relx = 0.5, anchor='n')
+  yesB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "Yes", command = lambda: close_window2(window, True))
+  yesB.place(y = 75, relx=0.25, anchor='n')
+  noB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "No", command = lambda: close_window2(window, False))
+  noB.place(y = 75, relx=0.75, anchor='n')
+  window.mainloop()
+
 def close_window(window, isQuit):
   global TK_VAL
   TK_VAL = isQuit
   window.destroy()
 
+def close_window2(window, isDel):
+  global TK_VAL_DEL
+  TK_VAL_DEL = isDel
+  window.destroy()
+
 def main_load(vol):
   global TK_VAL
+  global TK_VAL_DEL
   user32 = ctypes.windll.user32
   screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)  # 해상도 구하기
   midpoint = screensize[0] / 2, screensize[1] / 2 # 화면 중앙점
@@ -76,6 +103,7 @@ def main_load(vol):
 
     try:
       lst_blindfiles = os.listdir('./doc')
+      print(lst_blindfiles)
       numFile = len(lst_blindfiles) -1  ## Setting 하나 빼야함
     except Exception as e:
       print("Error occured while opening and listdir: ", e)
@@ -93,7 +121,7 @@ def main_load(vol):
         obj.make(file)
         obj.putFilename(name)
         file.close()
-        lstBlindObjs.insert(0,obj)
+        lstBlindObjs.append(obj)
 
         tempTitle = fontTitle.render(obj.getTitle(), True, BLACK)
         objTemp = tempTitle.get_rect()
@@ -110,14 +138,14 @@ def main_load(vol):
         objDurations = tempDurations.get_rect()
         objDurations.topleft = (round(550/screenScale), round((220+cnt*BOXINTERVAL)/screenScale))
 
-        lstTextBlinds.insert(0,(tempTitle,tempType, tempDurations))
-        lstRectBlinds.insert(0,(objTemp,objType, objDurations))
+        lstTextBlinds.append((tempTitle,tempType, tempDurations))
+        lstRectBlinds.append((objTemp,objType, objDurations))
 
         tempRect = pygame.Rect(0,0,round(1000/screenScale),round(BOXHEIGHT/screenScale))
         tempRect.topleft = (round(525/screenScale), round((100+cnt*BOXINTERVAL)/screenScale))
         tempRectOutline = pygame.Rect(0,0,round(1000/screenScale),round(BOXHEIGHT/screenScale))
         tempRectOutline.topleft = (round(525/screenScale), round((100+cnt*BOXINTERVAL)/screenScale))
-        lstRectBackgrounds.insert(0,(tempRect, tempRectOutline))
+        lstRectBackgrounds.append((tempRect, tempRectOutline))
         cnt+=1
     #### End of reading files
 
@@ -132,6 +160,8 @@ def main_load(vol):
     textSettingSB = TextObj(font = fontSup, content="SB", color=WHITE, relative="center", position=(midpoint[0] - round(50/screenScale), round(90/screenScale)))
     textSettingAnte = TextObj(font = fontSup, content="Ante", color=WHITE, relative="center", position=(midpoint[0] + round(125/screenScale), round(90/screenScale)))
     textSettingDur = TextObj(font = fontSup, content="Duration", color=WHITE, relative="center", position=(midpoint[0] + round(300/screenScale), round(90/screenScale)))
+    textRename = TextObj(font = fontSup, content="Rename", position = (0,0), relative="topleft", color = BLACK)
+    textDelete = TextObj(font = fontSup, content="Delete", color=BLACK, relative="topleft", position=(0,0))
 
   #endregion
 
@@ -140,6 +170,10 @@ def main_load(vol):
     rectBack = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
     rectBack.center = (midpoint[0] - round(300/screenScale), round(1030/screenScale))
     rectSettings = pygame.Rect(0,0,round(2200/screenScale), round(120/screenScale))
+    rectMenuRename = pygame.Rect(0,0,round(200/screenScale), round(50/screenScale))
+    rectMenuRename.center = (0,0)
+    rectMenuDelete = pygame.Rect(0,0,round(200/screenScale), round(50/screenScale))
+    rectMenuDelete.center = (0,0)
 
     running = True
 
@@ -152,6 +186,10 @@ def main_load(vol):
     temp_input = 0
     objControl = None
     flagFirst = False
+    right_clicked = -1
+    flagTyping = False
+    fixIdx = 0
+    flagShift = False
 
     while running:
       if TK_VAL:
@@ -161,15 +199,96 @@ def main_load(vol):
       if not flagNext: #### 아직 flag를 누르기 전, 그러니까 기존 Blind Structure에서 고르는 단계 
         for event in pygame.event.get():
           if event.type == KEYDOWN:
-            if event.key == ord('q'):
+            if event.key == ord('q') and not flagTyping:
               confirmQuit()
               if TK_VAL:
                 running = False
                 gotomain = False
+            if flagTyping:
+              key = pygame.key.name(event.key)
+              key = " " if (key == "space") else key
+              key = key[1] if (key[0] == "[") else key
+              if key == "return":
+                temp_input = 0
+                lstTag[fixIdx] = False
+                flagTyping = False
+                fixIdx = -1
+              elif key == "enter":
+                ################################################ 작업해야함
+                pass
+              elif event.key == K_BACKSPACE:
+                temp_input = '' if (temp_input == '') else temp_input[:-1]
+              elif key in SHIFT:
+                flagShift = True
+              elif len(key) > 1:
+                pass
+              elif key not in BANNED:
+                if flagShift:
+                  key = "_" if (key == "-") else key
+                  if key in STRNUM:
+                    key = ""
+                  key = key.capitalize()
+                temp_input = temp_input + key
+
           if event.type == MOUSEBUTTONDOWN:
             if event.button == 1:# Left Click
               position = pygame.mouse.get_pos()
-              if mouseInRect(rectNext, position): #Next Button
+              if right_clicked != -1: #우클릭 된 상태
+                if mouseInRect(rectMenuDelete, position):
+                  confirmDelete()
+                  if TK_VAL_DEL:
+                    TK_VAL_DEL = False
+                    numFile -= 1
+                    lstTag = [False for _ in range(numFile)]
+                    lstRectBackgrounds.pop(right_clicked)
+                    lstTextBlinds.pop(right_clicked)
+                    lstRectBlinds.pop(right_clicked)
+                    lst_blindfiles.remove('settings')
+                    os.remove('./doc/'+lst_blindfiles[right_clicked])
+                    lst_blindfiles = os.listdir('./doc')
+                    print(right_clicked, numFile)
+                    for i in range(right_clicked, numFile):
+                      lstRectBackgrounds[i][0].top = lstRectBackgrounds[i][0].top-round(BOXINTERVAL / screenScale)
+                      lstRectBackgrounds[i][1].top = lstRectBackgrounds[i][1].top-round(BOXINTERVAL / screenScale)
+                      for j in range(3):
+                        lstRectBlinds[i][j].top = lstRectBlinds[i][j].top-round(BOXINTERVAL / screenScale)
+                  right_clicked = -1
+                elif mouseInRect(rectMenuRename, position):
+                  flagTyping = True
+                  #lstTextBlinds.append((tempTitle,tempType, tempDurations))
+                  #lstRectBlinds.append((objTemp,objType, objDurations))
+                  temp_input = ''
+                  fixIdx = right_clicked
+                  right_clicked = -1
+                  pass
+                  #########################################
+                
+
+
+
+
+
+
+
+
+
+
+                        #작업 해야함
+                
+
+
+
+
+
+
+
+
+
+
+
+
+                #########################################
+              elif mouseInRect(rectNext, position): #Next Button
                 flagNext = True
                 flagFirst = True
                 objControl = lstBlindObjs[selected]
@@ -207,23 +326,39 @@ def main_load(vol):
               elif (((position[0] - shutCenter[0]) ** 2 + (position[1] - shutCenter[1]) ** 2) ** 0.5 <= shutRadius):
                 confirmQuit()
               else:
+                for j in range(len(lstTag)):
+                  lstTag[j] = False
+                  selected = -1
                 for i in range(numFile):
                   box = (lstRectBackgrounds[i][0].left, lstRectBackgrounds[i][0].right, lstRectBackgrounds[i][0].top, lstRectBackgrounds[i][0].bottom)
-                  for j in range(len(lstTag)):
-                    lstTag[j] = False
-                    selected = -1
                   if 0 < lstRectBackgrounds[i][0].bottom < (CUTLINE)/screenScale:
                     if(box[0]<=position[0]<=box[1] and box[2]<=position[1]<=box[3]): #Clicked a box
                       lstTag[i] = True
                       selected = i
                       break
-            elif event.button == 4 and lstRectBackgrounds[-1][0].bottom >= (CUTLINE - 100)/screenScale: #scroll up
+            elif event.button == 3:  ### 우클릭한 경우
+              position = pygame.mouse.get_pos()
+              for j in range(len(lstTag)):
+                lstTag[j] = False
+                right_clicked = -1
+              for i in range(numFile):
+                if mouseInRect(lstRectBackgrounds[i][0], position):
+                  lstTag[i] = True
+                  right_clicked = i
+                  print(right_clicked)
+                  rectMenuRename.topleft = position
+                  textRename.changePosition(relative="center", position=rectMenuRename.center)
+                  rectMenuDelete.topleft = (rectMenuRename.bottomleft[0], rectMenuRename.bottomleft[1] - round(4/screenScale))
+                  textDelete.changePosition(relative="center", position=rectMenuDelete.center)
+                  break
+              pass
+            elif event.button == 4 and lstRectBackgrounds[-1][0].bottom >= (CUTLINE - 100)/screenScale and right_clicked == -1: #scroll up
               for i in range(numFile):
                 lstRectBackgrounds[i][0].top = lstRectBackgrounds[i][0].top-round(SCRLLFACTOR / screenScale)
                 lstRectBackgrounds[i][1].top = lstRectBackgrounds[i][1].top-round(SCRLLFACTOR / screenScale)
                 for j in range(3):
                   lstRectBlinds[i][j].top = lstRectBlinds[i][j].top-round(SCRLLFACTOR / screenScale)
-            elif event.button == 5 and lstRectBackgrounds[0][0].top <= 99/screenScale:
+            elif event.button == 5 and lstRectBackgrounds[0][0].top <= 99/screenScale and right_clicked == -1:
               for i in range(numFile):
                 lstRectBackgrounds[i][0].top = lstRectBackgrounds[i][0].top+round(SCRLLFACTOR / screenScale)
                 lstRectBackgrounds[i][1].top = lstRectBackgrounds[i][1].top+round(SCRLLFACTOR / screenScale)
@@ -237,20 +372,29 @@ def main_load(vol):
             if 0< lstRectBackgrounds[i][0].bottom < (CUTLINE)/screenScale:
               if lstTag[i]:
                 pygame.draw.rect(screen, SELECTED, lstRectBackgrounds[i][0])
+                if flagTyping: ### 제목 수정중일 경우
+                  pygame.draw.rect(screen, WHITE, lstRectBlinds[i][0])
               else:
                 pygame.draw.rect(screen, PALEGRAY, lstRectBackgrounds[i][0])
-              pygame.draw.rect(screen, GRAY, lstRectBackgrounds[i][1], width=4)
+              pygame.draw.rect(screen, GRAY, lstRectBackgrounds[i][1], width=round(4/screenScale))
               for j in range(3):
                 screen.blit(lstTextBlinds[i][j], lstRectBlinds[i][j])
         pygame.draw.rect(screen, PALEGRAY, rectNext)
-        pygame.draw.rect(screen, GRAY, rectNext, width = 4)
+        pygame.draw.rect(screen, GRAY, rectNext, width = round(4/screenScale))
         screen.blit(textNext.getText(), textNext.getRect())
         pygame.draw.rect(screen, PALEGRAY, rectBack)
-        pygame.draw.rect(screen, GRAY, rectBack, width = 4)
+        pygame.draw.rect(screen, GRAY, rectBack, width = round(4/screenScale))
         screen.blit(textBack.getText(), textBack.getRect())
         pygame.draw.line(screen,WHITE, (0,round(CUTLINE/screenScale)), (round(2048/screenScale),round(CUTLINE/screenScale)))
         pygame.draw.circle(screen, RED, shutCenter, shutRadius)
-        pygame.draw.circle(screen, BLACK, shutCenter, shutRadius, width = 2)
+        pygame.draw.circle(screen, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
+        if right_clicked != -1:
+          pygame.draw.rect(screen, WHITE, rectMenuRename)
+          pygame.draw.rect(screen, BLACK, rectMenuRename, width=round(4/screenScale))
+          screen.blit(textRename.getText(), textRename.getRect())
+          pygame.draw.rect(screen, WHITE, rectMenuDelete)
+          pygame.draw.rect(screen, BLACK, rectMenuDelete, width=round(4/screenScale))
+          screen.blit(textDelete.getText(), textDelete.getRect())
         pygame.display.flip()
 
         #####################
@@ -447,37 +591,37 @@ def main_load(vol):
           if 120/screenScale<tempbox.bottom<(CUTLINE)/screenScale:  
             if boxblinds[0] == 0: #Break
               pygame.draw.rect(screen,WHITE, tempbox)
-              pygame.draw.rect(screen,BLACK, tempbox, width=4)
+              pygame.draw.rect(screen,BLACK, tempbox, width=round(4/screenScale))
               if boxblinds[2] != 0:
                 pygame.draw.rect(screen, GRAY, boxblinds[1][boxblinds[2]].getRect())
               blitText(screen, boxblinds[1][1], boxblinds[1][2])
             else:
               pygame.draw.rect(screen,GRAY, tempbox)
-              pygame.draw.rect(screen,BLACK, tempbox, width=4)
+              pygame.draw.rect(screen,BLACK, tempbox, width=round(4/screenScale))
               blitText(screen, boxblinds[1][1], boxblinds[1][2],boxblinds[1][3],boxblinds[1][4],boxblinds[1][5])
               if boxblinds[2] != 0: # 무언가 클릭됐을 때
                 pygame.draw.rect(screen, WHITE, boxblinds[1][boxblinds[2]].getRect())
                 blitText(screen, boxblinds[1][boxblinds[2]])
             pygame.draw.rect(screen, RED, boxblinds[3])  ### Delete button
-            pygame.draw.rect(screen, BLACK, boxblinds[3], width = 3)
+            pygame.draw.rect(screen, BLACK, boxblinds[3], width = round(3/screenScale))
         #### End of for loop printing boxes on screen
         if 120/screenScale<plusBox.bottom<(CUTLINE)/screenScale:
           pygame.draw.rect(screen, GRAY, plusBox)
-          pygame.draw.rect(screen, BLACK, plusBox, width=4)
+          pygame.draw.rect(screen, BLACK, plusBox, width=round(4/screenScale))
           screen.blit(textPlus.getText(), textPlus.getRect())        
         pygame.draw.rect(screen, DARKGRAY, rectSettings)
-        pygame.draw.line(screen, BLACK, (0,round(120/screenScale)), (round(2200/screenScale),round(120/screenScale)), width=5)
+        pygame.draw.line(screen, BLACK, (0,round(120/screenScale)), (round(2200/screenScale),round(120/screenScale)), width=round(5/screenScale))
         pygame.draw.line(screen,WHITE, (0,round(CUTLINE/screenScale)), (round(2048/screenScale),round(CUTLINE/screenScale)))
         pygame.draw.rect(screen, PALEGRAY, rectNext)
-        pygame.draw.rect(screen, GRAY, rectNext, width = 4)
+        pygame.draw.rect(screen, GRAY, rectNext, width = round(4/screenScale))
         screen.blit(textSavenGo.getText(), textSavenGo.getRect())
         pygame.draw.rect(screen, PALEGRAY, rectBack)
-        pygame.draw.rect(screen, GRAY, rectBack, width = 4)
+        pygame.draw.rect(screen, GRAY, rectBack, width = round(4/screenScale))
         screen.blit(textBack.getText(), textBack.getRect())
         pygame.draw.line(screen,WHITE, (0,round(CUTLINE/screenScale)), (round(2048/screenScale),round(CUTLINE/screenScale)))
         blitText(screen, textSettingLevel, textSettingBB, textSettingAnte, textSettingDur, textSettingSB)
         pygame.draw.circle(screen, RED, shutCenter, shutRadius)
-        pygame.draw.circle(screen, BLACK, shutCenter, shutRadius, width = 2)
+        pygame.draw.circle(screen, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
         pygame.display.flip()
     #### End of main While
 
