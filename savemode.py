@@ -259,12 +259,12 @@ def main_save(vol):
                 lstBoxs[selectedIdx][3] = 0
                 selectedIdx = -1
                 temp_input = 0
-              elif mouseInRect(rectNext, position):
+              elif mouseInRect(rectNext, position):   #Next 버튼을 눌렀을 때
                 if len(lstBoxs) <= 1:
                   caution("You need at least one level")
                 else:
                   objControl = BlindFile()
-                  filename = title + "_" + str(round(time.time()))
+                  filename = title + "_" + str(round(time.time())) + '.bld'
                   structueType = 1
                   numBlinds = len(lstBoxs) - 1
                   templst = []
