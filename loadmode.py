@@ -190,6 +190,7 @@ def main_load(vol):
     fixIdx = 0
     flagShift = False
     temp_topleft = (0,0)
+    tabbedOnly = False
 
     while running:
       if TK_VAL:
@@ -362,7 +363,6 @@ def main_load(vol):
                 if mouseInRect(lstRectBackgrounds[i][0], position):
                   lstTag[i] = True
                   right_clicked = i
-                  print(right_clicked)
                   rectMenuRename.topleft = position
                   textRename.changePosition(relative="center", position=rectMenuRename.center)
                   rectMenuDelete.topleft = (rectMenuRename.bottomleft[0], rectMenuRename.bottomleft[1] - round(4/screenScale))
@@ -434,32 +434,44 @@ def main_load(vol):
               if event.key in K_NUM or event.key == K_BACKSPACE:
                 temp_input = (temp_input*10 + processAscii(event.key)) if (event.key in K_NUM) else (temp_input//10)
                 lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str(temp_input))
+                tabbedOnly = False
               elif event.key == K_RETURN:
                 lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str(temp_input))
                 objControl.changeLstBlinds(selectedIdx, lstBoxBlinds[selectedIdx][2] - 1, temp_input)
                 lstBoxBlinds[selectedIdx][2] = 0
                 selectedIdx = -1
                 temp_input = 0
+                tabbedOnly = False
               elif event.key == K_TAB:
+                #print(tabbedOnly)
                 if selectedIdx == len(lstBoxBlinds)-1 and lstBoxBlinds[selectedIdx][2] == 2:
-                  pass
-                elif lstBoxBlinds[selectedIdx][2] != 2: #Duration이 선택된게 아닌 경우
-                  lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str(temp_input))
-                  objControl.changeLstBlinds(selectedIdx, lstBoxBlinds[selectedIdx][2] - 1, temp_input)
+                  lstBoxBlinds[selectedIdx][2] = 0
+                  if not tabbedOnly:
+                    temp_input = 1 if (temp_input <= 0) else temp_input
+                    lstBoxBlinds[selectedIdx][1][2].changeContent(font = fontBox, content = str(temp_input))
+                    objControl.changeLstBlinds(selectedIdx, lstBoxBlinds[selectedIdx][2] - 1, temp_input)
+                  selectedIdx = -1
+                elif lstBoxBlinds[selectedIdx][2] != 2: #Duration이 선택됐던게 아닌 경우
+                  if not tabbedOnly:
+                    lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str(temp_input))
+                    objControl.changeLstBlinds(selectedIdx, lstBoxBlinds[selectedIdx][2] - 1, temp_input)
+                  tabbedOnly = True
                   if lstBoxBlinds[selectedIdx][2] != 5:
                     lstBoxBlinds[selectedIdx][2] = lstBoxBlinds[selectedIdx][2] + 1
                   else:
                     lstBoxBlinds[selectedIdx][2] = 2
                   temp_input = 0
                 else: #Duration이 선택됐던 경우
-                  temp_input = 1 if (temp_input == 0) else temp_input
-                  lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str(temp_input))
-                  objControl.changeLstBlinds(selectedIdx, lstBoxBlinds[selectedIdx][2] - 1, temp_input)
+                  if not tabbedOnly:
+                    temp_input = 1 if (temp_input == 0) else temp_input
+                    lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str(temp_input))
+                    objControl.changeLstBlinds(selectedIdx, lstBoxBlinds[selectedIdx][2] - 1, temp_input)
+                  tabbedOnly = True
                   lstBoxBlinds[selectedIdx][2] = 0
                   selectedIdx += 1
                   f = -1
                   for boxblinds in lstBoxBlinds: #Scroll up 효과
-                  #tempLst2 = [isbreak,[tempBox, lvl, dur, bb, sb, ante]]
+                  #tempLst2 = [isbreak,[tempBox, lvl, dur, bb, sb, ante], clickedwhere]
                     boxblinds[1][0].top = boxblinds[1][0].top + f*round(BLINDINTERVAL / screenScale) #박스
                     boxblinds[3].top = boxblinds[3].top + f*round(BLINDINTERVAL / screenScale)
                     for j in range(5):
@@ -492,7 +504,10 @@ def main_load(vol):
                 textPlus.changePosition(relative = "top", position=(textPlus.getRect().centerx, textPlus.getRect().top + f*round(SCRLLFACTOR / screenScale)))
             if event.button == 1: ## 클릭
               if selectedIdx != -1:
-                objControl.changeLstBlinds(selectedIdx, lstBoxBlinds[selectedIdx][2] - 1, temp_input)
+                if not tabbedOnly:
+                  temp_input = 1 if lstBoxBlinds[selectedIdx][2] == 2 and temp_input <= 0 else temp_input
+                  lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str(temp_input))
+                  objControl.changeLstBlinds(selectedIdx, lstBoxBlinds[selectedIdx][2] - 1, temp_input)
                 lstBoxBlinds[selectedIdx][2] = 0
                 selectedIdx = -1
                 temp_input = 0
@@ -554,6 +569,7 @@ def main_load(vol):
                       elif mouseInRect(boxblinds[1][2].getRect(), position):
                         boxblinds[2] = 2
                         selectedIdx = cntIdx
+                        tabbedOnly = True
                         ### 작업 해야 함
                     else: # Level인 경우
                       if mouseInRect(boxblinds[1][1].getRect(), position): # Lvl
@@ -576,6 +592,8 @@ def main_load(vol):
                       elif mouseInRect(boxblinds[1][5].getRect(), position): # ante
                         boxblinds[2] = 5
                         selectedIdx = cntIdx
+                      tabbedOnly = True if selectedIdx != -1 else False
+                      #print(tabbedOnly)
                   cntIdx += 1
                 if flagUp:
                   plusBox.top = plusBox.top - round(BLINDINTERVAL/screenScale)

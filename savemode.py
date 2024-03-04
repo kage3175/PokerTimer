@@ -104,6 +104,7 @@ def main_save(vol):
     objControl = None
     selectedIdx = -1
     temp_input = 0
+    tabbedOnly = False
 
     while running:
       if TK_VAL:
@@ -187,23 +188,33 @@ def main_save(vol):
               if event.key in K_NUM or event.key == K_BACKSPACE:
                 temp_input = (temp_input*10 + processAscii(event.key)) if (event.key in K_NUM) else (temp_input//10)
                 lstBoxs[selectedIdx][2][lstBoxs[selectedIdx][3]].changeContent(font = fontBox, content = str(temp_input))
+                tabbedOnly = False
               elif pygame.key.name(event.key) == "return" or pygame.key.name(event.key) == "enter":
                 lstBoxs[selectedIdx][3] = 0
                 selectedIdx = -1
                 temp_input = 0
+                tabbedOnly = False
               elif event.key == K_TAB:
-                if selectedIdx == len(lstBoxs)-1 and lstBoxs[selectedIdx][3] == 1:
-                  pass
+                if selectedIdx == len(lstBoxs)-2 and lstBoxs[selectedIdx][3] == 1:
+                  lstBoxs[selectedIdx][3] = 0
+                  if not tabbedOnly:
+                    temp_input = 1 if (temp_input <= 0) else temp_input
+                    lstBoxs[selectedIdx][2][1].changeContent(font = fontBox, content = str(temp_input))
+                  selectedIdx = -1
                 elif lstBoxs[selectedIdx][3] != 1: #Duration이 선택된게 아닌 경우
-                  lstBoxs[selectedIdx][2][lstBoxs[selectedIdx][3]].changeContent(font = fontBox, content = str(temp_input))
+                  if not tabbedOnly:
+                    lstBoxs[selectedIdx][2][lstBoxs[selectedIdx][3]].changeContent(font = fontBox, content = str(temp_input))
+                  tabbedOnly = True
                   if lstBoxs[selectedIdx][3] != 4:
                     lstBoxs[selectedIdx][3] = lstBoxs[selectedIdx][3] + 1
                   else:
                     lstBoxs[selectedIdx][3] = 1
                   temp_input = 0
                 else: #Duration이 선택됐던 경우
-                  temp_input = 1 if (temp_input == 0) else temp_input
-                  lstBoxs[selectedIdx][2][lstBoxs[selectedIdx][3]].changeContent(font = fontBox, content = str(temp_input))
+                  if not tabbedOnly:
+                    temp_input = 1 if (temp_input == 0) else temp_input
+                    lstBoxs[selectedIdx][2][lstBoxs[selectedIdx][3]].changeContent(font = fontBox, content = str(temp_input))
+                  tabbedOnly = True
                   lstBoxs[selectedIdx][3] = 0
                   selectedIdx += 1
                   f = -1
@@ -242,6 +253,9 @@ def main_save(vol):
                     pass
             if event.button == 1:
               if selectedIdx != -1:
+                if not tabbedOnly:
+                  temp_input = 1 if lstBoxs[selectedIdx][3] == 1 and temp_input <= 0 else temp_input
+                  lstBoxs[selectedIdx][2][1].changeContent(font = fontBox, content = str(temp_input))
                 lstBoxs[selectedIdx][3] = 0
                 selectedIdx = -1
                 temp_input = 0
@@ -325,6 +339,7 @@ def main_save(vol):
                       elif mouseInRect(lstBoxs[i][2][1].getRect(), position): #Break Duration
                         lstBoxs[i][3] = 1
                         selectedIdx = i
+                        tabbedOnly = True
                     elif lstBoxs[i][0] == 1: # Level인 경우
                       if mouseInRect(lstBoxs[i][2][0].getRect(), position): # Lvl
                         cntBreak+=1
@@ -345,6 +360,7 @@ def main_save(vol):
                       elif mouseInRect(lstBoxs[i][2][4].getRect(), position): # ante
                         lstBoxs[i][3] = 4
                         selectedIdx = i
+                      tabbedOnly = True if selectedIdx != -1 else False
                     else: # PlusBox
                       if 120/screenScale<lstBoxs[i][1][0].bottom<(CUTLINE)/screenScale and mouseInRect(lstBoxs[i][1][0], position):
                         tempBox = pygame.Rect(0,0,round(900/screenScale),round(50/screenScale))
