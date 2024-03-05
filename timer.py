@@ -133,6 +133,32 @@ def updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textBlind, text
   textNextBBAntenum.changeContent(font = fontNextLevelnum, content = temp_str)
   return cntBreak
 
+def endAction(surface, textPause, fontPause, rectPauseline, rectNextLevel, pauseBox, rectPause, shutCenter, shutRadius):
+  global TK_VAL
+  textPause.changeContent(font = fontPause, content = "No more blinds")
+  pygame.draw.rect(surface, RED, rectPauseline, width=5)
+  pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
+  surface.blit(pauseBox, rectPause)
+  surface.blit(textPause.getText(), textPause.getRect())
+  pygame.draw.circle(surface, RED, shutCenter, shutRadius)
+  pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = 2)
+  pygame.display.flip()
+  for event in pygame.event.get():
+    if event.type == KEYDOWN:
+      if event.key == ord('q'):
+        confirmQuit()
+        if TK_VAL:
+          running = False
+    if event.type == MOUSEBUTTONDOWN:
+      if event.button == 1:
+        position = pygame.mouse.get_pos()
+        if (((position[0] - shutCenter[0]) ** 2 + (position[1] - shutCenter[1]) ** 2) ** 0.5 <= shutRadius):
+          confirmQuit()
+          if TK_VAL:
+            running = False
+  time.sleep(0.1)
+  return running
+
 def main(lstBLINDS, lstLevels,title, isLoad, vol):
   volume = vol
   global LSTLEVELS, LSTBLINDS
@@ -355,19 +381,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                 currLevel = newLevel
                 if LSTLEVELS[currLevel]==0: ### End of blind
                   while running:
-                    textPause.changeContent(font = fontPause, content = "No more blinds")
-                    pygame.draw.rect(surface, RED, rectPauseline, width=5)
-                    pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
-                    surface.blit(pauseBox, rectPause)
-                    surface.blit(textPause.getText(), textPause.getRect())
-                    pygame.draw.circle(surface, RED, shutCenter, shutRadius)
-                    pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = 2)
-                    pygame.display.flip()
-                    for event in pygame.event.get():
-                      if event.type == KEYDOWN:
-                        if event.key == ord('q'):
-                          confirmQuit()
-                    time.sleep(0.1)
+                    running = endAction(surface, textPause, fontPause, rectPauseline, rectNextLevel, pauseBox, rectPause, shutCenter, shutRadius)
                 try:
                   cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textBlind, textBBAnte, fontBlind, fontNextLevelnum, fontTitleTournament, textNextBBAntenum, textNextBlindnum, cntBreak)
                 except:
@@ -483,20 +497,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
             currLevel = newLevel
             if LSTLEVELS[currLevel]==0: ### End of blind
               while running:
-                textPause.changeContent(font = fontPause, content = "No more blinds")
-                pygame.draw.rect(surface, RED, rectPauseline, width=5)
-                pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
-                surface.blit(pauseBox, rectPause)
-                surface.blit(textPause.getText(), textPause.getRect())
-                pygame.draw.circle(surface, RED, shutCenter, shutRadius)
-                pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = 2)
-                pygame.display.flip()
-                for event in pygame.event.get():
-                  if event.type == KEYDOWN:
-                    if event.key == ord('q'):
-                      currLevel-=1
-                      confirmQuit()
-                time.sleep(0.1)
+                running = endAction(surface, textPause, fontPause, rectPauseline, rectNextLevel, pauseBox, rectPause, shutCenter, shutRadius)
             try:
               cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textBlind, textBBAnte, fontBlind, fontNextLevelnum, fontTitleTournament, textNextBBAntenum, textNextBlindnum, cntBreak)
 
@@ -533,58 +534,25 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
       min, sec, total, newLevel, min_break, sec_break = timeupdate(min, sec, total, 1, currLevel, soundLevelup,lstBreakIdx)
       if newLevel != currLevel:
         currLevel = newLevel
+        if LSTLEVELS[currLevel]==0: ### End of blind
+          while running:
+            textPause.changeContent(font = fontPause, content = "No more blinds")
+            pygame.draw.rect(surface, RED, rectPauseline, width=5)
+            pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
+            surface.blit(pauseBox, rectPause)
+            surface.blit(textPause.getText(), textPause.getRect())
+            pygame.draw.circle(surface, RED, shutCenter, shutRadius)
+            pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = 2)
+            pygame.display.flip()
+            for event in pygame.event.get():
+              if event.type == KEYDOWN:
+                if event.key == ord('q'):
+                  confirmQuit()
+                  if TK_VAL:
+                    running = False
+            time.sleep(0.1)
         try:
-          if LSTLEVELS[currLevel]==0: ### End of blind
-            while running:
-              textPause.changeContent(font = fontPause, content = "No more blinds")
-              pygame.draw.rect(surface, RED, rectPauseline, width=5)
-              pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
-              surface.blit(pauseBox, rectPause)
-              surface.blit(textPause.getText(), textPause.getRect())
-              pygame.draw.circle(surface, RED, shutCenter, shutRadius)
-              pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = 2)
-              pygame.display.flip()
-              time.sleep(0.1)
-              for event in pygame.event.get():
-                if event.type == KEYDOWN:
-                  if event.key == ord('q'):
-                    confirmQuit()
-          if LSTBLINDS[currLevel][0] == 0: #Break
-            cntBreak+=1
-            textCurrLevel.changeColor(BRIGHTRED)
-            textCurrLevel.changeContent(font = fontTitleTournament, content = "Break")
-            textBlind.changeContent(font = fontBlind, content = "- / -")
-            textBBAnte.changeContent(font = fontBlind, content = "-")
-            if LSTBLINDS[currLevel+1][0] == 0:
-              temp_str1 = "- / -"
-              temp_str = "-"
-            else:
-              tmp_str1 = format(LSTBLINDS[currLevel+1][0], ",") + " / " + format(LSTBLINDS[currLevel+1][1], ",")
-              if LSTBLINDS[currLevel+1][2] != 0:
-                temp_str = format(LSTBLINDS[currLevel+1][2], ",")
-              else:
-                temp_str = "-"
-            textNextBlindnum.changeContent(font = fontNextLevelnum, content = tmp_str1)
-            textNextBBAntenum.changeContent(font = fontNextLevelnum, content = temp_str)
-          else:
-            textCurrLevel.changeContent(font = fontTitleTournament, content = 'Level '+str(currLevel-cntBreak))
-            textBlind.changeContent(font = fontBlind, content = format(LSTBLINDS[currLevel][0], ",")+" / "+format(LSTBLINDS[currLevel][1], ","))
-            if LSTBLINDS[currLevel][2] != 0:
-              temp_str = format(LSTBLINDS[currLevel][2], ",")
-            else:
-              temp_str = "-"
-            textBBAnte.changeContent(font = fontBlind, content = temp_str)
-            if LSTBLINDS[currLevel+1][0] == 0:
-              temp_str1 = "- / -"
-              temp_str = "-"
-            else:
-              temp_str1 = format(LSTBLINDS[currLevel+1][0], ",") + " / " + format(LSTBLINDS[currLevel+1][1], ",")
-              if LSTBLINDS[currLevel+1][2] != 0:
-                temp_str = format(LSTBLINDS[currLevel+1][2], ",")
-              else:
-                temp_str = "-"
-            textNextBlindnum.changeContent(font = fontNextLevelnum, content = temp_str1)
-            textNextBBAntenum.changeContent(font = fontNextLevelnum, content = temp_str)
+          cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textBlind, textBBAnte, fontBlind, fontNextLevelnum, fontTitleTournament, textNextBBAntenum, textNextBlindnum, cntBreak)
         except:
           print("No levels left")
       strTimer = makeTimerString(min, sec, total)
