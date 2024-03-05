@@ -14,8 +14,6 @@ PALEGRAY = (180,180,180)
 
 TK_VAL = False
 
-
-
 def timeupdate(minute, second, total, amount, currLevel, soundlvlup, lstBreakIdx):
   global LSTLEVELS, LSTBLINDS
   level = currLevel
