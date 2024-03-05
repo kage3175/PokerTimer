@@ -12,7 +12,6 @@ PALEGRAY = (150,150,150)
 TK_VAL = False
 TK_VAL_DEL = False
 
-  
 def confirmQuit():
   window = tk.Tk()
   window.title('Quit?')
