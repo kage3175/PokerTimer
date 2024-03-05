@@ -1,0 +1,4 @@
+flagPlayer, flagAverage, flagChips, flagEntries, flagStarting
+
+기본값: -1
+0, 1, 2, 3, 4
