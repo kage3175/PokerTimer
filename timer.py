@@ -101,6 +101,7 @@ def close_window(window, isQuit):
   global TK_VAL
   TK_VAL = isQuit
   window.destroy()
+
   
 def updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textBlind, textBBAnte, fontBlind, fontNextLevelnum, fontTitleTournament, textNextBBAntenum, textNextBlindnum, cntBreak):
   if LSTBLINDS[currLevel][0] == 0:   ## 현재 레벨이 브레이크인 경우
@@ -131,15 +132,15 @@ def updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textBlind, text
   textNextBBAntenum.changeContent(font = fontNextLevelnum, content = temp_str)
   return cntBreak
 
-def endAction(surface, textPause, fontPause, rectPauseline, rectNextLevel, pauseBox, rectPause, shutCenter, shutRadius):
+def endAction(surface, textPause, fontPause, rectPauseline, rectNextLevel, pauseBox, rectPause, shutCenter, shutRadius, screenScale):
   global TK_VAL
   textPause.changeContent(font = fontPause, content = "No more blinds")
-  pygame.draw.rect(surface, RED, rectPauseline, width=5)
-  pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
+  pygame.draw.rect(surface, RED, rectPauseline, width=round(5/screenScale))
+  pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = round(3/screenScale))
   surface.blit(pauseBox, rectPause)
   surface.blit(textPause.getText(), textPause.getRect())
   pygame.draw.circle(surface, RED, shutCenter, shutRadius)
-  pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = 2)
+  pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
   pygame.display.flip()
   for event in pygame.event.get():
     if event.type == KEYDOWN:
@@ -170,6 +171,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   running = True
   pygame.init()
   
+  clock = pygame.time.Clock()
+  
   user32 = ctypes.windll.user32
   screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)  # 해상도 구하기
   midpoint = screensize[0] / 2, screensize[1] / 2 # 화면 중앙점
@@ -192,6 +195,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   cntBreak = 0
   min, sec, total = LSTLEVELS[currLevel], 0, LSTLEVELS[currLevel]*60
   strTimer = makeTimerString(min, sec, total)
+  doubleClickTimer = 0
+  dt = 0
   
   temp = len(LSTLEVELS)-2
   for i in range(len(LSTLEVELS)-2,0,-1):
@@ -298,6 +303,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   rectNext.center = (midpoint[0] + round(300/screenScale), round(1030/screenScale))
   rectBack = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
   rectBack.center = (midpoint[0] - round(300/screenScale), round(1030/screenScale))
+  rectTemp = pygame.Rect(0,0,round(420/screenScale), round(750/screenScale))
+  rectTemp.topleft = (round(1580/screenScale), round(200/screenScale))
   
 
   pauseEvent = True
@@ -324,26 +331,28 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
           except:
             print("clickedNum Error")
         blitText(surface, textMainTimer, textTitleTournament, textCurrLevel, textBlind, textTEXTBlind, textTEXTBBAnte, textBBAnte, textTEXTPlayer, textPlayernum, textAverage, textAveragenum, textChipsinplay, textChipsinplaynum, textEntries, textEntriesnum, textStartingstack, textStartingstacknum, textTimeBreak, textTimeBreaknum, textNextLevel, textNextBlind, textNextBBAnte, textNextBlindnum, textNextBBAntenum)
-        pygame.draw.rect(surface, WHITE, rectMainTimer, width=3)
-        pygame.draw.rect(surface, WHITE, rectCurrBlind, width=3)
-        pygame.draw.rect(surface, RED, rectPauseline, width=5)
-        pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
+        pygame.draw.rect(surface, WHITE, rectMainTimer, width=round(3/screenScale))
+        pygame.draw.rect(surface, WHITE, rectCurrBlind, width=round(3/screenScale))
+        pygame.draw.rect(surface, RED, rectPauseline, width=round(5/screenScale))
+        pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = round(3/screenScale))
         surface.blit(pauseBox, rectPause)
         surface.blit(textPause.getText(), textPause.getRect())
         pygame.draw.circle(surface, RED, shutCenter, shutRadius)
-        pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = 2)
+        pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
         surface.blit(imgSettings, rectSettings)
+        #pygame.draw.rect(surface, DARKGRAY, rectTemp, width=round(3/screenScale))
       else:
         pygame.draw.line(surface, WHITE, (midpoint[0] - round(400/screenScale), midpoint[1]), (midpoint[0] + round(600/screenScale), midpoint[1]), width=4)
         surface.blit(imgBar, rectBar)
         surface.blit(textVol, objVol)
         pygame.draw.rect(surface, PALEGRAY, rectNext)
-        pygame.draw.rect(surface, DARKGRAY, rectNext, width = 4)
+        pygame.draw.rect(surface, DARKGRAY, rectNext, width = round(4/screenScale))
         surface.blit(textNext.getText(), textNext.getRect())
         pygame.draw.rect(surface, PALEGRAY, rectBack)
-        pygame.draw.rect(surface, DARKGRAY, rectBack, width = 4)
+        pygame.draw.rect(surface, DARKGRAY, rectBack, width = round(4/screenScale))
         surface.blit(textBack.getText(), textBack.getRect())
       pygame.display.flip()
+      dt = clock.tick(30) / 1000
       pause_time_to_add = pause_start - time.time()
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -379,7 +388,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                 currLevel = newLevel
                 if LSTLEVELS[currLevel]==0: ### End of blind
                   while running:
-                    running = endAction(surface, textPause, fontPause, rectPauseline, rectNextLevel, pauseBox, rectPause, shutCenter, shutRadius)
+                    running = endAction(surface, textPause, fontPause, rectPauseline, rectNextLevel, pauseBox, rectPause, shutCenter, shutRadius, screenScale)
                 try:
                   cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textBlind, textBBAnte, fontBlind, fontNextLevelnum, fontTitleTournament, textNextBBAntenum, textNextBlindnum, cntBreak)
                 except:
@@ -396,6 +405,13 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
         elif event.type == MOUSEBUTTONDOWN:
           if event.button == 1:
             position = pygame.mouse.get_pos()
+            if doubleClickTimer == 0:
+              doubleClickTimer = 0.001
+            elif doubleClickTimer < 0.5:
+              #print('Double Clicked!')
+              if mouseInRect(rectTemp, position):
+                pass
+              doubleClickTimer = 0
             if not flagSettings:
               temp_input = 0
               if clickedNum!=-1:
@@ -445,6 +461,11 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
           volume = (rectBar.centerx - midpoint[0] + 400/screenScale) / float(1000)
           soundLevelup.set_volume(volume)
           soundLevelup.play()
+      if doubleClickTimer != 0:
+        doubleClickTimer += dt
+        if doubleClickTimer>= 0.5:
+          #print('single clicked!')
+          doubleClickTimer = 0
       if flag:
         continue
       else:
@@ -495,7 +516,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
             currLevel = newLevel
             if LSTLEVELS[currLevel]==0: ### End of blind
               while running:
-                running = endAction(surface, textPause, fontPause, rectPauseline, rectNextLevel, pauseBox, rectPause, shutCenter, shutRadius)
+                running = endAction(surface, textPause, fontPause, rectPauseline, rectNextLevel, pauseBox, rectPause, shutCenter, shutRadius, screenScale)
             try:
               cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textBlind, textBBAnte, fontBlind, fontNextLevelnum, fontTitleTournament, textNextBBAntenum, textNextBlindnum, cntBreak)
 
@@ -510,6 +531,11 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
           if event.button == 1:
             position = pygame.mouse.get_pos()
             temp_input = 0
+            if doubleClickTimer == 0:
+              doubleClickTimer = 0.001
+            elif doubleClickTimer < 0.5:
+              #print('Double Clicked!')
+              doubleClickTimer = 0
             if clickedNum!=-1:
               dictClicked[clickedNum].changeColor(WHITE)
               dictClicked[clickedNum].changeContent(font = fontSideNum, content = format(dictNum[clickedNum], ","))
@@ -524,8 +550,14 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
               clickedNum=3
             elif mouseInRect(textStartingstacknum.getRect(), position):
               clickedNum=4
-            elif (((position[0] - shutCenter[0]) ** 2 + (position[1] - shutCenter[1]) ** 2) ** 0.5 <= shutRadius):
-                confirmQuit()
+            if (((position[0] - shutCenter[0]) ** 2 + (position[1] - shutCenter[1]) ** 2) ** 0.5 <= shutRadius):
+              confirmQuit()
+    if doubleClickTimer != 0:
+      doubleClickTimer += dt
+      if doubleClickTimer>= 0.5:
+        #print('single clicked!')
+        doubleClickTimer = 0    
+            
     #####
     if(time.time() - start_time + pause_time > timer): ### 매 1초마다
       timer+=1
@@ -535,13 +567,14 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
         if LSTLEVELS[currLevel]==0: ### End of blind
           while running:
             textPause.changeContent(font = fontPause, content = "No more blinds")
-            pygame.draw.rect(surface, RED, rectPauseline, width=5)
-            pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
+            pygame.draw.rect(surface, RED, rectPauseline, width=round(5/screenScale))
+            pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = round(5/screenScale))
             surface.blit(pauseBox, rectPause)
             surface.blit(textPause.getText(), textPause.getRect())
             pygame.draw.circle(surface, RED, shutCenter, shutRadius)
-            pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = 2)
+            pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
             pygame.display.flip()
+            
             for event in pygame.event.get():
               if event.type == KEYDOWN:
                 if event.key == ord('q'):
@@ -561,13 +594,14 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
     if clickedNum != -1:
       pygame.draw.rect(surface, PALEGRAY, dictClicked[clickedNum].getRect())
     blitText(surface, textMainTimer, textTitleTournament,textCurrLevel,textBlind,textTEXTBlind,textTEXTBBAnte,textBBAnte,textTEXTPlayer,textPlayernum,textAverage,textAveragenum,textChipsinplay,textChipsinplaynum,textEntries,textEntriesnum,textStartingstack,textTimeBreak,textTimeBreaknum,textStartingstacknum,textNextLevel,textNextBlind,textNextBBAnte,textNextBBAntenum,textNextBlindnum)
-    pygame.draw.rect(surface, WHITE, rectMainTimer, width=3)
-    pygame.draw.rect(surface, WHITE, rectCurrBlind, width=3)
-    pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = 3)
+    pygame.draw.rect(surface, WHITE, rectMainTimer, width=round(3/screenScale))
+    pygame.draw.rect(surface, WHITE, rectCurrBlind, width=round(3/screenScale))
+    pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = round(3/screenScale))
     pygame.draw.circle(surface, RED, shutCenter, shutRadius)
-    pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = 2)
+    pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
+    #pygame.draw.rect(surface, DARKGRAY, rectTemp, width=round(3/screenScale))
     pygame.display.flip()
-    time.sleep(0.05)
+    dt = clock.tick(30) / 1000
   soundLevelup.stop()
   pygame.quit()
   if flagback == "load":

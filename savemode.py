@@ -47,6 +47,12 @@ def caution(text = "Caution"):
   yesB = tk.Button(window, width=40, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "Okay", command = lambda: close_window(window, False))
   yesB.place(y = 75, relx=0.5, anchor='n')
   window.mainloop()
+  
+def key2char(eventKey):
+  key = pygame.key.name(eventKey)
+  key = " " if (key == "space") else key
+  key = key[1] if (key[0] == "[") else key
+  return key
 
 def main_save(vol):
   r = True
@@ -117,9 +123,7 @@ def main_save(vol):
         for event in pygame.event.get():
           if event.type == KEYDOWN:
             if flagModTitle:
-              key = pygame.key.name(event.key)
-              key = " " if (key == "space") else key
-              key = key[1] if (key[0] == "[") else key
+              key = key2char(event.key)
               if key in SHIFT:
                 flagShift = True
               elif event.key == K_BACKSPACE:
