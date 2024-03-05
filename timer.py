@@ -103,6 +103,35 @@ def close_window(window, isQuit):
   global TK_VAL
   TK_VAL = isQuit
   window.destroy()
+  
+def updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textBlind, textBBAnte, fontBlind, fontNextLevelnum, fontTitleTournament, textNextBBAntenum, textNextBlindnum, cntBreak):
+  if LSTBLINDS[currLevel][0] == 0:   ## 현재 레벨이 브레이크인 경우
+    cntBreak+=1
+    textCurrLevel.changeColor(BRIGHTRED)
+    textCurrLevel.changeContent(font = fontTitleTournament, content = "Break")
+    textBlind.changeContent(font = fontBlind, content = "- / -")
+    textBBAnte.changeContent(font = fontBlind, content = "-")
+  else:
+    textCurrLevel.changeColor(WHITE)
+    textCurrLevel.changeContent(font = fontTitleTournament, content = 'Level '+str(currLevel-cntBreak))
+    textBlind.changeContent(font = fontBlind, content = format(LSTBLINDS[currLevel][0], ",")+" / "+format(LSTBLINDS[currLevel][1], ","))
+    if LSTBLINDS[currLevel][2] != 0:
+      temp_str = format(LSTBLINDS[currLevel][2], ",")
+    else:
+      temp_str = "-"
+    textBBAnte.changeContent(font = fontBlind, content = temp_str)
+  if LSTBLINDS[currLevel+1][0] == 0:
+    temp_str1 = "- / -"
+    temp_str = "-"
+  else:
+    temp_str1 = format(LSTBLINDS[currLevel+1][0], ",") + " / " + format(LSTBLINDS[currLevel+1][1], ",")
+    if LSTBLINDS[currLevel+1][2] != 0:
+      temp_str = format(LSTBLINDS[currLevel+1][2], ",")
+    else:
+      temp_str = "-"
+  textNextBlindnum.changeContent(font = fontNextLevelnum, content = temp_str1)
+  textNextBBAntenum.changeContent(font = fontNextLevelnum, content = temp_str)
+  return cntBreak
 
 def main(lstBLINDS, lstLevels,title, isLoad, vol):
   volume = vol
@@ -339,44 +368,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                         if event.key == ord('q'):
                           confirmQuit()
                     time.sleep(0.1)
-                    
                 try:
-                  if LSTBLINDS[currLevel][0] == 0:
-                    cntBreak+=1
-                    textCurrLevel.changeColor(BRIGHTRED)
-                    textCurrLevel.changeContent(font = fontTitleTournament, content = "Break")
-                    textBlind.changeContent(font = fontBlind, content="- / -")
-                    textBBAnte.changeContent(font = fontBlind, content = "-")
-                    if LSTBLINDS[currLevel+1][0] == 0:
-                      temp_str1 = "- / -"
-                      temp_str = "-"
-                    else:
-                      temp_str1 = format(LSTBLINDS[currLevel+1][0], ",") + " / " + format(LSTBLINDS[currLevel+1][1], ",")
-                      if LSTBLINDS[currLevel+1][2] != 0:
-                        temp_str = format(LSTBLINDS[currLevel+1][2], ",")
-                      else:
-                        temp_str = "-"
-                    textNextBlindnum.changeContent(font = fontNextLevelnum, content = temp_str1)
-                    textNextBBAntenum.changeContent(font = fontNextLevelnum, content = temp_str)
-                  else:
-                    textCurrLevel.changeContent(font = fontTitleTournament, content = 'Level '+str(currLevel-cntBreak))
-                    textBlind.changeContent(font = fontBlind, content = format(LSTBLINDS[currLevel][0], ",")+" / "+format(LSTBLINDS[currLevel][1], ","))
-                    if LSTBLINDS[currLevel][2] != 0:
-                      temp_str = format(LSTBLINDS[currLevel][2], ",")
-                    else:
-                      temp_str = "-"
-                    textBBAnte.changeContent(font = fontBlind, content = temp_str)
-                    if LSTBLINDS[currLevel+1][0] == 0:
-                      temp_str1 = "- / -"
-                      temp_str = "-"
-                    else:
-                      temp_str1 = format(LSTBLINDS[currLevel+1][0], ",") + " / " + format(LSTBLINDS[currLevel+1][1], ",")
-                      if LSTBLINDS[currLevel+1][2] != 0:
-                        temp_str = format(LSTBLINDS[currLevel+1][2], ",")
-                      else:
-                        temp_str = "-"
-                    textNextBlindnum.changeContent(font = fontNextLevelnum, content = temp_str1)
-                    textNextBBAntenum.changeContent(font = fontNextLevelnum, content = temp_str)
+                  cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textBlind, textBBAnte, fontBlind, fontNextLevelnum, fontTitleTournament, textNextBBAntenum, textNextBlindnum, cntBreak)
                 except:
                   print("No levels left2")
               strTimer = makeTimerString(min, sec, total)
@@ -505,31 +498,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                       confirmQuit()
                 time.sleep(0.1)
             try:
-              if LSTBLINDS[currLevel][0] == 0:
-                cntBreak+=1
-                textCurrLevel.changeColor(BRIGHTRED)
-                textCurrLevel.changeContent(font = fontTitleTournament, content = "Break")
-                textBlind.changeContent(font = fontBlind, content = "- / -")
-                textBBAnte.changeContent(font = fontBlind, content = "-")
-              else:
-                textCurrLevel.changeContent(font = fontTitleTournament, content = 'Level '+str(currLevel-cntBreak))
-                textBlind.changeContent(font = fontBlind, content = format(LSTBLINDS[currLevel][0], ",")+" / "+format(LSTBLINDS[currLevel][1], ","))
-                if LSTBLINDS[currLevel][2] != 0:
-                  temp_str = format(LSTBLINDS[currLevel][2], ",")
-                else:
-                  temp_str = "-"
-                textBBAnte.changeContent(font = fontBlind, content = temp_str)
-              if LSTBLINDS[currLevel+1][0] == 0:
-                temp_str1 = "- / -"
-                temp_str = "-"
-              else:
-                temp_str1 = format(LSTBLINDS[currLevel+1][0], ",") + " / " + format(LSTBLINDS[currLevel+1][1], ",")
-                if LSTBLINDS[currLevel+1][2] != 0:
-                  temp_str = format(LSTBLINDS[currLevel+1][2], ",")
-                else:
-                  temp_str = "-"
-              textNextBlindnum.changeContent(font = fontNextLevelnum, content = temp_str1)
-              textNextBBAntenum.changeContent(font = fontNextLevelnum, content = temp_str)
+              cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textBlind, textBBAnte, fontBlind, fontNextLevelnum, fontTitleTournament, textNextBBAntenum, textNextBlindnum, cntBreak)
+
             except:
               print("No levels left")
           strTimer = makeTimerString(min, sec, total)
