@@ -14,6 +14,91 @@ PALEGRAY = (180,180,180)
 
 TK_VAL = False
 
+PRIZEINTERVAL = 40
+
+TK_LST = []
+
+def focus_next_entry(event):
+  event.widget.tk_focusNext().focus()
+  return 'break'
+
+def finishPrizeInput(window, entries):
+  global TK_LST
+  TK_LST = []
+  flag = False
+  n=len(entries)
+  rank1,rank2, prize=0,0,""
+  templst = []
+  for i in range(n):
+    entry = entries[i]
+    s = entry.get()
+    if i%3 == 0: # 등수1
+      flag = False
+      try:
+        rank1 = int(s)
+      except:
+        flag = True # 이 행은 무시하고 넘어가야 한다
+    elif i%3 == 1 and not flag: #등수2
+      try:
+        rank2 = int(s)
+        if rank2 < rank1:
+          rank1,rank2 = rank2, rank1 #Swap
+      except:
+        flag = True
+    elif not flag:
+      if s: # Prize 칸이 비어있지 않으면
+        prize = s
+        if 11<=rank2<=20:
+          th = "th: "
+        elif rank2%10 == 1:
+          th = TH[1]
+        elif rank2%10 == 2:
+          th = TH[2]
+        elif rank2%10 == 3:
+          th = TH[3]
+        else:
+          th = "th: "
+        if rank1 != rank2:
+          TK_LST.append(str(rank1)+"-"+str(rank2)+th+prize)
+        else:
+          TK_LST.append(str(rank1)+th+prize)
+  window.destroy()
+
+def prizeInput(screenScale):
+  window = tk.Tk()
+  window.title('Prize')
+  screen_width = window.winfo_screenwidth()
+  screen_height = window.winfo_screenheight()
+  width,height = round(800/screenScale), round(1000/screenScale)
+
+  x = (screen_width - width) // 2
+  y = (screen_height - height) // 2 - 50
+  window.geometry(f"{width}x{height}+{x}+{y}")
+  window.configure(bg = 'gray90')
+  window.resizable(False, False)
+  for i in range(18):
+    labelRank = tk.Label(window, font = ("./font/NanumGothic.ttf", round(20/screenScale)), bg = 'gray90', text = "Rank: ")
+    labelRank.place(x=round(15/screenScale),y=round(50*i/screenScale)+round(20/screenScale))
+    labelWave = tk.Label(window, font = ("./font/NanumGothic.ttf", round(20/screenScale)), bg = 'gray90', text = "~")
+    labelWave.place(x=round(160/screenScale), y=round(50*i/screenScale)+round(20/screenScale))
+    labelPrize = tk.Label(window, font = ("./font/NanumGothic.ttf", round(20/screenScale)), bg = 'gray90', text = "Prize: ")
+    labelPrize.place(x=round(290/screenScale), y=round(50*i/screenScale)+round(20/screenScale))
+  button = tk.Button(window, width=round(50/screenScale), height=round(2/screenScale), bg='white', relief="raised", overrelief="solid", borderwidth=4, font = ("./font/NanumGothic.ttf", 15), text= "Okay", command=lambda: finishPrizeInput(window, entries))
+  button.place(relx=0.5, y=round(920/screenScale), anchor='n')
+  entries = []
+  for i in range(54):
+    entry = tk.Entry(window, font="Helvetica 20")
+    entry.bind('<Tab>', focus_next_entry)
+    if i%3 == 0:
+      entry.place(x=round(95/screenScale), y=round(50/screenScale)*(i//3)+round(20/screenScale),width=round(60/screenScale), height=round(30/screenScale))
+    elif i%3==1:
+      entry.place(x=round(195/screenScale), y=round(50/screenScale)*(i//3)+round(20/screenScale),width=round(60/screenScale), height=round(30/screenScale))
+    else:
+      entry.place(x=round(370/screenScale), y=round(50/screenScale)*(i//3)+round(20/screenScale),width=round(380/screenScale), height=round(30/screenScale))
+    entries.append(entry)
+  
+  window.mainloop()
+
 def timeupdate(minute, second, total, amount, currLevel, soundlvlup, lstBreakIdx):
   global LSTLEVELS, LSTBLINDS
   level = currLevel
@@ -89,11 +174,11 @@ def confirmQuit():
   window.geometry(f"{width}x{height}+{x}+{y}")
   window.configure(bg = 'white')
   window.resizable(False, False)
-  label = tk.Label(window, font = ("Arial", 25), bg = 'white', text = "Are you sure to Quit?")
+  label = tk.Label(window, font = ("./font/NanumGothicBold.ttf", 25), bg = 'white', text = "Are you sure to Quit?")
   label.place(x=100, y=20)
-  yesB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "Yes", command = lambda: close_window(window, True))
+  yesB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("./font/NanumGothic.ttf", 15), text= "Yes", command = lambda: close_window(window, True))
   yesB.place(x = 40, y = 80)
-  noB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "No", command = lambda: close_window(window, False))
+  noB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("./font/NanumGothic.ttf", 15), text= "No", command = lambda: close_window(window, False))
   noB.place(x = 280, y = 80)
   window.mainloop()
 
@@ -160,7 +245,7 @@ def endAction(surface, textPause, fontPause, rectPauseline, rectNextLevel, pause
 
 def main(lstBLINDS, lstLevels,title, isLoad, vol):
   volume = vol
-  global LSTLEVELS, LSTBLINDS
+  global LSTLEVELS, LSTBLINDS, TK_LST
   LSTLEVELS = lstLevels
   LSTLEVELS.append(100)
 
@@ -229,6 +314,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   fontNextLevelnum = pygame.font.Font('./font/NanumGothic.ttf', round(35/screenScale))
   fontButton = pygame.font.Font('./font/NanumGothicBold.ttf', round(80/screenScale))
   fontVolume = pygame.font.Font('./font/NanumGothic.ttf', round(80/screenScale))
+  fontPrize = pygame.font.Font('./font/NanumGothic.ttf', round(27/screenScale))
 
 
   ### location, loc 모음집
@@ -277,6 +363,12 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   objVol = textVol.get_rect()
   objVol.center = (midpoint[0] - round(600/screenScale), midpoint[1])
 
+  lstTextPrize = []
+  '''for i in range(18):
+    temp = TextObj(font = fontPrize, content="1st: APL 1T", relative="topleft", color=WHITE, position=(round(1590/screenScale), round((210+PRIZEINTERVAL*i)/screenScale)))
+    lstTextPrize.append(temp)'''
+
+
   #endregion
 
   numPlayer, numChips, numAverage, numEntries, numStarting = 0,0,0,0,0
@@ -303,8 +395,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   rectNext.center = (midpoint[0] + round(300/screenScale), round(1030/screenScale))
   rectBack = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
   rectBack.center = (midpoint[0] - round(300/screenScale), round(1030/screenScale))
-  rectTemp = pygame.Rect(0,0,round(420/screenScale), round(750/screenScale))
-  rectTemp.topleft = (round(1580/screenScale), round(200/screenScale))
+  rectPrizeBox = pygame.Rect(0,0,round(420/screenScale), round(780/screenScale))
+  rectPrizeBox.topleft = (round(1580/screenScale), round(200/screenScale))
   
 
   pauseEvent = True
@@ -340,7 +432,9 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
         pygame.draw.circle(surface, RED, shutCenter, shutRadius)
         pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
         surface.blit(imgSettings, rectSettings)
-        #pygame.draw.rect(surface, DARKGRAY, rectTemp, width=round(3/screenScale))
+        pygame.draw.rect(surface, DARKGRAY, rectPrizeBox, width=round(3/screenScale))
+        for text in lstTextPrize:
+          surface.blit(text.getText(), text.getRect())
       else:
         pygame.draw.line(surface, WHITE, (midpoint[0] - round(400/screenScale), midpoint[1]), (midpoint[0] + round(600/screenScale), midpoint[1]), width=4)
         surface.blit(imgBar, rectBar)
@@ -408,9 +502,12 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
             if doubleClickTimer == 0:
               doubleClickTimer = 0.001
             elif doubleClickTimer < 0.5:
-              #print('Double Clicked!')
-              if mouseInRect(rectTemp, position):
-                pass
+              if mouseInRect(rectPrizeBox, position):
+                prizeInput(screenScale)
+                lstTextPrize = []
+                for i in range(len(TK_LST)):
+                  temp = TextObj(font = fontPrize, content=TK_LST[i], relative="topleft", color=WHITE, position=(round(1590/screenScale), round((210+PRIZEINTERVAL*i)/screenScale)))
+                  lstTextPrize.append(temp)
               doubleClickTimer = 0
             if not flagSettings:
               temp_input = 0
@@ -464,7 +561,6 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
       if doubleClickTimer != 0:
         doubleClickTimer += dt
         if doubleClickTimer>= 0.5:
-          #print('single clicked!')
           doubleClickTimer = 0
       if flag:
         continue
@@ -534,7 +630,12 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
             if doubleClickTimer == 0:
               doubleClickTimer = 0.001
             elif doubleClickTimer < 0.5:
-              #print('Double Clicked!')
+              if mouseInRect(rectPrizeBox, position):
+                prizeInput(screenScale)
+                lstTextPrize = []
+                for i in range(len(TK_LST)):
+                  temp = TextObj(font = fontPrize, content=TK_LST[i], relative="topleft", color=WHITE, position=(round(1590/screenScale), round((210+PRIZEINTERVAL*i)/screenScale)))
+                  lstTextPrize.append(temp)
               doubleClickTimer = 0
             if clickedNum!=-1:
               dictClicked[clickedNum].changeColor(WHITE)
@@ -599,7 +700,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
     pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = round(3/screenScale))
     pygame.draw.circle(surface, RED, shutCenter, shutRadius)
     pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
-    #pygame.draw.rect(surface, DARKGRAY, rectTemp, width=round(3/screenScale))
+    pygame.draw.rect(surface, DARKGRAY, rectPrizeBox, width=round(3/screenScale))
+    surface.blit(text.getText(), text.getRect())
     pygame.display.flip()
     dt = clock.tick(30) / 1000
   soundLevelup.stop()

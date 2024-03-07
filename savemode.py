@@ -23,11 +23,11 @@ def confirmQuit():
   window.geometry(f"{width}x{height}+{x}+{y}")
   window.configure(bg = 'white')
   window.resizable(False, False)
-  label = tk.Label(window, font = ("Arial", 25), bg = 'white', text = "Are you sure to Quit?")
+  label = tk.Label(window, font = ("./font/NanumGothicBold.ttf", 25), bg = 'white', text = "Are you sure to Quit?")
   label.place(y=20, relx = 0.5, anchor='n')
-  yesB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "Yes", command = lambda: close_window(window, True))
+  yesB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("./font/NanumGothic.ttf", 15), text= "Yes", command = lambda: close_window(window, True))
   yesB.place(y = 75, relx=0.25, anchor='n')
-  noB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "No", command = lambda: close_window(window, False))
+  noB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("./font/NanumGothic.ttf", 15), text= "No", command = lambda: close_window(window, False))
   noB.place(y = 75, relx=0.75, anchor='n')
   window.mainloop()
 
@@ -39,12 +39,18 @@ def close_window(window, isQuit):
 def caution(text = "Caution"):
   window = tk.Tk()
   window.title('Error')
-  window.geometry("500x160+200+200")
+  screen_width = window.winfo_screenwidth()
+  screen_height = window.winfo_screenheight()
+  width,height = 500,160
+
+  x = (screen_width - width) // 2
+  y = (screen_height - height) // 2 - 50
+  window.geometry(f"{width}x{height}+{x}+{y}")
   window.configure(bg = 'white')
   window.resizable(False, False)
-  label = tk.Label(window, font = ("Arial", 25), bg = 'white', text = text)
+  label = tk.Label(window, font = ("./font/NanumGothicBold.ttf", 25), bg = 'white', text = text)
   label.place(y=20, anchor='n', relx=0.5)
-  yesB = tk.Button(window, width=40, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("Arial", 15), text= "Okay", command = lambda: close_window(window, False))
+  yesB = tk.Button(window, width=40, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("./font/NanumGothic.ttf", 15), text= "Okay", command = lambda: close_window(window, False))
   yesB.place(y = 75, relx=0.5, anchor='n')
   window.mainloop()
   
