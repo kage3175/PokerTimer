@@ -306,7 +306,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   #### font, font 모음집
   fontMainTimer = pygame.font.Font('./font/NanumSquareB.ttf', round(270 / screenScale))
   fontTitleTournament = pygame.font.Font('./font/NanumGothic.ttf', round(60 / screenScale))
-  fontBlind = pygame.font.Font('./font/NanumGothic.ttf', round(45 / screenScale))
+  fontBlind = pygame.font.Font('./font/NanumGothicBold.ttf', round(55 / screenScale))
   fontSide = pygame.font.Font('./font/NanumGothicExtraBold.ttf', round(40/screenScale))
   fontSideNum = pygame.font.Font('./font/NanumGothic.ttf', round(40/screenScale))
   fontPause = pygame.font.Font('./font/NanumGothicBold.ttf', round(80/screenScale))
@@ -314,15 +314,15 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   fontNextLevelnum = pygame.font.Font('./font/NanumGothic.ttf', round(35/screenScale))
   fontButton = pygame.font.Font('./font/NanumGothicBold.ttf', round(80/screenScale))
   fontVolume = pygame.font.Font('./font/NanumGothic.ttf', round(80/screenScale))
-  fontPrize = pygame.font.Font('./font/NanumGothic.ttf', round(27/screenScale))
+  fontPrize = pygame.font.Font('./font/NanumGothicBold.ttf', round(27/screenScale))
 
 
   ### location, loc 모음집
   locMainTimer = (midpoint[0], midpoint[1] - round(200 / screenScale))
   locTitleTournament = (midpoint[0], midpoint[1] - round(440 /screenScale))
-  locTextCurrLevel = (midpoint[0], midpoint[1] + round(25 /screenScale))
-  locCurrBlind = (midpoint[0], midpoint[1] + round(150/screenScale))
-  locNextLevel = (midpoint[0], midpoint[1] + round(280/screenScale))
+  locTextCurrLevel = (midpoint[0], midpoint[1] + round(20 /screenScale))
+  locCurrBlind = (midpoint[0], midpoint[1] + round(155/screenScale))
+  locNextLevel = (midpoint[0], midpoint[1] + round(285/screenScale))
   locSettings = (screensize[0] - round(70 /screenScale), screensize[1] - round(70 / screenScale))
   #locTextBlind = (midpoint[0] + round(150/screenScale), midpoint[1] + round(115/screenScale))
   #locTextTEXTBlind = (midpoint[0] - round(200/screenScale), midpoint[1] + round(115/screenScale))
@@ -333,11 +333,11 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   textMainTimer = TextObj(font=fontMainTimer, content= strTimer, position=locMainTimer, relative="center", color=WHITE)
   textTitleTournament = TextObj(content=title, position = locTitleTournament, relative="center", color=PALEGRAY, font=fontTitleTournament)
   textCurrLevel = TextObj(font = fontTitleTournament, content='Level '+ str(currLevel), relative="center", color=WHITE, position=locTextCurrLevel)
-  textBlind = TextObj(font = fontBlind, content=format(LSTBLINDS[currLevel][0], ",") + " / " + format(LSTBLINDS[currLevel][1], ","), relative="rcenter", position = (midpoint[1] + round(115/screenScale), midpoint[0] + round(350/screenScale)), color=WHITE)
-  textTEXTBlind = TextObj(font = fontBlind, content="BLINDS", position=(midpoint[1] + round(115/screenScale), midpoint[0] - round(340/screenScale)), relative="lcenter", color=WHITE)
-  textTEXTBBAnte = TextObj(font = fontBlind, content="BB Ante", position=(midpoint[1] + round(175/screenScale), midpoint[0] - round(340/screenScale)), relative="lcenter", color=WHITE)
+  textBlind = TextObj(font = fontBlind, content=format(LSTBLINDS[currLevel][0], ",") + " / " + format(LSTBLINDS[currLevel][1], ","), relative="rcenter", position = (midpoint[1] + round(110/screenScale), midpoint[0] + round(430/screenScale)), color=WHITE)
+  textTEXTBlind = TextObj(font = fontBlind, content="BLINDS", position=(midpoint[1] + round(110/screenScale), midpoint[0] - round(450/screenScale)), relative="lcenter", color=WHITE)
+  textTEXTBBAnte = TextObj(font = fontBlind, content="BB Ante", position=(midpoint[1] + round(190/screenScale), midpoint[0] - round(450/screenScale)), relative="lcenter", color=WHITE)
   temp = "-" if LSTBLINDS[currLevel][2] == 0 else format(LSTBLINDS[currLevel][2], ",")
-  textBBAnte = TextObj(font=fontBlind, content=temp, position=(midpoint[1] + round(175/screenScale), midpoint[0] + round(350/screenScale)), relative="rcenter", color=WHITE)
+  textBBAnte = TextObj(font=fontBlind, content=temp, position=(midpoint[1] + round(190/screenScale), midpoint[0] + round(430/screenScale)), relative="rcenter", color=WHITE)
   textTEXTPlayer = TextObj(font=fontSide, content="Players", position=(round(80/screenScale),round(110/screenScale)), relative="topleft", color=WHITE)
   textPlayernum = TextObj(font = fontSideNum, content="0", position= (round(80/screenScale),round(165/screenScale)), relative="topleft", color=WHITE)
   textAverage = TextObj(font = fontSide, content="Average Chips", position=(round(80/screenScale),round(265/screenScale)), relative="topleft", color=WHITE)
@@ -352,11 +352,11 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   textTimeBreaknum = TextObj(font=fontSideNum, content=strBreakTimer, color=WHITE, relative="topleft", position=(round(80/screenScale),round(940/screenScale)))
   textPause = TextObj(font = fontPause, content="Game Paused", color=BLACK, position=locMainTimer, relative="center")
   textNextLevel = TextObj(font = fontNextLevel, content="Next Level", color=PALEGRAY, position=locNextLevel, relative="center")
-  textNextBlind = TextObj(font = fontNextLevelnum, content="Blinds", color=PALEGRAY, position=(midpoint[0]-round(240/screenScale),midpoint[1] + round(340/screenScale)), relative="topleft")
-  textNextBBAnte = TextObj(font = fontNextLevelnum, content="BB Ante", color=PALEGRAY, position=(midpoint[0]-round(240/screenScale),midpoint[1] + round(395/screenScale)), relative="topleft")
-  textNextBlindnum = TextObj(font = fontNextLevelnum, color=PALEGRAY, content=format(LSTBLINDS[currLevel+1][0], ",") + " / " + format(LSTBLINDS[currLevel+1][1], ","), position= (midpoint[0]+round(240/screenScale),midpoint[1] + round(340/screenScale)), relative="topright")
+  textNextBlind = TextObj(font = fontNextLevelnum, content="Blinds", color=PALEGRAY, position=(midpoint[0]-round(240/screenScale),midpoint[1] + round(345/screenScale)), relative="topleft")
+  textNextBBAnte = TextObj(font = fontNextLevelnum, content="BB Ante", color=PALEGRAY, position=(midpoint[0]-round(240/screenScale),midpoint[1] + round(400/screenScale)), relative="topleft")
+  textNextBlindnum = TextObj(font = fontNextLevelnum, color=PALEGRAY, content=format(LSTBLINDS[currLevel+1][0], ",") + " / " + format(LSTBLINDS[currLevel+1][1], ","), position= (midpoint[0]+round(240/screenScale),midpoint[1] + round(345/screenScale)), relative="topright")
   temp = "-" if LSTBLINDS[currLevel+1][2] == 0 else format(LSTBLINDS[currLevel+1][2], ",")
-  textNextBBAntenum = TextObj(font=fontNextLevelnum, content=temp, color=PALEGRAY, position=(midpoint[0]+round(240/screenScale),midpoint[1] + round(395/screenScale)), relative="topright")
+  textNextBBAntenum = TextObj(font=fontNextLevelnum, content=temp, color=PALEGRAY, position=(midpoint[0]+round(240/screenScale),midpoint[1] + round(400/screenScale)), relative="topright")
   textNext = TextObj(font= fontButton, content="Save", position=(midpoint[0] + round(300/screenScale), round(1030/screenScale)), relative="center", color=BLACK)
   textBack = TextObj(font = fontButton, content="Back", color=BLACK, relative="center", position=(midpoint[0] - round(300/screenScale), round(1030/screenScale)))
   textVol = fontVolume.render("Volume", True, WHITE)
@@ -379,13 +379,13 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   rectMainTimer.center = locMainTimer
   rectMidPoint = pygame.Rect(0,0,20,20)
   rectMidPoint.center = midpoint
-  rectCurrBlind = pygame.Rect(0,0,round(800/screenScale), round(165/screenScale))
+  rectCurrBlind = pygame.Rect(0,0,round(1000/screenScale), round(190/screenScale))
   rectCurrBlind.center = locCurrBlind
   rectPause = pygame.Rect(0,0,round(800/screenScale),round(100/screenScale))
   rectPause.center = locMainTimer
   rectPauseline = pygame.Rect(0,0,round(800/screenScale),round(100/screenScale))
   rectPauseline.center = locMainTimer
-  rectNextLevel = pygame.Rect(0,0,round(600/screenScale),round(140/screenScale))
+  rectNextLevel = pygame.Rect(0,0,round(600/screenScale),round(145/screenScale))
   rectNextLevel.center = (midpoint[0], midpoint[1] + round(390/screenScale))
   rectSettings = imgSettings.get_rect()
   rectSettings.center = locSettings
@@ -701,7 +701,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
     pygame.draw.circle(surface, RED, shutCenter, shutRadius)
     pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
     pygame.draw.rect(surface, DARKGRAY, rectPrizeBox, width=round(3/screenScale))
-    surface.blit(text.getText(), text.getRect())
+    for text in lstTextPrize:
+      surface.blit(text.getText(), text.getRect())
     pygame.display.flip()
     dt = clock.tick(30) / 1000
   soundLevelup.stop()
