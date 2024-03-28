@@ -2,6 +2,12 @@ import pygame
 from ClassObjs import *
 import ctypes
 
+BACKGROUND = (76, 69, 244)
+
+def test(screen, rect):
+  screen.fill(BACKGROUND)
+  pygame.draw.rect(screen, WHITE, rect, width=8)
+  #pygame.draw.line(screen, )
 
 pygame.init()
 
@@ -12,6 +18,9 @@ print(screensize)
 midpoint = screensize[0] / 2, screensize[1] / 2 # 화면 중앙점
 screenScale = 1152/screensize[1]
 screen = pygame.display.set_mode()
+
+bigRect = pygame.Rect(0,0,round(1996/screenScale),round(1096/screenScale))
+bigRect.topleft = (26, 28)
 
 img = pygame.image.load('./img/Aria_Style.png')
 img = pygame.transform.scale(img, screensize)
@@ -28,6 +37,7 @@ while True:
         position = pygame.mouse.get_pos()
         print(position)
 
-  screen.blit(img, (0,0))
+  #screen.blit(img, (0,0))
+  test(screen, bigRect)
   pygame.display.flip()
   clock.tick(FPS)
