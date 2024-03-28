@@ -245,6 +245,7 @@ def endAction(surface, textPause, fontPause, rectPauseline, rectNextLevel, pause
 
 def main(lstBLINDS, lstLevels,title, isLoad, vol):
   volume = vol
+  print(lstBLINDS, lstLevels, title, isLoad, vol)
   global LSTLEVELS, LSTBLINDS, TK_LST
   LSTLEVELS = lstLevels
   LSTLEVELS.append(100)

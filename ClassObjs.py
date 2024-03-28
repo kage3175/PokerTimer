@@ -114,6 +114,8 @@ class TextObj:
     self.clicked=not self.clicked
   def getPos(self):
     return self.position
+  def getFont(self):
+    return self.font
   
 class BlindFile:
   def __init__(self) -> None:

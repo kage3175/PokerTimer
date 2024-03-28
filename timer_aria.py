@@ -11,12 +11,30 @@ LSTLEVELS = []
 LSTBLINDS = []
 
 PALEGRAY = (180,180,180)
+BACKGROUND = (60, 55, 230)
 
 TK_VAL = False
 
 PRIZEINTERVAL = 40
 
 TK_LST = []
+
+def blitBackground(screen, rect, screenScale):
+  screen.fill(BACKGROUND)
+  pygame.draw.rect(screen, WHITE, rect, width=8)
+  pygame.draw.line(screen, WHITE, (round(26/screenScale), round(176/screenScale)), (round(2018/screenScale), round(176/screenScale)), width=4)
+  pygame.draw.line(screen, WHITE, (round(26/screenScale), round(276/screenScale)), (round(2018/screenScale), round(276/screenScale)), width=2)
+  pygame.draw.line(screen, WHITE, (round(640/screenScale), round(375/screenScale)), (round(1408/screenScale), round(375/screenScale)), width=2)
+  pygame.draw.line(screen, WHITE, (round(26/screenScale), round(590/screenScale)), (round(2018/screenScale), round(590/screenScale)), width=2)
+  pygame.draw.line(screen, WHITE, (round(26/screenScale), round(905/screenScale)), (round(1024/screenScale), round(905/screenScale)), width=2)
+  pygame.draw.line(screen, WHITE, (round(26/screenScale), round(955/screenScale)), (round(1024/screenScale), round(955/screenScale)), width=2)
+  pygame.draw.line(screen, WHITE, (round(26/screenScale), round(1040/screenScale)), (round(2018/screenScale), round(1040/screenScale)), width=2)
+
+
+  pygame.draw.line(screen, WHITE, (round(505/screenScale), round(905/screenScale)), (round(505/screenScale), round(1040/screenScale)), width=2)
+  pygame.draw.line(screen, WHITE, (round(1408/screenScale), round(276/screenScale)), (round(1408/screenScale), round(590/screenScale)), width=2)
+  pygame.draw.line(screen, WHITE, (round(640/screenScale), round(276/screenScale)), (round(640/screenScale), round(590/screenScale)), width=2)
+  pygame.draw.line(screen, WHITE, (round(1024/screenScale), round(590/screenScale)), (round(1024/screenScale), round(1040/screenScale)), width=2)
 
 def focus_next_entry(event):
   event.widget.tk_focusNext().focus()
@@ -188,40 +206,44 @@ def close_window(window, isQuit):
   window.destroy()
 
   
-def updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textBlind, textBBAnte, fontBlind, fontNextLevelnum, fontTitleTournament, textNextBBAntenum, textNextBlindnum, cntBreak):
+def updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, textBBnum, textAntenum, textNextSBnum, textNextBBnum, textNextAntenum, cntBreak):
   if LSTBLINDS[currLevel][0] == 0:   ## 현재 레벨이 브레이크인 경우
     cntBreak+=1
     textCurrLevel.changeColor(BRIGHTRED)
-    textCurrLevel.changeContent(font = fontTitleTournament, content = "Break")
-    textBlind.changeContent(font = fontBlind, content = "- / -")
-    textBBAnte.changeContent(font = fontBlind, content = "-")
+    textCurrLevel.changeContent(font = textCurrLevel.getFont(), content = "Break")
+    textSBnum.changeContent(font = textSBnum.getFont(), content = "-")
+    textBBnum.changeContent(font = textBBnum.getFont(), content = "-")
+    textAntenum.changeContent(font = textAntenum.getFont(), content = "-")
   else:
     textCurrLevel.changeColor(WHITE)
-    textCurrLevel.changeContent(font = fontTitleTournament, content = 'Level '+str(currLevel-cntBreak))
-    textBlind.changeContent(font = fontBlind, content = format(LSTBLINDS[currLevel][0], ",")+" / "+format(LSTBLINDS[currLevel][1], ","))
+    textCurrLevel.changeContent(font = textCurrLevel.getFont(), content = 'Level '+str(currLevel-cntBreak))
+    textSBnum.changeContent(font = textSBnum.getFont(), content = format(LSTBLINDS[currLevel][0], ","))
+    textBBnum.changeContent(font = textBBnum.getFont(), content = format(LSTBLINDS[currLevel][1], ","))
     if LSTBLINDS[currLevel][2] != 0:
       temp_str = format(LSTBLINDS[currLevel][2], ",")
     else:
       temp_str = "-"
-    textBBAnte.changeContent(font = fontBlind, content = temp_str)
+    textAntenum.changeContent(font = textAntenum.getFont(), content = temp_str)
   if LSTBLINDS[currLevel+1][0] == 0:
-    temp_str1 = "- / -"
+    temp_str1 = "-"
+    temp_str2 = "-"
     temp_str = "-"
   else:
-    temp_str1 = format(LSTBLINDS[currLevel+1][0], ",") + " / " + format(LSTBLINDS[currLevel+1][1], ",")
+    temp_str1 = format(LSTBLINDS[currLevel+1][0], ",")
+    temp_str2 = format(LSTBLINDS[currLevel+1][1], ",")
     if LSTBLINDS[currLevel+1][2] != 0:
       temp_str = format(LSTBLINDS[currLevel+1][2], ",")
     else:
       temp_str = "-"
-  textNextBlindnum.changeContent(font = fontNextLevelnum, content = temp_str1)
-  textNextBBAntenum.changeContent(font = fontNextLevelnum, content = temp_str)
+  textNextSBnum.changeContent(font = textNextSBnum.getFont(), content = temp_str1)
+  textNextBBnum.changeContent(font = textNextBBnum.getFont(), content = temp_str2)
+  textNextAntenum.changeContent(font = textNextAntenum.getFont(), content = temp_str)
   return cntBreak
 
-def endAction(surface, textPause, fontPause, rectPauseline, rectNextLevel, pauseBox, rectPause, shutCenter, shutRadius, screenScale):
+def endAction(surface, textPause, fontPause, rectPauseline, pauseBox, rectPause, shutCenter, shutRadius, screenScale):
   global TK_VAL
   textPause.changeContent(font = fontPause, content = "No more blinds")
   pygame.draw.rect(surface, RED, rectPauseline, width=round(5/screenScale))
-  pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = round(3/screenScale))
   surface.blit(pauseBox, rectPause)
   surface.blit(textPause.getText(), textPause.getRect())
   pygame.draw.circle(surface, RED, shutCenter, shutRadius)
@@ -301,28 +323,24 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   imgSettings = pygame.image.load("./img/settings.png")
   imgSettings = pygame.transform.scale(imgSettings,(round(100/screenScale),round(100/screenScale)))
   imgBar = pygame.image.load("./img/test.png")
-  surface.blit(imgBackground,(0,0))
+  #surface.blit(imgBackground,(0,0))
 
   #### font, font 모음집
-  fontMainTimer = pygame.font.Font('./font/NanumSquareB.ttf', round(270 / screenScale))
-  fontTitleTournament = pygame.font.Font('./font/NanumGothic.ttf', round(60 / screenScale))
-  fontBlind = pygame.font.Font('./font/NanumGothicBold.ttf', round(55 / screenScale))
-  fontSide = pygame.font.Font('./font/NanumGothicExtraBold.ttf', round(40/screenScale))
-  fontSideNum = pygame.font.Font('./font/NanumGothic.ttf', round(40/screenScale))
+  fontTitle = pygame.font.Font('./font/NanumSquareEB.ttf', round(65/screenScale))
+  fontMainTimer = pygame.font.Font('./font/NanumSquareEB.ttf', round(200/screenScale))
+  fontLevel = pygame.font.Font('./font/NanumSquareB.ttf', round(70/screenScale))
+  fontLeftObjs = pygame.font.Font('./font/NanumSquareEB.ttf', round(60/screenScale))
+  fontRightObjs = pygame.font.Font('./font/NanumSquareB.ttf', round(42/screenScale))
+  fontLeftSmall = pygame.font.Font('./font/NanumGothicExtraBold.ttf', round(30/screenScale))
   fontPause = pygame.font.Font('./font/NanumGothicBold.ttf', round(80/screenScale))
-  fontNextLevel = pygame.font.Font("./font/NanumGothic.ttf", round(40/screenScale))
-  fontNextLevelnum = pygame.font.Font('./font/NanumGothic.ttf', round(35/screenScale))
   fontButton = pygame.font.Font('./font/NanumGothicBold.ttf', round(80/screenScale))
   fontVolume = pygame.font.Font('./font/NanumGothic.ttf', round(80/screenScale))
   fontPrize = pygame.font.Font('./font/NanumGothicBold.ttf', round(27/screenScale))
 
 
   ### location, loc 모음집
-  locMainTimer = (midpoint[0], midpoint[1] - round(200 / screenScale))
-  locTitleTournament = (midpoint[0], midpoint[1] - round(440 /screenScale))
-  locTextCurrLevel = (midpoint[0], midpoint[1] + round(20 /screenScale))
+  locMainTimer = (midpoint[0], round(483/screenScale))
   locCurrBlind = (midpoint[0], midpoint[1] + round(155/screenScale))
-  locNextLevel = (midpoint[0], midpoint[1] + round(285/screenScale))
   locSettings = (screensize[0] - round(70 /screenScale), screensize[1] - round(70 / screenScale))
   #locTextBlind = (midpoint[0] + round(150/screenScale), midpoint[1] + round(115/screenScale))
   #locTextTEXTBlind = (midpoint[0] - round(200/screenScale), midpoint[1] + round(115/screenScale))
@@ -330,33 +348,40 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   #region texts
 
   #### text 모음집
-  textMainTimer = TextObj(font=fontMainTimer, content= strTimer, position=locMainTimer, relative="center", color=WHITE)
-  textTitleTournament = TextObj(content=title, position = locTitleTournament, relative="center", color=PALEGRAY, font=fontTitleTournament)
-  textCurrLevel = TextObj(font = fontTitleTournament, content='Level '+ str(currLevel), relative="center", color=WHITE, position=locTextCurrLevel)
-  textBlind = TextObj(font = fontBlind, content=format(LSTBLINDS[currLevel][0], ",") + " / " + format(LSTBLINDS[currLevel][1], ","), relative="rcenter", position = (midpoint[1] + round(110/screenScale), midpoint[0] + round(430/screenScale)), color=WHITE)
-  textTEXTBlind = TextObj(font = fontBlind, content="BLINDS", position=(midpoint[1] + round(110/screenScale), midpoint[0] - round(450/screenScale)), relative="lcenter", color=WHITE)
-  textTEXTBBAnte = TextObj(font = fontBlind, content="BB Ante", position=(midpoint[1] + round(190/screenScale), midpoint[0] - round(450/screenScale)), relative="lcenter", color=WHITE)
+  textMainTimer = TextObj(font = fontMainTimer, content = strTimer, position=locMainTimer, relative='center', color=WHITE)
+  textTitleTournament = TextObj(font = fontTitle, content=title, position=(midpoint[0],round(230/screenScale)), relative='center', color=WHITE)
+  textCurrLevel = TextObj(font = fontLevel, content='Level '+ str(currLevel), position=(midpoint[0], round(326/screenScale)), relative='center', color=WHITE)
+  textSB = TextObj(font = fontLeftObjs, content='Small Blind:', position=(round(505/screenScale), round(605/screenScale)), relative='topright', color=WHITE)
+  textBB = TextObj(font = fontLeftObjs, content='Big Blind:', position=(round(505/screenScale), round(680/screenScale)), relative='topright', color=WHITE)
+  textAnte = TextObj(font = fontLeftObjs, content='Ante:', position=(round(505/screenScale), round(755/screenScale)), relative='topright', color=WHITE)
   temp = "-" if LSTBLINDS[currLevel][2] == 0 else format(LSTBLINDS[currLevel][2], ",")
-  textBBAnte = TextObj(font=fontBlind, content=temp, position=(midpoint[1] + round(190/screenScale), midpoint[0] + round(430/screenScale)), relative="rcenter", color=WHITE)
-  textTEXTPlayer = TextObj(font=fontSide, content="Players", position=(round(80/screenScale),round(110/screenScale)), relative="topleft", color=WHITE)
-  textPlayernum = TextObj(font = fontSideNum, content="0", position= (round(80/screenScale),round(165/screenScale)), relative="topleft", color=WHITE)
-  textAverage = TextObj(font = fontSide, content="Average Chips", position=(round(80/screenScale),round(265/screenScale)), relative="topleft", color=WHITE)
-  textAveragenum = TextObj(font = fontSideNum, content="0", position=(round(80/screenScale),round(320/screenScale)), relative="topleft", color=WHITE)
-  textChipsinplay = TextObj(font = fontSide, content="Chips in Play", position=(round(80/screenScale),round(420/screenScale)), relative="topleft", color=WHITE)
-  textChipsinplaynum = TextObj(font=fontSideNum, content="0", position=(round(80/screenScale),round(475/screenScale)), relative="topleft", color=WHITE)
-  textEntries = TextObj(font = fontSide, content="Entries", position=(round(80/screenScale),round(575/screenScale)), relative="topleft", color=WHITE)
-  textEntriesnum = TextObj(font = fontSideNum, content="0", color=WHITE, position=(round(80/screenScale),round(630/screenScale)), relative="topleft")
-  textStartingstack = TextObj(font=fontSide, content="Starting Stacks", color=WHITE, relative="topleft", position=(round(80/screenScale),round(730/screenScale)))
-  textStartingstacknum = TextObj(font = fontSideNum, color=WHITE, content="0", relative="topleft", position=(round(80/screenScale),round(785/screenScale)))
-  textTimeBreak = TextObj(font=fontSide, content="Time to Break", color=WHITE, position= (round(80/screenScale),round(885/screenScale)), relative="topleft")
-  textTimeBreaknum = TextObj(font=fontSideNum, content=strBreakTimer, color=WHITE, relative="topleft", position=(round(80/screenScale),round(940/screenScale)))
+  textSBnum = TextObj(font = fontLeftObjs, content=format(LSTBLINDS[currLevel][0], ","), position=(round(515/screenScale), round(605/screenScale)), relative='topleft', color=WHITE)
+  textBBnum = TextObj(font = fontLeftObjs, content=format(LSTBLINDS[currLevel][1], ","), position=(round(515/screenScale), round(680/screenScale)), relative='topleft', color=WHITE)
+  textAntenum = TextObj(font = fontLeftObjs, content=temp, position=(round(515/screenScale), round(755/screenScale)), relative='topleft', color=WHITE)
+  
   textPause = TextObj(font = fontPause, content="Game Paused", color=BLACK, position=locMainTimer, relative="center")
-  textNextLevel = TextObj(font = fontNextLevel, content="Next Level", color=PALEGRAY, position=locNextLevel, relative="center")
-  textNextBlind = TextObj(font = fontNextLevelnum, content="Blinds", color=PALEGRAY, position=(midpoint[0]-round(240/screenScale),midpoint[1] + round(345/screenScale)), relative="topleft")
-  textNextBBAnte = TextObj(font = fontNextLevelnum, content="BB Ante", color=PALEGRAY, position=(midpoint[0]-round(240/screenScale),midpoint[1] + round(400/screenScale)), relative="topleft")
-  textNextBlindnum = TextObj(font = fontNextLevelnum, color=PALEGRAY, content=format(LSTBLINDS[currLevel+1][0], ",") + " / " + format(LSTBLINDS[currLevel+1][1], ","), position= (midpoint[0]+round(240/screenScale),midpoint[1] + round(345/screenScale)), relative="topright")
-  temp = "-" if LSTBLINDS[currLevel+1][2] == 0 else format(LSTBLINDS[currLevel+1][2], ",")
-  textNextBBAntenum = TextObj(font=fontNextLevelnum, content=temp, color=PALEGRAY, position=(midpoint[0]+round(240/screenScale),midpoint[1] + round(400/screenScale)), relative="topright")
+  textNextSB = TextObj(font = fontRightObjs, content='Next Small Blind:', position=(round(1500/screenScale), round(605/screenScale)), relative='topright', color=WHITE)
+  textNextBB = TextObj(font = fontRightObjs, content='Next Big Blind:', position=(round(1500/screenScale), round(660/screenScale)), relative='topright', color=WHITE)
+  textNextAnte = TextObj(font = fontRightObjs, content='Next Ante:', position=(round(1500/screenScale), round(715/screenScale)), relative='topright', color=WHITE)
+  textAvgChips = TextObj(font = fontRightObjs, content='Average Chips:', position=(round(1500/screenScale), round(770/screenScale)), relative='topright', color=WHITE)
+  textTotalChips = TextObj(font = fontRightObjs, content='Total Chips:', position=(round(1500/screenScale), round(825/screenScale)), relative='topright', color=WHITE)
+  textStartingStack = TextObj(font = fontRightObjs, content='Starting Stack:', position=(round(1500/screenScale), round(880/screenScale)), relative='topright', color=WHITE)
+  textTimetoBreak = TextObj(font = fontRightObjs, content='Time to Break:', position=(round(1500/screenScale), round(935/screenScale)), relative='topright', color=WHITE)
+
+  textNextSBnum = TextObj(font = fontRightObjs, content=format(LSTBLINDS[currLevel+1][0], ","), position=(round(1510/screenScale), round(605/screenScale)), relative='topleft', color=WHITE)
+  textNextBBnum = TextObj(font = fontRightObjs, content=format(LSTBLINDS[currLevel+1][1], ","), position=(round(1510/screenScale), round(660/screenScale)), relative='topleft', color=WHITE)
+  temp = "-" if LSTBLINDS[currLevel][2] == 0 else format(LSTBLINDS[currLevel+1][2], ",")
+  textNextAntenum = TextObj(font = fontRightObjs, content=temp, position=(round(1510/screenScale), round(715/screenScale)), relative='topleft', color=WHITE)
+  textAvgChipsnum = TextObj(font = fontRightObjs, content='0', position=(round(1510/screenScale), round(770/screenScale)), relative='topleft', color=WHITE)
+  textTotalChipsnum = TextObj(font = fontRightObjs, content='0', position=(round(1510/screenScale), round(825/screenScale)), relative='topleft', color=WHITE)
+  textStartingStacknum = TextObj(font = fontRightObjs, content='0', position=(round(1510/screenScale), round(880/screenScale)), relative='topleft', color=WHITE)
+  textTimetoBreaknum = TextObj(font = fontRightObjs, content=strBreakTimer, position=(round(1510/screenScale), round(935/screenScale)), relative='topleft', color=WHITE)
+
+  textEntrants = TextObj(font = fontLeftSmall, content='Entrants', position=(round(266/screenScale), round(930/screenScale)), relative='center', color=WHITE)
+  textPlayersLeft = TextObj(font = fontLeftSmall, content='Players Left', position=(round(765/screenScale), round(930/screenScale)), relative='center', color=WHITE)
+  textEntrantsnum = TextObj(font = fontLeftObjs, content='0', position=(round(266/screenScale), round(998/screenScale)), relative='center', color=WHITE)
+  textPlayersLeftnum = TextObj(font = fontLeftObjs, content='0', position=(round(765/screenScale), round(998/screenScale)), relative='center', color=WHITE)
+
   textNext = TextObj(font= fontButton, content="Save", position=(midpoint[0] + round(300/screenScale), round(1030/screenScale)), relative="center", color=BLACK)
   textBack = TextObj(font = fontButton, content="Back", color=BLACK, relative="center", position=(midpoint[0] - round(300/screenScale), round(1030/screenScale)))
   textVol = fontVolume.render("Volume", True, WHITE)
@@ -375,18 +400,12 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   temp_input = 0
 
   #### rect 모음집
-  rectMainTimer = pygame.Rect(0,0,round(1050/screenScale),round(350/screenScale))
-  rectMainTimer.center = locMainTimer
   rectMidPoint = pygame.Rect(0,0,20,20)
   rectMidPoint.center = midpoint
-  rectCurrBlind = pygame.Rect(0,0,round(1000/screenScale), round(190/screenScale))
-  rectCurrBlind.center = locCurrBlind
   rectPause = pygame.Rect(0,0,round(800/screenScale),round(100/screenScale))
   rectPause.center = locMainTimer
   rectPauseline = pygame.Rect(0,0,round(800/screenScale),round(100/screenScale))
   rectPauseline.center = locMainTimer
-  rectNextLevel = pygame.Rect(0,0,round(600/screenScale),round(145/screenScale))
-  rectNextLevel.center = (midpoint[0], midpoint[1] + round(390/screenScale))
   rectSettings = imgSettings.get_rect()
   rectSettings.center = locSettings
   rectBar = imgBar.get_rect()
@@ -395,8 +414,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   rectNext.center = (midpoint[0] + round(300/screenScale), round(1030/screenScale))
   rectBack = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
   rectBack.center = (midpoint[0] - round(300/screenScale), round(1030/screenScale))
-  rectPrizeBox = pygame.Rect(0,0,round(420/screenScale), round(780/screenScale))
-  rectPrizeBox.topleft = (round(1580/screenScale), round(200/screenScale))
+  bigRect = pygame.Rect(0,0,round(1996/screenScale),round(1096/screenScale))
+  bigRect.topleft = (round(26/screenScale), round(28/screenScale))
   
 
   pauseEvent = True
@@ -406,7 +425,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   flagSettings = False
   barMove = False
   clickedNum = -1
-  dictClicked = {0:textPlayernum, 1:textAveragenum, 2:textChipsinplaynum, 3: textEntriesnum, 4:textStartingstacknum}
+  dictClicked = {0:textPlayersLeftnum, 1:textAvgChipsnum, 2:textTotalChipsnum, 3: textEntrantsnum, 4:textStartingStacknum}
   dictNum = {0:numPlayer, 1:numAverage, 2:numChips, 3:numEntries, 4:numStarting}
 
   while running:
@@ -415,27 +434,25 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
       continue
     if pauseEvent:
       flag = True
-      surface.blit(imgBackground,(0,0))
+      
       if not flagSettings:
+        blitBackground(surface, bigRect, screenScale)
         if clickedNum != -1:
           try:
             pygame.draw.rect(surface, PALEGRAY, dictClicked[clickedNum].getRect())
           except:
             print("clickedNum Error")
-        blitText(surface, textMainTimer, textTitleTournament, textCurrLevel, textBlind, textTEXTBlind, textTEXTBBAnte, textBBAnte, textTEXTPlayer, textPlayernum, textAverage, textAveragenum, textChipsinplay, textChipsinplaynum, textEntries, textEntriesnum, textStartingstack, textStartingstacknum, textTimeBreak, textTimeBreaknum, textNextLevel, textNextBlind, textNextBBAnte, textNextBlindnum, textNextBBAntenum)
-        pygame.draw.rect(surface, WHITE, rectMainTimer, width=round(3/screenScale))
-        pygame.draw.rect(surface, WHITE, rectCurrBlind, width=round(3/screenScale))
+        blitText(surface, textMainTimer, textTitleTournament, textCurrLevel, textSB, textBB, textAnte, textSBnum, textBBnum, textAntenum, textNextSB, textNextBB, textNextAnte, textAvgChips, textTotalChips, textStartingStack, textTimetoBreak, textNextSBnum, textNextBBnum, textNextAntenum, textAvgChipsnum, textTotalChipsnum, textStartingStacknum, textTimetoBreaknum, textEntrants, textPlayersLeft, textEntrantsnum, textPlayersLeftnum)
         pygame.draw.rect(surface, RED, rectPauseline, width=round(5/screenScale))
-        pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = round(3/screenScale))
         surface.blit(pauseBox, rectPause)
         surface.blit(textPause.getText(), textPause.getRect())
         pygame.draw.circle(surface, RED, shutCenter, shutRadius)
         pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
         surface.blit(imgSettings, rectSettings)
-        pygame.draw.rect(surface, DARKGRAY, rectPrizeBox, width=round(3/screenScale))
         for text in lstTextPrize:
           surface.blit(text.getText(), text.getRect())
       else:
+        surface.fill(BACKGROUND)
         pygame.draw.line(surface, WHITE, (midpoint[0] - round(400/screenScale), midpoint[1]), (midpoint[0] + round(600/screenScale), midpoint[1]), width=4)
         surface.blit(imgBar, rectBar)
         surface.blit(textVol, objVol)
@@ -457,23 +474,24 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
               soundLevelup.play()
               pauseEvent = False
               flag = False
-              textBlind.changeContent(font = fontBlind, content = format(LSTBLINDS[currLevel][0], ",")+" / "+format(LSTBLINDS[currLevel][1], ","))
+              textSBnum.changeContent(font = textSBnum.getFont(), content = format(LSTBLINDS[currLevel][0], ","))
+              textBBnum.changeContent(font = textBBnum.getFont(), content = format(LSTBLINDS[currLevel][1], ","))
               if LSTBLINDS[currLevel][2] != 0:
-                textBBAnte.changeContent(font = fontBlind, content = format(LSTBLINDS[currLevel][2], ","))
+                textAntenum.changeContent(font = fontLeftObjs, content = format(LSTBLINDS[currLevel][2], ","))
             if event.key in K_NUM or event.key == K_BACKSPACE:
               if clickedNum != -1:
                 temp_input = (temp_input*10 + processAscii(event.key)) if (event.key in K_NUM) else (temp_input//10)
                 dictClicked[clickedNum].changeColor(BLACK)
-                dictClicked[clickedNum].changeContent(font=fontSideNum, content= format(temp_input, ","))
+                dictClicked[clickedNum].changeContent(font=dictClicked[clickedNum].getFont(), content= format(temp_input, ","))
             if pygame.key.name(event.key) == "return" or pygame.key.name(event.key) == "enter":
               if clickedNum != -1: ### dictClicked = {0:textPlayernum, 1:textAveragenum, 2:textChipsinplaynum, 3: textEntriesnum, 4:textStartingstacknum}
                 dictNum[clickedNum] = temp_input
                 dictClicked[clickedNum].changeColor(WHITE)
-                dictClicked[clickedNum].changeContent(font = fontSideNum, content = format(dictNum[clickedNum], ","))
+                dictClicked[clickedNum].changeContent(font = dictClicked[clickedNum].getFont(), content = format(dictNum[clickedNum], ","))
                 if (clickedNum==0 or clickedNum ==2) and dictNum[0]>0:
                   dictNum[1] = dictNum[2] // dictNum[0]
-                  textAveragenum.changeColor(WHITE)
-                  textAveragenum.changeContent(font = fontSideNum, content = format(dictNum[1], ","))                  
+                  textAvgChipsnum.changeColor(WHITE)
+                  textAvgChipsnum.changeContent(font = textAvgChipsnum.getFont(), content = format(dictNum[1], ","))                  
               temp_input = 0
               clickedNum=-1
             if event.key == K_RIGHT: ### 1분 뒤로
@@ -482,15 +500,16 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                 currLevel = newLevel
                 if LSTLEVELS[currLevel]==0: ### End of blind
                   while running:
-                    running = endAction(surface, textPause, fontPause, rectPauseline, rectNextLevel, pauseBox, rectPause, shutCenter, shutRadius, screenScale)
+                    running = endAction(surface, textPause, fontPause, rectPauseline, pauseBox, rectPause, shutCenter, shutRadius, screenScale)
                 try:
-                  cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textBlind, textBBAnte, fontBlind, fontNextLevelnum, fontTitleTournament, textNextBBAntenum, textNextBlindnum, cntBreak)
+                  #updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, textBBnum, textAntenum, textNextSBnum, textNextBBnum, textNextAntenum):
+                  cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, textBBnum, textAntenum, textNextSBnum, textNextBBnum, textNextAntenum, cntBreak)
                 except:
                   print("No levels left2")
               strTimer = makeTimerString(min, sec, total)
               textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
               strBreakTimer = makeTimerString(min_break,sec_break,total)
-              textTimeBreaknum.changeContent(font = fontSideNum, content = strBreakTimer)
+              textTimetoBreaknum.changeContent(font = textTimetoBreaknum.getFont(), content = strBreakTimer)
           if event.key == ord('q'):
             confirmQuit()
           if event.key == K_ESCAPE:
@@ -502,28 +521,28 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
             if doubleClickTimer == 0:
               doubleClickTimer = 0.001
             elif doubleClickTimer < 0.5:
-              if mouseInRect(rectPrizeBox, position):
+              '''if mouseInRect(rectPrizeBox, position):
                 prizeInput(screenScale)
                 lstTextPrize = []
                 for i in range(len(TK_LST)):
                   temp = TextObj(font = fontPrize, content=TK_LST[i], relative="topleft", color=WHITE, position=(round(1590/screenScale), round((210+PRIZEINTERVAL*i)/screenScale)))
-                  lstTextPrize.append(temp)
+                  lstTextPrize.append(temp)'''
               doubleClickTimer = 0
             if not flagSettings:
               temp_input = 0
               if clickedNum!=-1:
                 dictClicked[clickedNum].changeColor(WHITE)
-                dictClicked[clickedNum].changeContent(font = fontSideNum, content = format(dictNum[clickedNum], ","))
+                dictClicked[clickedNum].changeContent(font = dictClicked[clickedNum].getFont(), content = format(dictNum[clickedNum], ","))
                 clickedNum=-1
-              elif mouseInRect(textPlayernum.getRect(), position):
+              elif mouseInRect(textPlayersLeftnum.getRect(), position):
                 clickedNum=0
-              elif mouseInRect(textAveragenum.getRect(), position):
+              elif mouseInRect(textAvgChipsnum.getRect(), position):
                 clickedNum=1
-              elif mouseInRect(textChipsinplaynum.getRect(), position):
+              elif mouseInRect(textTotalChipsnum.getRect(), position):
                 clickedNum=2
-              elif mouseInRect(textEntriesnum.getRect(), position):
+              elif mouseInRect(textEntrantsnum.getRect(), position):
                 clickedNum=3
-              elif mouseInRect(textStartingstacknum.getRect(), position):
+              elif mouseInRect(textStartingStacknum.getRect(), position):
                 clickedNum=4
               elif (((position[0] - shutCenter[0]) ** 2 + (position[1] - shutCenter[1]) ** 2) ** 0.5 <= shutRadius):
                 confirmQuit()
@@ -587,7 +606,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
           if clickedNum != -1:
             temp_input = (temp_input*10 + processAscii(event.key)) if (event.key in K_NUM) else (temp_input//10)
             dictClicked[clickedNum].changeColor(BLACK)
-            dictClicked[clickedNum].changeContent(font = fontSideNum, content = format(temp_input, ","))
+            dictClicked[clickedNum].changeContent(font = dictClicked[clickedNum].getFont(), content = format(temp_input, ","))
           elif event.key == K_BACKSPACE:
             if isLoad:
               flagback = "load"
@@ -598,11 +617,11 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
           if clickedNum != -1:
             dictNum[clickedNum]=temp_input
             dictClicked[clickedNum].changeColor(WHITE)
-            dictClicked[clickedNum].changeContent(font = fontSideNum, content = format(dictNum[clickedNum], ","))
+            dictClicked[clickedNum].changeContent(font = dictClicked[clickedNum].getFont(), content = format(dictNum[clickedNum], ","))
             if (clickedNum==0 or clickedNum==2) and dictNum[0] > 0:
               dictNum[1] = dictNum[2] // dictNum[0]
-              textAveragenum.changeColor(WHITE)
-              textAveragenum.changeContent(font = fontSideNum, content = format(dictNum[1], ","))
+              textAvgChipsnum.changeColor(WHITE)
+              textAvgChipsnum.changeContent(font = textAvgChipsnum.getFont(), content = format(dictNum[1], ","))
           temp_input = 0
           clickedNum = -1
         if event.key == K_RIGHT or event.key == K_LEFT: ### 1분 뒤로
@@ -612,16 +631,16 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
             currLevel = newLevel
             if LSTLEVELS[currLevel]==0: ### End of blind
               while running:
-                running = endAction(surface, textPause, fontPause, rectPauseline, rectNextLevel, pauseBox, rectPause, shutCenter, shutRadius, screenScale)
+                running = endAction(surface, textPause, fontPause, rectPauseline, pauseBox, rectPause, shutCenter, shutRadius, screenScale)
             try:
-              cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textBlind, textBBAnte, fontBlind, fontNextLevelnum, fontTitleTournament, textNextBBAntenum, textNextBlindnum, cntBreak)
+              cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, textBBnum, textAntenum, textNextSBnum, textNextBBnum, textNextAntenum, cntBreak)
 
             except:
               print("No levels left")
           strTimer = makeTimerString(min, sec, total)
           textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
           strBreakTimer = makeTimerString(min_break,sec_break,total)
-          textTimeBreaknum.changeContent(font = fontSideNum, content = strBreakTimer)
+          textTimetoBreaknum.changeContent(font = textTimetoBreaknum.getFont(), content = strBreakTimer)
         
       elif event.type == MOUSEBUTTONDOWN:
           if event.button == 1:
@@ -630,26 +649,26 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
             if doubleClickTimer == 0:
               doubleClickTimer = 0.001
             elif doubleClickTimer < 0.5:
-              if mouseInRect(rectPrizeBox, position):
+              '''if mouseInRect(rectPrizeBox, position):
                 prizeInput(screenScale)
                 lstTextPrize = []
                 for i in range(len(TK_LST)):
                   temp = TextObj(font = fontPrize, content=TK_LST[i], relative="topleft", color=WHITE, position=(round(1590/screenScale), round((210+PRIZEINTERVAL*i)/screenScale)))
-                  lstTextPrize.append(temp)
+                  lstTextPrize.append(temp)'''
               doubleClickTimer = 0
             if clickedNum!=-1:
               dictClicked[clickedNum].changeColor(WHITE)
-              dictClicked[clickedNum].changeContent(font = fontSideNum, content = format(dictNum[clickedNum], ","))
+              dictClicked[clickedNum].changeContent(font = dictClicked[clickedNum].getFont(), content = format(dictNum[clickedNum], ","))
               clickedNum=-1
-            elif mouseInRect(textPlayernum.getRect(), position):
+            elif mouseInRect(textPlayersLeftnum.getRect(), position):
               clickedNum=0
-            elif mouseInRect(textAveragenum.getRect(), position):
+            elif mouseInRect(textAvgChipsnum.getRect(), position):
               clickedNum=1
-            elif mouseInRect(textChipsinplaynum.getRect(), position):
+            elif mouseInRect(textTotalChipsnum.getRect(), position):
               clickedNum=2
-            elif mouseInRect(textEntriesnum.getRect(), position):
+            elif mouseInRect(textEntrantsnum.getRect(), position):
               clickedNum=3
-            elif mouseInRect(textStartingstacknum.getRect(), position):
+            elif mouseInRect(textStartingStacknum.getRect(), position):
               clickedNum=4
             if (((position[0] - shutCenter[0]) ** 2 + (position[1] - shutCenter[1]) ** 2) ** 0.5 <= shutRadius):
               confirmQuit()
@@ -669,7 +688,6 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
           while running:
             textPause.changeContent(font = fontPause, content = "No more blinds")
             pygame.draw.rect(surface, RED, rectPauseline, width=round(5/screenScale))
-            pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = round(5/screenScale))
             surface.blit(pauseBox, rectPause)
             surface.blit(textPause.getText(), textPause.getRect())
             pygame.draw.circle(surface, RED, shutCenter, shutRadius)
@@ -684,23 +702,19 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                     running = False
             time.sleep(0.1)
         try:
-          cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textBlind, textBBAnte, fontBlind, fontNextLevelnum, fontTitleTournament, textNextBBAntenum, textNextBlindnum, cntBreak)
+          cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, textBBnum, textAntenum, textNextSBnum, textNextBBnum, textNextAntenum, cntBreak)
         except:
           print("No levels left")
       strTimer = makeTimerString(min, sec, total)
       textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
       strBreakTimer = makeTimerString(min_break,sec_break,total)
-      textTimeBreaknum.changeContent(font = fontSideNum, content = strBreakTimer)
-    surface.blit(imgBackground,(0,0))
+      textTimetoBreaknum.changeContent(font = fontRightObjs, content = strBreakTimer)
+    blitBackground(surface, bigRect, screenScale)
     if clickedNum != -1:
       pygame.draw.rect(surface, PALEGRAY, dictClicked[clickedNum].getRect())
-    blitText(surface, textMainTimer, textTitleTournament,textCurrLevel,textBlind,textTEXTBlind,textTEXTBBAnte,textBBAnte,textTEXTPlayer,textPlayernum,textAverage,textAveragenum,textChipsinplay,textChipsinplaynum,textEntries,textEntriesnum,textStartingstack,textTimeBreak,textTimeBreaknum,textStartingstacknum,textNextLevel,textNextBlind,textNextBBAnte,textNextBBAntenum,textNextBlindnum)
-    pygame.draw.rect(surface, WHITE, rectMainTimer, width=round(3/screenScale))
-    pygame.draw.rect(surface, WHITE, rectCurrBlind, width=round(3/screenScale))
-    pygame.draw.rect(surface, PALEGRAY, rectNextLevel, width = round(3/screenScale))
+    blitText(surface, textMainTimer, textTitleTournament, textCurrLevel, textSB, textBB, textAnte, textSBnum, textBBnum, textAntenum, textNextSB, textNextBB, textNextAnte, textAvgChips, textTotalChips, textStartingStack, textTimetoBreak, textNextSBnum, textNextBBnum, textNextAntenum, textAvgChipsnum, textTotalChipsnum, textStartingStacknum, textTimetoBreaknum, textEntrants, textPlayersLeft, textEntrantsnum, textPlayersLeftnum)
     pygame.draw.circle(surface, RED, shutCenter, shutRadius)
     pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
-    pygame.draw.rect(surface, DARKGRAY, rectPrizeBox, width=round(3/screenScale))
     for text in lstTextPrize:
       surface.blit(text.getText(), text.getRect())
     pygame.display.flip()
@@ -714,3 +728,5 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   else:
     return 0
 #### End of main function
+
+main([0, [100, 200, 0], [200, 400, 0], [300, 600, 0], [400, 800, 0], [0, 0, 0], [500, 1000, 1000], [600, 1200, 1200], [800, 1600, 1600], [1000, 2000, 2000], [1500, 3000, 3000], [0, 0, 0], [2000, 4000, 4000], [2500, 5000, 5000], [3000, 6000, 6000], [4000, 8000, 8000], [5000, 10000, 10000], [5500, 11000, 11000], [6000, 12000, 12000], [8000, 16000, 16000], [10000, 20000, 20000], [15000, 30000, 30000], [20000, 40000, 40000], [100000, 200000, 200000]], [0, 15, 15, 15, 15, 10, 15, 15, 15, 15, 15, 10, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12], 'Sample Structure1', True, 0.5)
