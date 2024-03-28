@@ -7,6 +7,7 @@ import timer
 from ClassObjs import *
 import datetime
 import tkinter as tk
+import timer_simple
 
 TK_VAL = False
 
@@ -60,7 +61,7 @@ def key2char(eventKey):
   key = key[1] if (key[0] == "[") else key
   return key
 
-def main_save(vol):
+def main_save(vol, style):
   r = True
   
   while r:
@@ -437,7 +438,10 @@ def main_save(vol):
     if gotomain:
       return True
     if flagTimer:
-      flag=timer.main(lstBlind, lstLevel, title, False, vol)
+      if style == 1:
+        flag = timer_simple.main(lstBlind, lstLevel, title, True, vol)
+      else:
+        flag = timer.main(lstBlind, lstLevel, title, True, vol)
       if flag == 0:
         r = False
       else: r = True

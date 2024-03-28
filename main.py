@@ -35,6 +35,7 @@ def close_window(window, isQuit):
   window.destroy()
 
 def main():
+  style, style_selected = 0, 0
   flagRun = True
   while flagRun:
 
@@ -59,6 +60,7 @@ def main():
 
     fontButton = pygame.font.Font('./font/NanumSquareB.ttf', round(100/screenScale))
     fontVolume = pygame.font.Font('./font/NanumGothic.ttf', round(80/screenScale))
+    fontStyle = pygame.font.Font('./font/NanumGothicBold.ttf', round(75/screenScale))
 
     locSave = (midpoint[0], midpoint[1] - round(200/screenScale))
     locLoad = (midpoint[0], midpoint[1] + round(200/screenScale))
@@ -70,11 +72,12 @@ def main():
     textLoad = fontButton.render("Load", True, BLACK)
     objLoad = textLoad.get_rect()
     objLoad.center = locLoad
-    textVol = fontVolume.render("Volume", True, WHITE)
-    objVol = textVol.get_rect()
-    objVol.center = (midpoint[0] - round(600/screenScale), midpoint[1])
+    textVol = TextObj(font = fontVolume, content='Volume', position=(midpoint[0] - round(500/screenScale), midpoint[1]), color=WHITE, relative='topright')
+    textStyle = TextObj(font = fontVolume, content='Style', position=(midpoint[0] - round(500/screenScale), midpoint[1] - round(300/screenScale)), color=WHITE, relative='topright')
     textNext = TextObj(font = fontButton, content="Save", position=(midpoint[0] + round(300/screenScale), round(1030/screenScale)), relative="center", color=BLACK)
     textBack = TextObj(font = fontButton, content="Back", color=BLACK, relative="center", position=(midpoint[0] - round(300/screenScale), round(1030/screenScale)))
+    textCasual = TextObj(font = fontStyle, content="Casual", position=(midpoint[0] - round(150/screenScale), textStyle.getRect().centery), relative="center", color=BLACK)
+    textSimple = TextObj(font = fontStyle, content="Simple", position=(midpoint[0] + round(300/screenScale), textStyle.getRect().centery), relative="center", color=BLACK)
 
 
     rectSave = pygame.Rect(0,0,round(800/screenScale),round(300/screenScale))
@@ -88,11 +91,15 @@ def main():
     rectSettings = imgSettings.get_rect()
     rectSettings.center = locSettings
     rectBar = imgBar.get_rect()
-    rectBar.center = (midpoint[0] + round(100/screenScale), midpoint[1])
+    rectBar.center = (midpoint[0] + round(100/screenScale), midpoint[1] + round(50/screenScale))
     rectNext = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
     rectNext.center = (midpoint[0] + round(300/screenScale), round(1030/screenScale))
     rectBack = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
     rectBack.center = (midpoint[0] - round(300/screenScale), round(1030/screenScale))
+    rectCasual = pygame.Rect(0,0,round(400/screenScale),round(140/screenScale))
+    rectCasual.center = (midpoint[0] - round(150/screenScale), textStyle.getRect().centery)
+    rectSimple = pygame.Rect(0,0,round(400/screenScale),round(140/screenScale))
+    rectSimple.center = (midpoint[0] + round(300/screenScale), textStyle.getRect().centery)
 
     mode = 0
     running = True
@@ -135,12 +142,17 @@ def main():
               flagSettings = False
               barMove = False
               vol = (rectBar.centerx - midpoint[0] + 400/screenScale) / float(1000)
+              style_selected = style
               outfile = open("./doc/settings", "w")
               outfile.write(str(vol))
               outfile.close()
             elif mouseInRect(rectBack, position):
               flagSettings = False
               barMove = False
+            elif mouseInRect(rectCasual, position):
+              style = 0
+            elif mouseInRect(rectSimple, position):
+              style = 1
         elif event.type == MOUSEMOTION and flagSettings and barMove:
           x,y,z = pygame.mouse.get_pressed()
           if x:
@@ -167,15 +179,26 @@ def main():
         pygame.draw.circle(screen, BLACK, shutCenter, shutRadius, width = 2)
         screen.blit(imgSettings, rectSettings)
       else:
-        pygame.draw.line(screen, WHITE, (midpoint[0] - round(400/screenScale), midpoint[1]), (midpoint[0] + round(600/screenScale), midpoint[1]), width=4)
+        pygame.draw.line(screen, WHITE, (midpoint[0] - round(400/screenScale), midpoint[1] + round(50/screenScale)), (midpoint[0] + round(600/screenScale), midpoint[1] + round(50/screenScale)), width=4)
         screen.blit(imgBar, rectBar)
-        screen.blit(textVol, objVol)
         pygame.draw.rect(screen, PALEGRAY, rectNext)
         pygame.draw.rect(screen, DARKGRAY, rectNext, width = 4)
         screen.blit(textNext.getText(), textNext.getRect())
         pygame.draw.rect(screen, PALEGRAY, rectBack)
         pygame.draw.rect(screen, DARKGRAY, rectBack, width = 4)
+        if style == 0:
+          colorCasual = BRIGHTRED
+          colorSimple = PALEGRAY
+        else:
+          colorCasual = PALEGRAY
+          colorSimple = BRIGHTRED
+        pygame.draw.rect(screen, colorCasual, rectCasual)
+        pygame.draw.rect(screen, DARKGRAY, rectCasual, width = 4)
+        pygame.draw.rect(screen, colorSimple, rectSimple)
+        pygame.draw.rect(screen, DARKGRAY, rectSimple, width = 4)
         screen.blit(textBack.getText(), textBack.getRect())
+        blitText(screen, textStyle, textVol, textCasual, textSimple)
+        
       pygame.display.flip()
       clock.tick(FPS)
 
@@ -187,9 +210,9 @@ def main():
     if mode == 0:
       pass
     elif mode == 1: # Loadmode
-      flagRun = loadmode.main_load(vol)
+      flagRun = loadmode.main_load(vol, style_selected)
     elif mode == 2: # Savemode
-      flagRun = savemode.main_save(vol)
+      flagRun = savemode.main_save(vol, style_selected)
 ################ End of main
 
 if __name__ == "__main__":

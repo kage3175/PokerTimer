@@ -6,6 +6,7 @@ import os
 import timer
 from ClassObjs import *
 import tkinter as tk
+import timer_simple
 
 PALEGRAY = (150,150,150)
 
@@ -62,7 +63,7 @@ def close_window2(window, isDel):
   TK_VAL_DEL = isDel
   window.destroy()
 
-def main_load(vol):
+def main_load(vol, style):
   global TK_VAL
   global TK_VAL_DEL
   user32 = ctypes.windll.user32
@@ -665,7 +666,10 @@ def main_load(vol):
     if gotomain:
       return True
     elif flagTimer:
-      flag = timer.main(lstBlind, lstLevel, title, True, vol)
+      if style == 1:
+        flag = timer_simple.main(lstBlind, lstLevel, title, True, vol)
+      else:
+        flag = timer.main(lstBlind, lstLevel, title, True, vol)
       if flag == 0:
         r = False
       else: r = True
