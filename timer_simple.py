@@ -318,12 +318,12 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
     temp+=1
   strBreakTimer = makeTimerString(min_break,sec_break,total)
 
-  imgBackground = pygame.image.load("./img/background.jpg")
-  imgBackground = pygame.transform.scale(imgBackground, screensize)
   imgSettings = pygame.image.load("./img/settings.png")
   imgSettings = pygame.transform.scale(imgSettings,(round(100/screenScale),round(100/screenScale)))
   imgBar = pygame.image.load("./img/test.png")
-  #surface.blit(imgBackground,(0,0))
+  imgUpDown = pygame.image.load("./img/Aria_updown.png")
+  imgUpDown = pygame.transform.scale(imgUpDown,(round(55/screenScale),round(70/screenScale)))
+
 
   #### font, font 모음집
   fontTitle = pygame.font.Font('./font/NanumSquareEB.ttf', round(65/screenScale))
@@ -410,6 +410,12 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   rectSettings.center = locSettings
   rectBar = imgBar.get_rect()
   rectBar.center = (midpoint[0] + round(100/screenScale), midpoint[1])
+  rectUpDown1 = imgUpDown.get_rect()
+  rectUpDown1.centery = round(998/screenScale)
+  rectUpDown1.right = round(500/screenScale)
+  rectUpDown2 = imgUpDown.get_rect()
+  rectUpDown2.centery = round(998/screenScale)
+  rectUpDown2.right = round(1019/screenScale)
   rectNext = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
   rectNext.center = (midpoint[0] + round(300/screenScale), round(1030/screenScale))
   rectBack = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
@@ -448,6 +454,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
         surface.blit(textPause.getText(), textPause.getRect())
         pygame.draw.circle(surface, RED, shutCenter, shutRadius)
         pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
+        surface.blit(imgUpDown, rectUpDown1)
+        surface.blit(imgUpDown, rectUpDown2)
         surface.blit(imgSettings, rectSettings)
         for text in lstTextPrize:
           surface.blit(text.getText(), text.getRect())
@@ -549,6 +557,28 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
               if mouseInRect(rectSettings, position):
                 flagSettings = True
                 rectBar.centerx = midpoint[0] - round(400/screenScale) + round(volume * 1000)
+              if (round(445/screenScale)<=position[0]<=round(500/screenScale) and round(961/screenScale)<=position[1]<= round(988/screenScale)): #entrants up button
+                # dictNum = {0:numPlayer, 1:numAverage, 2:numChips, 3:numEntries, 4:numStarting}
+                dictNum[3] += 1
+                dictClicked[3].changeContent(font = dictClicked[3].getFont(), content=str(dictNum[3]))
+              elif (round(445/screenScale)<=position[0]<=round(500/screenScale) and round(1007/screenScale)<=position[1]<= round(1032/screenScale)):
+                if(dictNum[3] > 0):
+                  dictNum[3] -= 1
+                  dictClicked[3].changeContent(font = dictClicked[3].getFont(), content=str(dictNum[3]))
+              elif (round(964/screenScale)<=position[0]<=round(1019/screenScale) and round(961/screenScale)<=position[1]<= round(988/screenScale)): #player up button
+                # dictNum = {0:numPlayer, 1:numAverage, 2:numChips, 3:numEntries, 4:numStarting}
+                dictNum[0] += 1
+                dictClicked[0].changeContent(font = dictClicked[0].getFont(), content=str(dictNum[0]))
+                dictNum[1] = round(dictNum[2]/dictNum[0])
+                dictClicked[1].changeContent(font = dictClicked[1].getFont(), content=str(dictNum[1]))
+              elif (round(964/screenScale)<=position[0]<=round(1019/screenScale) and round(1007/screenScale)<=position[1]<= round(1032/screenScale)): #player down button
+                # dictNum = {0:numPlayer, 1:numAverage, 2:numChips, 3:numEntries, 4:numStarting}\
+                if dictNum[0] > 0:
+                  dictNum[0] -= 1
+                  dictClicked[0].changeContent(font = dictClicked[0].getFont(), content=str(dictNum[0]))
+                  if dictNum[0] != 0:
+                    dictNum[1] = round(dictNum[2]/dictNum[0])
+                    dictClicked[1].changeContent(font = dictClicked[1].getFont(), content=str(dictNum[1]))
             else:
               pygame.mouse.get_rel()
               if mouseInRect(rectBar, position):
@@ -672,6 +702,28 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
               clickedNum=4
             if (((position[0] - shutCenter[0]) ** 2 + (position[1] - shutCenter[1]) ** 2) ** 0.5 <= shutRadius):
               confirmQuit()
+            if (round(445/screenScale)<=position[0]<=round(500/screenScale) and round(961/screenScale)<=position[1]<= round(988/screenScale)): #entrants up button
+              # dictNum = {0:numPlayer, 1:numAverage, 2:numChips, 3:numEntries, 4:numStarting}
+              dictNum[3] += 1
+              dictClicked[3].changeContent(font = dictClicked[3].getFont(), content=str(dictNum[3]))
+            elif (round(445/screenScale)<=position[0]<=round(500/screenScale) and round(1007/screenScale)<=position[1]<= round(1032/screenScale)):
+              if(dictNum[3] > 0):
+                dictNum[3] -= 1
+                dictClicked[3].changeContent(font = dictClicked[3].getFont(), content=str(dictNum[3]))
+            elif (round(964/screenScale)<=position[0]<=round(1019/screenScale) and round(961/screenScale)<=position[1]<= round(988/screenScale)): #player up button
+                # dictNum = {0:numPlayer, 1:numAverage, 2:numChips, 3:numEntries, 4:numStarting}
+              dictNum[0] += 1
+              dictClicked[0].changeContent(font = dictClicked[0].getFont(), content=str(dictNum[0]))
+              dictNum[1] = round(dictNum[2]/dictNum[0])
+              dictClicked[1].changeContent(font = dictClicked[1].getFont(), content=str(dictNum[1]))
+            elif (round(964/screenScale)<=position[0]<=round(1019/screenScale) and round(1007/screenScale)<=position[1]<= round(1032/screenScale)): #player down button
+              # dictNum = {0:numPlayer, 1:numAverage, 2:numChips, 3:numEntries, 4:numStarting}\
+              if dictNum[0] > 0:
+                dictNum[0] -= 1
+                dictClicked[0].changeContent(font = dictClicked[0].getFont(), content=str(dictNum[0]))
+                if dictNum[0] != 0:
+                  dictNum[1] = round(dictNum[2]/dictNum[0])
+                  dictClicked[1].changeContent(font = dictClicked[1].getFont(), content=str(dictNum[1]))
     if doubleClickTimer != 0:
       doubleClickTimer += dt
       if doubleClickTimer>= 0.5:
@@ -715,6 +767,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
     blitText(surface, textMainTimer, textTitleTournament, textCurrLevel, textSB, textBB, textAnte, textSBnum, textBBnum, textAntenum, textNextSB, textNextBB, textNextAnte, textAvgChips, textTotalChips, textStartingStack, textTimetoBreak, textNextSBnum, textNextBBnum, textNextAntenum, textAvgChipsnum, textTotalChipsnum, textStartingStacknum, textTimetoBreaknum, textEntrants, textPlayersLeft, textEntrantsnum, textPlayersLeftnum)
     pygame.draw.circle(surface, RED, shutCenter, shutRadius)
     pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
+    surface.blit(imgUpDown, rectUpDown1)
+    surface.blit(imgUpDown, rectUpDown2)
     for text in lstTextPrize:
       surface.blit(text.getText(), text.getRect())
     pygame.display.flip()
