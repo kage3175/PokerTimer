@@ -323,6 +323,14 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   imgBar = pygame.image.load("./img/test.png")
   imgUpDown = pygame.image.load("./img/Aria_updown.png")
   imgUpDown = pygame.transform.scale(imgUpDown,(round(55/screenScale),round(70/screenScale)))
+  imgPauseButton = pygame.image.load("./img/pauseButton.png")
+  imgPauseButton = pygame.transform.scale(imgPauseButton,(round(55/screenScale),round(55/screenScale)))
+  imgPlayButton = pygame.image.load("./img/playButton.png")
+  imgPlayButton = pygame.transform.scale(imgPlayButton,(round(55/screenScale),round(55/screenScale)))
+  imgPlusOneButton = pygame.image.load("./img/plusOne.png")
+  imgPlusOneButton = pygame.transform.scale(imgPlusOneButton,(round(55/screenScale),round(55/screenScale)))
+  imgMinusOneButton = pygame.image.load("./img/minusOne.png")
+  imgMinusOneButton = pygame.transform.scale(imgMinusOneButton,(round(55/screenScale),round(55/screenScale)))
 
 
   #### font, font 모음집
@@ -416,6 +424,15 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   rectUpDown2 = imgUpDown.get_rect()
   rectUpDown2.centery = round(998/screenScale)
   rectUpDown2.right = round(1019/screenScale)
+  rectPauseButton = imgPauseButton.get_rect()
+  rectPauseButton.center = (midpoint[0], round(1079/screenScale))
+  rectPlayButton = imgPlayButton.get_rect()
+  rectPlayButton.center = (midpoint[0], round(1079/screenScale))
+  rectPlusOneButton = imgPlusOneButton.get_rect()
+  rectPlusOneButton.center = (midpoint[0] + round(65), round(1079/screenScale))
+  rectMinusOneButton = imgMinusOneButton.get_rect()
+  rectMinusOneButton.center = (midpoint[0] - round(65), round(1079/screenScale))
+
   rectNext = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
   rectNext.center = (midpoint[0] + round(300/screenScale), round(1030/screenScale))
   rectBack = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
@@ -457,6 +474,9 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
         surface.blit(imgUpDown, rectUpDown1)
         surface.blit(imgUpDown, rectUpDown2)
         surface.blit(imgSettings, rectSettings)
+        surface.blit(imgPlayButton, rectPlayButton)
+        surface.blit(imgPlusOneButton, rectPlusOneButton)
+        surface.blit(imgMinusOneButton, rectMinusOneButton)
         for text in lstTextPrize:
           surface.blit(text.getText(), text.getRect())
       else:
@@ -579,6 +599,30 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                   if dictNum[0] != 0:
                     dictNum[1] = round(dictNum[2]/dictNum[0])
                     dictClicked[1].changeContent(font = dictClicked[1].getFont(), content=str(dictNum[1]))
+              elif mouseInRect(rectPlusOneButton, position):
+                min, sec, total, newLevel, min_break, sec_break = timeupdate(min, sec, total, 60, currLevel, soundLevelup,lstBreakIdx)
+                if newLevel != currLevel:
+                  currLevel = newLevel
+                  if LSTLEVELS[currLevel]==0: ### End of blind
+                    while running:
+                      running = endAction(surface, textPause, fontPause, rectPauseline, pauseBox, rectPause, shutCenter, shutRadius, screenScale)
+                  try:
+                    #updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, textBBnum, textAntenum, textNextSBnum, textNextBBnum, textNextAntenum):
+                    cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, textBBnum, textAntenum, textNextSBnum, textNextBBnum, textNextAntenum, cntBreak)
+                  except:
+                    print("No levels left2")
+                strTimer = makeTimerString(min, sec, total)
+                textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
+                strBreakTimer = makeTimerString(min_break,sec_break,total)
+                textTimetoBreaknum.changeContent(font = textTimetoBreaknum.getFont(), content = strBreakTimer)
+              elif mouseInRect(rectPlayButton, position):
+                soundLevelup.play()
+                pauseEvent = False
+                flag = False
+                textSBnum.changeContent(font = textSBnum.getFont(), content = format(LSTBLINDS[currLevel][0], ","))
+                textBBnum.changeContent(font = textBBnum.getFont(), content = format(LSTBLINDS[currLevel][1], ","))
+                if LSTBLINDS[currLevel][2] != 0:
+                  textAntenum.changeContent(font = fontLeftObjs, content = format(LSTBLINDS[currLevel][2], ","))
             else:
               pygame.mouse.get_rel()
               if mouseInRect(rectBar, position):
@@ -724,6 +768,30 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                 if dictNum[0] != 0:
                   dictNum[1] = round(dictNum[2]/dictNum[0])
                   dictClicked[1].changeContent(font = dictClicked[1].getFont(), content=str(dictNum[1]))
+            elif mouseInRect(rectPlusOneButton, position) or mouseInRect(rectMinusOneButton, position):
+              factor = 60 if mouseInRect(rectPlusOneButton, position) else -60
+              min, sec, total, newLevel, min_break, sec_break = timeupdate(min, sec, total, factor, currLevel, soundLevelup,lstBreakIdx)
+              if newLevel != currLevel:
+                currLevel = newLevel
+                if LSTLEVELS[currLevel]==0: ### End of blind
+                  while running:
+                    running = endAction(surface, textPause, fontPause, rectPauseline, pauseBox, rectPause, shutCenter, shutRadius, screenScale)
+                try:
+                  cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, textBBnum, textAntenum, textNextSBnum, textNextBBnum, textNextAntenum, cntBreak)
+
+                except:
+                  print("No levels left")
+              strTimer = makeTimerString(min, sec, total)
+              textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
+              strBreakTimer = makeTimerString(min_break,sec_break,total)
+              textTimetoBreaknum.changeContent(font = textTimetoBreaknum.getFont(), content = strBreakTimer)
+            elif mouseInRect(rectPauseButton, position):
+              if pauseEvent:
+                pauseEvent = False
+              else:
+                pause_start = time.time()
+                pauseEvent = True
+                continue
     if doubleClickTimer != 0:
       doubleClickTimer += dt
       if doubleClickTimer>= 0.5:
@@ -769,6 +837,9 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
     pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
     surface.blit(imgUpDown, rectUpDown1)
     surface.blit(imgUpDown, rectUpDown2)
+    surface.blit(imgPauseButton, rectPauseButton)
+    surface.blit(imgPlusOneButton, rectPlusOneButton)
+    surface.blit(imgMinusOneButton, rectMinusOneButton)
     for text in lstTextPrize:
       surface.blit(text.getText(), text.getRect())
     pygame.display.flip()
