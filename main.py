@@ -35,7 +35,7 @@ def close_window(window, isQuit):
   window.destroy()
 
 def main():
-  style, style_selected = 0, 0
+  style, style_selected = 1, 1
   flagRun = True
   while flagRun:
 

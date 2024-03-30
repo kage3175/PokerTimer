@@ -491,7 +491,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
         pygame.draw.rect(surface, DARKGRAY, rectBack, width = round(4/screenScale))
         surface.blit(textBack.getText(), textBack.getRect())
       pygame.display.flip()
-      dt = clock.tick(30) / 1000
+      dt = clock.tick(FPS) / 1000
       pause_time_to_add = pause_start - time.time()
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -842,8 +842,10 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
     surface.blit(imgMinusOneButton, rectMinusOneButton)
     for text in lstTextPrize:
       surface.blit(text.getText(), text.getRect())
+    #clock.tick(FPS)
     pygame.display.flip()
-    dt = clock.tick(30) / 1000
+    dt = clock.tick(FPS) / 1000
+    print(time.time())
   soundLevelup.stop()
   pygame.quit()
   if flagback == "load":
