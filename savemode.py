@@ -266,7 +266,7 @@ def main_save(vol, style):
               if selectedIdx != -1:
                 if not tabbedOnly:
                   temp_input = 1 if lstBoxs[selectedIdx][3] == 1 and temp_input <= 0 else temp_input
-                  lstBoxs[selectedIdx][2][1].changeContent(font = fontBox, content = str(temp_input))
+                  lstBoxs[selectedIdx][2][lstBoxs[selectedIdx][3]].changeContent(font = fontBox, content = str(temp_input))
                 lstBoxs[selectedIdx][3] = 0
                 selectedIdx = -1
                 temp_input = 0
