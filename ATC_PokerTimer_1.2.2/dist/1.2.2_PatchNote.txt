@@ -1,0 +1,6 @@
+1. Simple Timer 내 다양한 기능 추가(레벨 건너뛰기)
+2. 코드 일부 수정으로 이후 수정 및 효율을 올림
+3. Settings 폴더를 새로 개설해 기존 doc 폴더에 있던 volume setting을 settings 폴더로 이동
+4. Simple Timer 배경 색상을 Settings에서 변경 가능
+5. 1분 당기기나 밀기 아이콘을 변경
+6. Simple Timer에서 프라이즈 표기 기능 추가해야함

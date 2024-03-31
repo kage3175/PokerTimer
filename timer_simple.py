@@ -780,15 +780,16 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
             r = r if r <= 255 else 255
             BACKGROUND[0] = r
           elif gbarMove:
-            r = 255 - round(((midpoint[0] - rectRBar.centerx) * screenScale - 90) / 2)
+            r = 255 - round(((midpoint[0] - rectGBar.centerx) * screenScale - 90) / 2)
             r = r if r >= 0 else 0
             r = r if r <= 255 else 255
             BACKGROUND[1] = r
           elif bbarMove:
-            r = 255 - round(((midpoint[0] - rectRBar.centerx) * screenScale - 90) / 2)
+            r = 255 - round(((midpoint[0] - rectBBar.centerx) * screenScale - 90) / 2)
             r = r if r >= 0 else 0
             r = r if r <= 255 else 255
             BACKGROUND[2] = r
+            #print(r, rectBBar.center)
           barMove, rbarMove, gbarMove, bbarMove = False, False, False, False
           
       if doubleClickTimer != 0:
@@ -1002,4 +1003,4 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
     return 0
 #### End of main function
   
-main([0, [100, 200, 0], [200, 400, 0], [300, 600, 0], [400, 800, 0], [0, 0, 0], [500, 1000, 1000], [600, 1200, 1200], [800, 1600, 1600], [1000, 2000, 2000], [1500, 3000, 3000], [0, 0, 0], [2000, 4000, 4000], [2500, 5000, 5000], [3000, 6000, 6000], [4000, 8000, 8000], [5000, 10000, 10000], [5500, 11000, 11000], [6000, 12000, 12000], [8000, 16000, 16000], [10000, 20000, 20000], [15000, 30000, 30000], [20000, 40000, 40000], [100000, 200000, 200000]] , [0, 15, 15, 15, 15, 10, 15, 15, 15, 15, 15, 10, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12] , "Sample Structure1" , True , 0.5)
+#main([0, [100, 200, 0], [200, 400, 0], [300, 600, 0], [400, 800, 0], [0, 0, 0], [500, 1000, 1000], [600, 1200, 1200], [800, 1600, 1600], [1000, 2000, 2000], [1500, 3000, 3000], [0, 0, 0], [2000, 4000, 4000], [2500, 5000, 5000], [3000, 6000, 6000], [4000, 8000, 8000], [5000, 10000, 10000], [5500, 11000, 11000], [6000, 12000, 12000], [8000, 16000, 16000], [10000, 20000, 20000], [15000, 30000, 30000], [20000, 40000, 40000], [100000, 200000, 200000]] , [0, 15, 15, 15, 15, 10, 15, 15, 15, 15, 15, 10, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12] , "Sample Structure1" , True , 0.5)
