@@ -103,7 +103,7 @@ def main_load(vol, style):
 
     try:
       lst_blindfiles = os.listdir('./doc')
-      numFile = len(lst_blindfiles) -1  ## Setting 하나 빼야함
+      numFile = len(lst_blindfiles) 
     except Exception as e:
       print("Error occured while opening and listdir: ", e)
     
@@ -271,7 +271,6 @@ def main_load(vol, style):
                   temp_input = ''
                   fixIdx = right_clicked
                   right_clicked = -1
-                  pass
                   #########################################
                 
 
@@ -304,6 +303,7 @@ def main_load(vol, style):
                 updateFile(lstBlindObjs[fixIdx])
                 temp_input = 0
                 lstTag[fixIdx] = False
+
                 flagTyping = False
                 fixIdx = -1  
               elif mouseInRect(rectNext, position): #Next Button

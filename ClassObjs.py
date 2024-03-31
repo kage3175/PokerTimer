@@ -16,9 +16,12 @@ SELECTED = (200,50,50)
 DARKGRAY = (75,75,75)
 BLINDGRAY = (175,175,175)
 BREAKGRAY = (215,215,215)
-RED = (210,0,0)
+RED = (255,0,0)
+GREEN = (0,255,0)
+BLUE = (0,0,255)
 BRIGHTRED = (255,10,10)
 YELLOW = (220,220,90)
+
 
 
 CUTLINE = 900
@@ -42,11 +45,11 @@ class TextObj:
     elif relative == "center":
       self.rect.center = position
     elif relative == "rcenter":
-      self.rect.centery = position[0]
-      self.rect.right = position[1]
+      self.rect.centery = position[1]
+      self.rect.right = position[0]
     elif relative == "lcenter":
-      self.rect.centery = position[0]
-      self.rect.left = position[1]
+      self.rect.centery = position[1]
+      self.rect.left = position[0]
     elif relative == "topright":
       self.rect.topright = position
   def changePosition(self, relative = "topleft", position = (0,0)):

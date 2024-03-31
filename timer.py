@@ -300,7 +300,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   imgBackground = pygame.transform.scale(imgBackground, screensize)
   imgSettings = pygame.image.load("./img/settings.png")
   imgSettings = pygame.transform.scale(imgSettings,(round(100/screenScale),round(100/screenScale)))
-  imgBar = pygame.image.load("./img/test.png")
+  imgBar = pygame.image.load("./img/bar.png")
+  imgBar = pygame.transform.scale(imgBar, (round(60/screenScale), round(120/screenScale)))
   surface.blit(imgBackground,(0,0))
 
   #### font, font 모음집
@@ -333,11 +334,11 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   textMainTimer = TextObj(font=fontMainTimer, content= strTimer, position=locMainTimer, relative="center", color=WHITE)
   textTitleTournament = TextObj(content=title, position = locTitleTournament, relative="center", color=PALEGRAY, font=fontTitleTournament)
   textCurrLevel = TextObj(font = fontTitleTournament, content='Level '+ str(currLevel), relative="center", color=WHITE, position=locTextCurrLevel)
-  textBlind = TextObj(font = fontBlind, content=format(LSTBLINDS[currLevel][0], ",") + " / " + format(LSTBLINDS[currLevel][1], ","), relative="rcenter", position = (midpoint[1] + round(110/screenScale), midpoint[0] + round(430/screenScale)), color=WHITE)
-  textTEXTBlind = TextObj(font = fontBlind, content="BLINDS", position=(midpoint[1] + round(110/screenScale), midpoint[0] - round(450/screenScale)), relative="lcenter", color=WHITE)
-  textTEXTBBAnte = TextObj(font = fontBlind, content="BB Ante", position=(midpoint[1] + round(190/screenScale), midpoint[0] - round(450/screenScale)), relative="lcenter", color=WHITE)
+  textBlind = TextObj(font = fontBlind, content=format(LSTBLINDS[currLevel][0], ",") + " / " + format(LSTBLINDS[currLevel][1], ","), relative="rcenter", position = (midpoint[0] + round(430/screenScale), midpoint[1] + round(110/screenScale)), color=WHITE)
+  textTEXTBlind = TextObj(font = fontBlind, content="BLINDS", position=(midpoint[0] - round(450/screenScale), midpoint[1] + round(110/screenScale)), relative="lcenter", color=WHITE)
+  textTEXTBBAnte = TextObj(font = fontBlind, content="BB Ante", position=(midpoint[0] - round(450/screenScale), midpoint[1] + round(190/screenScale)), relative="lcenter", color=WHITE)
   temp = "-" if LSTBLINDS[currLevel][2] == 0 else format(LSTBLINDS[currLevel][2], ",")
-  textBBAnte = TextObj(font=fontBlind, content=temp, position=(midpoint[1] + round(190/screenScale), midpoint[0] + round(430/screenScale)), relative="rcenter", color=WHITE)
+  textBBAnte = TextObj(font=fontBlind, content=temp, position=(midpoint[0] + round(430/screenScale), midpoint[1] + round(190/screenScale)), relative="rcenter", color=WHITE)
   textTEXTPlayer = TextObj(font=fontSide, content="Players", position=(round(80/screenScale),round(110/screenScale)), relative="topleft", color=WHITE)
   textPlayernum = TextObj(font = fontSideNum, content="0", position= (round(80/screenScale),round(165/screenScale)), relative="topleft", color=WHITE)
   textAverage = TextObj(font = fontSide, content="Average Chips", position=(round(80/screenScale),round(265/screenScale)), relative="topleft", color=WHITE)
@@ -538,7 +539,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                 flagSettings = False
                 barMove = False
                 vol = (rectBar.centerx - midpoint[0] + 400/screenScale) / float(1000)
-                outfile = open("./doc/settings", "w")
+                outfile = open("./settings/vol", "w")
                 outfile.write(str(vol))
                 outfile.close()
               elif mouseInRect(rectBack, position):

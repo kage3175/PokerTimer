@@ -50,8 +50,8 @@ def main():
     imgBackground = pygame.transform.scale(imgBackground, screensize)
     imgSettings = pygame.image.load("./img/settings.png")
     imgSettings = pygame.transform.scale(imgSettings,(round(100/screenScale),round(100/screenScale)))
-    imgBar = pygame.image.load("./img/test.png")
-
+    imgBar = pygame.image.load("./img/bar.png")
+    imgBar = pygame.transform.scale(imgBar, (round(60/screenScale), round(120/screenScale)))
     soundLevelup = pygame.mixer.Sound("./sound/levelup.mp3")
     
 
@@ -129,7 +129,7 @@ def main():
               confirmQuit()
             elif mouseInRect(rectSettings, position):
               flagSettings = True
-              settingfile = open("./doc/settings", "r")
+              settingfile = open("./settings/vol", "r")
               vol = float(settingfile.readline().replace("\n", ""))
               settingfile.close()
               rectBar.centerx = midpoint[0] - round(400/screenScale) + round(vol * 1000)
@@ -143,7 +143,7 @@ def main():
               barMove = False
               vol = (rectBar.centerx - midpoint[0] + 400/screenScale) / float(1000)
               style_selected = style
-              outfile = open("./doc/settings", "w")
+              outfile = open("./settings/vol", "w")
               outfile.write(str(vol))
               outfile.close()
             elif mouseInRect(rectBack, position):
@@ -204,7 +204,7 @@ def main():
 
     soundLevelup.stop()
     pygame.quit()
-    settingfile = open("./doc/settings", "r")
+    settingfile = open("./settings/vol", "r")
     vol = float(settingfile.readline().replace("\n", ""))
     settingfile.close()
     if mode == 0:
