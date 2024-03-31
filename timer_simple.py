@@ -210,9 +210,9 @@ def updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, text
     cntBreak+=1
     textCurrLevel.changeColor(BRIGHTRED)
     textCurrLevel.changeContent(font = textCurrLevel.getFont(), content = "Break")
-    textSBnum.changeContent(font = textSBnum.getFont(), content = "-")
-    textBBnum.changeContent(font = textBBnum.getFont(), content = "-")
-    textAntenum.changeContent(font = textAntenum.getFont(), content = "-")
+    textSBnum.changeContent(font = textSBnum.getFont(), content = "Break")
+    textBBnum.changeContent(font = textBBnum.getFont(), content = "Break")
+    textAntenum.changeContent(font = textAntenum.getFont(), content = "Break")
   else:
     textCurrLevel.changeColor(WHITE)
     textCurrLevel.changeContent(font = textCurrLevel.getFont(), content = 'Level '+str(currLevel-cntBreak))
@@ -224,9 +224,9 @@ def updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, text
       temp_str = "-"
     textAntenum.changeContent(font = textAntenum.getFont(), content = temp_str)
   if LSTBLINDS[currLevel+1][0] == 0:
-    temp_str1 = "-"
-    temp_str2 = "-"
-    temp_str = "-"
+    temp_str1 = "Break"
+    temp_str2 = "Break"
+    temp_str = "Break"
   else:
     temp_str1 = format(LSTBLINDS[currLevel+1][0], ",")
     temp_str2 = format(LSTBLINDS[currLevel+1][1], ",")
@@ -650,12 +650,26 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                 textBBnum.changeContent(font = textBBnum.getFont(), content = format(LSTBLINDS[currLevel][1], ","))
                 if LSTBLINDS[currLevel][2] != 0:
                   textAntenum.changeContent(font = fontLeftObjs, content = format(LSTBLINDS[currLevel][2], ","))
-              elif mouseInRect(rectLevelUpButton, position) and LSTLEVELS[currLevel] != 0:
-                currLevel+=1
-                if LSTLEVELS[currLevel][0] == 0:
-                  min, sec = LSTBLINDS[currLevel], 0
-                  pass
-                pass
+              elif (mouseInRect(rectLevelUpButton, position) and LSTLEVELS[currLevel] != 0) or (mouseInRect(rectLevelDownButton, position) and LSTLEVELS[currLevel - 1] != 0):
+                currLevel = currLevel + 1 if mouseInRect(rectLevelUpButton, position) else currLevel - 1
+                min, sec, total = LSTLEVELS[currLevel], 0, 60 * min
+                min_break = min
+                temp= currLevel+1
+                i = lstBreakIdx[currLevel]
+                while(temp < i):
+                  min_break +=LSTLEVELS[temp]
+                  temp+=1
+                strBreakTimer = makeTimerString(min_break,sec_break,total)
+                try:
+                  cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, textBBnum, textAntenum, textNextSBnum, textNextBBnum, textNextAntenum, cntBreak)
+                  soundLevelup.play()
+                except:
+                  print("No levels left")
+                strTimer = makeTimerString(min, sec, total)
+                textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
+                strBreakTimer = makeTimerString(min_break,sec_break,total)
+                textTimetoBreaknum.changeContent(font = textTimetoBreaknum.getFont(), content = strBreakTimer)
+
             else:
               pygame.mouse.get_rel()
               if mouseInRect(rectBar, position):
@@ -825,6 +839,25 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                 pause_start = time.time()
                 pauseEvent = True
                 continue
+            elif (mouseInRect(rectLevelUpButton, position) and LSTLEVELS[currLevel] != 0) or (mouseInRect(rectLevelDownButton, position) and LSTLEVELS[currLevel - 1] != 0):
+              currLevel = currLevel + 1 if mouseInRect(rectLevelUpButton, position) else currLevel - 1
+              min, sec, total = LSTLEVELS[currLevel], 0, 60 * min
+              min_break = min
+              temp= currLevel+1
+              i = lstBreakIdx[currLevel]
+              while(temp < i):
+                min_break +=LSTLEVELS[temp]
+                temp+=1
+              strBreakTimer = makeTimerString(min_break,sec_break,total)
+              try:
+                cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, textBBnum, textAntenum, textNextSBnum, textNextBBnum, textNextAntenum, cntBreak)
+                soundLevelup.play()
+              except:
+                print("No levels left")
+              strTimer = makeTimerString(min, sec, total)
+              textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
+              strBreakTimer = makeTimerString(min_break,sec_break,total)
+              textTimetoBreaknum.changeContent(font = textTimetoBreaknum.getFont(), content = strBreakTimer)
     if doubleClickTimer != 0:
       doubleClickTimer += dt
       if doubleClickTimer>= 0.5:
@@ -866,7 +899,6 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
     #clock.tick(FPS)
     pygame.display.flip()
     dt = clock.tick(FPS) / 1000
-    print(time.time())
   soundLevelup.stop()
   pygame.quit()
   if flagback == "load":
