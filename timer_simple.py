@@ -177,7 +177,6 @@ def levelupdate(minute, second, total, amount, currLevel, soundlvlup, updown):
 def blitText(surface, *textobjs):
   for text in textobjs:
     surface.blit(text.getText(), text.getRect())
-  pass
 #### End of blitText function
 
 def confirmQuit():
@@ -266,6 +265,7 @@ def endAction(surface, textPause, fontPause, rectPauseline, pauseBox, rectPause,
   return running
 
 def main(lstBLINDS, lstLevels,title, isLoad, vol):
+  #print(lstBLINDS, ",", lstLevels, ", \"", title, "\"",", isLoad, ",", vol)
   volume = vol
   global LSTLEVELS, LSTBLINDS, TK_LST
   LSTLEVELS = lstLevels
@@ -319,18 +319,22 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   strBreakTimer = makeTimerString(min_break,sec_break,total)
 
   imgSettings = pygame.image.load("./img/settings.png")
-  imgSettings = pygame.transform.scale(imgSettings,(round(100/screenScale),round(100/screenScale)))
+  imgSettings = pygame.transform.smoothscale(imgSettings,(round(100/screenScale),round(100/screenScale)))
   imgBar = pygame.image.load("./img/test.png")
   imgUpDown = pygame.image.load("./img/Aria_updown.png")
   imgUpDown = pygame.transform.scale(imgUpDown,(round(55/screenScale),round(70/screenScale)))
   imgPauseButton = pygame.image.load("./img/pauseButton.png")
   imgPauseButton = pygame.transform.scale(imgPauseButton,(round(55/screenScale),round(55/screenScale)))
   imgPlayButton = pygame.image.load("./img/playButton.png")
-  imgPlayButton = pygame.transform.scale(imgPlayButton,(round(55/screenScale),round(55/screenScale)))
+  imgPlayButton = pygame.transform.smoothscale(imgPlayButton,(round(55/screenScale),round(55/screenScale)))
   imgPlusOneButton = pygame.image.load("./img/plusOne.png")
   imgPlusOneButton = pygame.transform.scale(imgPlusOneButton,(round(55/screenScale),round(55/screenScale)))
   imgMinusOneButton = pygame.image.load("./img/minusOne.png")
   imgMinusOneButton = pygame.transform.scale(imgMinusOneButton,(round(55/screenScale),round(55/screenScale)))
+  imgLevelUpButton = pygame.image.load("./img/levelUp.png")
+  imgLevelUpButton = pygame.transform.smoothscale(imgLevelUpButton,(round(55/screenScale),round(55/screenScale)))
+  imgLevelDownButton = pygame.image.load("./img/levelDown.png")
+  imgLevelDownButton = pygame.transform.smoothscale(imgLevelDownButton,(round(55/screenScale),round(55/screenScale)))
 
 
   #### font, font 모음집
@@ -432,6 +436,10 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   rectPlusOneButton.center = (midpoint[0] + round(65), round(1079/screenScale))
   rectMinusOneButton = imgMinusOneButton.get_rect()
   rectMinusOneButton.center = (midpoint[0] - round(65), round(1079/screenScale))
+  rectLevelUpButton = imgLevelUpButton.get_rect()
+  rectLevelUpButton.center = (midpoint[0] + round(130), round(1079/screenScale))
+  rectLevelDownButton = imgLevelDownButton.get_rect()
+  rectLevelDownButton.center = (midpoint[0] - round(130), round(1079/screenScale))
 
   rectNext = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
   rectNext.center = (midpoint[0] + round(300/screenScale), round(1030/screenScale))
@@ -477,6 +485,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
         surface.blit(imgPlayButton, rectPlayButton)
         surface.blit(imgPlusOneButton, rectPlusOneButton)
         surface.blit(imgMinusOneButton, rectMinusOneButton)
+        surface.blit(imgLevelUpButton, rectLevelUpButton)
+        surface.blit(imgLevelDownButton, rectLevelDownButton)
         for text in lstTextPrize:
           surface.blit(text.getText(), text.getRect())
       else:
@@ -522,7 +532,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                   textAvgChipsnum.changeContent(font = textAvgChipsnum.getFont(), content = format(dictNum[1], ","))                  
               temp_input = 0
               clickedNum=-1
-            if event.key == K_RIGHT: ### 1분 뒤로
+            '''if event.key == K_RIGHT: ### 1분 뒤로
               min, sec, total, newLevel, min_break, sec_break = timeupdate(min, sec, total, 60, currLevel, soundLevelup,lstBreakIdx)
               if newLevel != currLevel:
                 currLevel = newLevel
@@ -534,6 +544,22 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                   cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, textBBnum, textAntenum, textNextSBnum, textNextBBnum, textNextAntenum, cntBreak)
                 except:
                   print("No levels left2")
+              strTimer = makeTimerString(min, sec, total)
+              textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
+              strBreakTimer = makeTimerString(min_break,sec_break,total)
+              textTimetoBreaknum.changeContent(font = textTimetoBreaknum.getFont(), content = strBreakTimer)'''
+            if event.key == K_RIGHT or event.key == K_LEFT: ### 1분 뒤로
+              factor = 60 if event.key == K_RIGHT else -60
+              min, sec, total, newLevel, min_break, sec_break = timeupdate(min, sec, total, factor, currLevel, soundLevelup,lstBreakIdx)
+              if newLevel != currLevel:
+                currLevel = newLevel
+                if LSTLEVELS[currLevel]==0: ### End of blind
+                  while running:
+                    running = endAction(surface, textPause, fontPause, rectPauseline, pauseBox, rectPause, shutCenter, shutRadius, screenScale)
+                try:
+                  cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, textBBnum, textAntenum, textNextSBnum, textNextBBnum, textNextAntenum, cntBreak)
+                except:
+                  print("No levels left")
               strTimer = makeTimerString(min, sec, total)
               textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
               strBreakTimer = makeTimerString(min_break,sec_break,total)
@@ -599,18 +625,19 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                   if dictNum[0] != 0:
                     dictNum[1] = round(dictNum[2]/dictNum[0])
                     dictClicked[1].changeContent(font = dictClicked[1].getFont(), content=str(dictNum[1]))
-              elif mouseInRect(rectPlusOneButton, position):
-                min, sec, total, newLevel, min_break, sec_break = timeupdate(min, sec, total, 60, currLevel, soundLevelup,lstBreakIdx)
+              elif mouseInRect(rectPlusOneButton, position) or mouseInRect(rectMinusOneButton, position):
+                factor = 60 if mouseInRect(rectPlusOneButton, position) else -60
+                min, sec, total, newLevel, min_break, sec_break = timeupdate(min, sec, total, factor, currLevel, soundLevelup,lstBreakIdx)
                 if newLevel != currLevel:
                   currLevel = newLevel
                   if LSTLEVELS[currLevel]==0: ### End of blind
                     while running:
                       running = endAction(surface, textPause, fontPause, rectPauseline, pauseBox, rectPause, shutCenter, shutRadius, screenScale)
                   try:
-                    #updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, textBBnum, textAntenum, textNextSBnum, textNextBBnum, textNextAntenum):
                     cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, textBBnum, textAntenum, textNextSBnum, textNextBBnum, textNextAntenum, cntBreak)
+
                   except:
-                    print("No levels left2")
+                    print("No levels left")
                 strTimer = makeTimerString(min, sec, total)
                 textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
                 strBreakTimer = makeTimerString(min_break,sec_break,total)
@@ -623,6 +650,12 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                 textBBnum.changeContent(font = textBBnum.getFont(), content = format(LSTBLINDS[currLevel][1], ","))
                 if LSTBLINDS[currLevel][2] != 0:
                   textAntenum.changeContent(font = fontLeftObjs, content = format(LSTBLINDS[currLevel][2], ","))
+              elif mouseInRect(rectLevelUpButton, position) and LSTLEVELS[currLevel] != 0:
+                currLevel+=1
+                if LSTLEVELS[currLevel][0] == 0:
+                  min, sec = LSTBLINDS[currLevel], 0
+                  pass
+                pass
             else:
               pygame.mouse.get_rel()
               if mouseInRect(rectBar, position):
@@ -806,21 +839,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
         currLevel = newLevel
         if LSTLEVELS[currLevel]==0: ### End of blind
           while running:
-            textPause.changeContent(font = fontPause, content = "No more blinds")
-            pygame.draw.rect(surface, RED, rectPauseline, width=round(5/screenScale))
-            surface.blit(pauseBox, rectPause)
-            surface.blit(textPause.getText(), textPause.getRect())
-            pygame.draw.circle(surface, RED, shutCenter, shutRadius)
-            pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
-            pygame.display.flip()
-            
-            for event in pygame.event.get():
-              if event.type == KEYDOWN:
-                if event.key == ord('q'):
-                  confirmQuit()
-                  if TK_VAL:
-                    running = False
-            time.sleep(0.1)
+            running = endAction(surface, textPause, fontPause, rectPauseline, pauseBox, rectPause, shutCenter, shutRadius, screenScale)
         try:
           cntBreak = updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, textBBnum, textAntenum, textNextSBnum, textNextBBnum, textNextAntenum, cntBreak)
         except:
@@ -840,6 +859,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
     surface.blit(imgPauseButton, rectPauseButton)
     surface.blit(imgPlusOneButton, rectPlusOneButton)
     surface.blit(imgMinusOneButton, rectMinusOneButton)
+    surface.blit(imgLevelUpButton, rectLevelUpButton)
+    surface.blit(imgLevelDownButton, rectLevelDownButton)
     for text in lstTextPrize:
       surface.blit(text.getText(), text.getRect())
     #clock.tick(FPS)
@@ -855,3 +876,5 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   else:
     return 0
 #### End of main function
+  
+main([0, [100, 200, 0], [200, 400, 0], [300, 600, 0], [400, 800, 0], [0, 0, 0], [500, 1000, 1000], [600, 1200, 1200], [800, 1600, 1600], [1000, 2000, 2000], [1500, 3000, 3000], [0, 0, 0], [2000, 4000, 4000], [2500, 5000, 5000], [3000, 6000, 6000], [4000, 8000, 8000], [5000, 10000, 10000], [5500, 11000, 11000], [6000, 12000, 12000], [8000, 16000, 16000], [10000, 20000, 20000], [15000, 30000, 30000], [20000, 40000, 40000], [100000, 200000, 200000]] , [0, 15, 15, 15, 15, 10, 15, 15, 15, 15, 15, 10, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12] , "Sample Structure1" , True , 0.5)
