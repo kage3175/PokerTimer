@@ -1,4 +1,5 @@
 from pygame.locals import *
+from enum import Enum
 
 K_NUM = [K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9, K_KP0, K_KP1, K_KP2, K_KP3, K_KP4, K_KP5, K_KP6, K_KP7, K_KP8, K_KP9]
 BANNED = ["\\", "/", ":", "*", "?", "<", ">", "\"", "|", "`", "+", "\'"]
@@ -119,6 +120,42 @@ class TextObj:
     return self.position
   def getFont(self):
     return self.font
+  
+class Relative(Enum):
+  CENTER = 2
+  TOPLEFT = 1
+  RCENTER = 3
+  LCENTER = 4
+  TOPRIGHT = 5
+  BOTTOMLEFT = 6
+  BOTTOMRIGHT = 7
+
+class ImgObj:
+  def __init__(self, fileAdrress, position, relative = "topleft", scalable = False, size = (50,50)) -> None:
+    self.fileAddress = fileAdrress
+    self.rect = None
+    self.position = position
+    self.size = size
+    self.img = None
+    self.relative = relative
+    try:
+      self.img = pygame.image.load(self.fileAddress)
+      if scalable:
+        try:
+          self.img = pygame.transform.smoothscale(self.img, size)
+        except:
+          self.img = pygame.transform.scale(self.img, size)
+      self.rect = self.img.get_rect()
+      if self.relative == Relative.TOPLEFT:
+        self.rect.topleft = position
+      elif self.relative == Relative.CENTER:
+        self.rect.center = position
+    except:
+      print("Failed to Open the img File at " + self.fileAddress)
+  def getImg(self):
+    return self.img
+  def getRect(self):
+    return self.rect
   
 class BlindFile:
   def __init__(self) -> None:
