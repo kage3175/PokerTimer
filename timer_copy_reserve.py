@@ -210,11 +210,13 @@ def confirmQuit():
   noB = tk.Button(window, width=15, height= 2, relief="raised", overrelief="solid", borderwidth=4, font = ("./font/NanumGothic.ttf", 15), text= "No", command = lambda: close_window(window, False))
   noB.place(x = 280, y = 80)
   window.mainloop()
+#### End of confirmQuit function
 
 def close_window(window, isQuit):
   global TK_VAL
   TK_VAL = isQuit
   window.destroy()
+#### End of close_window function
 
   
 def updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, textBBnum, textAntenum, textNextSBnum, textNextBBnum, textNextAntenum, cntBreak):
@@ -250,6 +252,7 @@ def updateTextAfterTimeSkip(LSTBLINDS, currLevel, textCurrLevel, textSBnum, text
   textNextBBnum.changeContent(font = textNextBBnum.getFont(), content = temp_str2)
   textNextAntenum.changeContent(font = textNextAntenum.getFont(), content = temp_str)
   return cntBreak
+#### End of updateTextAfterTimeSkip function
 
 def endAction(surface, textPause, fontPause, rectPauseline, pauseBox, rectPause, shutCenter, shutRadius, screenScale):
   global TK_VAL
@@ -275,6 +278,14 @@ def endAction(surface, textPause, fontPause, rectPauseline, pauseBox, rectPause,
             running = False
   time.sleep(0.1)
   return running
+#### End of endAction function
+
+def moveBar(imgBar, mx, my, midpoint, screenScale):
+  imgBar.getRect().x += mx
+  if imgBar.getRect().centerx < midpoint[0] - round(600/screenScale):
+    imgBar.getRect().centerx = midpoint[0] - round(600/screenScale)
+  if imgBar.getRect().centerx > midpoint[0] - round(90/screenScale):
+    imgBar.getRect().centerx = midpoint[0] - round(90/screenScale)
 
 def main(lstBLINDS, lstLevels,title, isLoad, vol):
   #print(lstBLINDS, ",", lstLevels, ", \"", title, "\"",", isLoad, ",", vol)
@@ -340,21 +351,23 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
     temp+=1
   strBreakTimer = makeTimerString(min_break,sec_break,total)
 
-  '''imgSettings = pygame.image.load("./img/settings.png")
-  imgSettings = pygame.transform.smoothscale(imgSettings,(round(100/screenScale),round(100/screenScale)))'''
+  xRbar, xGbar, xBbar = midpoint[0] - round(((255 - BACKGROUND[0]) * 2 + 90)/screenScale), midpoint[0] - round(((255 - BACKGROUND[1]) * 2 + 90)/screenScale), midpoint[0] - round(((255 - BACKGROUND[2]) * 2 + 90)/screenScale)
   imgSettings = ImgObj(fileAdrress="./img/settings.png", position=locSettings, relative=Relative.CENTER, scalable=True, size = (round(100/screenScale),round(100/screenScale)))
-  '''imgBar = pygame.image.load("./img/bar.png")
-  imgBar = pygame.transform.scale(imgBar, (round(60/screenScale), round(120/screenScale)))'''
   imgBar = ImgObj(fileAdrress="./img/bar.png", position=(midpoint[0] + round(100/screenScale), midpoint[1] + round(150/screenScale)), relative=Relative.CENTER, scalable=True, size = (round(60/screenScale), round(120/screenScale)))
-  imgRBar = pygame.image.load("./img/Rbar.png")
-  imgRBar = pygame.transform.scale(imgRBar, (round(40/screenScale), round(80/screenScale)))
-  imgGBar = pygame.image.load("./img/Gbar.png")
-  imgGBar = pygame.transform.scale(imgGBar, (round(40/screenScale), round(80/screenScale)))
-  imgBBar = pygame.image.load("./img/Bbar.png")
-  imgBBar = pygame.transform.scale(imgBBar, (round(40/screenScale), round(80/screenScale)))
-  imgUpDown = pygame.image.load("./img/Aria_updown.png")
-  imgUpDown = pygame.transform.scale(imgUpDown,(round(55/screenScale),round(70/screenScale)))
-  imgPauseButton = pygame.image.load("./img/pauseButton.png")
+  imgRBar = ImgObj(fileAdrress = "./img/Rbar.png", position=(xRbar, midpoint[1] - round(300/screenScale)), relative = Relative.CENTER, scalable=True, size = (round(40/screenScale), round(80/screenScale)))
+  imgGBar = ImgObj(fileAdrress = './img/Gbar.png', position=(xGbar, midpoint[1] - round(200/screenScale)), relative = Relative.CENTER, scalable=True, size = (round(40/screenScale), round(80/screenScale)))
+  imgBBar = ImgObj(fileAdrress='./img/Bbar.png', position = (xBbar, midpoint[1] - round(100/screenScale)), relative= Relative.CENTER, scalable=True, size = (round(40/screenScale), round(80/screenScale)))
+  imgUpDown1 = ImgObj(fileAdrress='./img/Aria_updown.png', position = (round(500/screenScale), round(998/screenScale)), relative=Relative.RCENTER, scalable=True, size = (round(55/screenScale),round(70/screenScale)))
+  imgUpDown2 = ImgObj(fileAdrress='./img/Aria_updown.png', position = (round(1019/screenScale), round(998/screenScale)), relative=Relative.RCENTER, scalable=True, size = (round(55/screenScale),round(70/screenScale)))
+  imgPauseButton = ImgObj(fileAdrress= './img/pauseButton.png', position = (midpoint[0], round(1079/screenScale)), relative= Relative.CENTER, scalable=True, size = (round(55/screenScale),round(55/screenScale)))
+  imgPlayButton = ImgObj(fileAdrress='./img/playButton.png', position = (midpoint[0], round(1079/screenScale)), relative=Relative.CENTER, scalable=True, size = (round(55/screenScale),round(55/screenScale)))
+  imgPlusOneButton = ImgObj(fileAdrress= './img/plusOne.png', position = (midpoint[0] + round(65), round(1079/screenScale)), relative=Relative.CENTER, scalable=True, size = (round(55/screenScale),round(55/screenScale)))
+  imgMinusOneButton = ImgObj(fileAdrress='./img/minusOne.png', position = (midpoint[0] - round(65), round(1079/screenScale)), relative=Relative.CENTER, scalable=True, size = (round(55/screenScale),round(55/screenScale)))
+  imgLevelUpButton = ImgObj(fileAdrress='./img/levelUp.png', position=(midpoint[0] + round(130), round(1079/screenScale)), relative=Relative.CENTER, scalable=True, size = (round(55/screenScale),round(55/screenScale)))
+  imgLevelDownButton = ImgObj(fileAdrress='./img/levelDown.png', position=(midpoint[0] - round(130), round(1079/screenScale)), relative= Relative.CENTER, scalable=True, size = (round(55/screenScale),round(55/screenScale)))
+  imgPrizeButton = ImgObj(fileAdrress='./img/prize.png', position= (midpoint[0] - round(195), round(1079/screenScale)), relative=Relative.CENTER, scalable=True, size = (round(55/screenScale),round(55/screenScale)))
+
+  '''imgPauseButton = pygame.image.load("./img/pauseButton.png")
   imgPauseButton = pygame.transform.scale(imgPauseButton,(round(55/screenScale),round(55/screenScale)))
   imgPlayButton = pygame.image.load("./img/playButton.png")
   imgPlayButton = pygame.transform.smoothscale(imgPlayButton,(round(55/screenScale),round(55/screenScale)))
@@ -367,7 +380,51 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   imgLevelDownButton = pygame.image.load("./img/levelDown.png")
   imgLevelDownButton = pygame.transform.smoothscale(imgLevelDownButton,(round(55/screenScale),round(55/screenScale)))
   imgPrizeButton = pygame.image.load("./img/prize.png")
-  imgPrizeButton = pygame.transform.smoothscale(imgPrizeButton,(round(55/screenScale),round(55/screenScale)))
+  imgPrizeButton = pygame.transform.smoothscale(imgPrizeButton,(round(55/screenScale),round(55/screenScale)))'''
+
+  #### rect 모음집
+  '''rectMidPoint = pygame.Rect(0,0,20,20)
+  rectMidPoint.center = midpoint
+  
+
+  rectRBar = imgRBar.get_rect()
+  rectRBar.center = (xRbar, midpoint[1] - round(300/screenScale))
+  rectGBar = imgGBar.get_rect()
+  rectGBar.center = (xGbar, midpoint[1] - round(200/screenScale))
+  rectBBar = imgBBar.get_rect()
+  rectBBar.center = (xBbar, midpoint[1] - round(100/screenScale))
+  rectUpDown1 = imgUpDown.get_rect()
+  rectUpDown1.centery = round(998/screenScale)
+  rectUpDown1.right = round(500/screenScale)
+  rectUpDown2 = imgUpDown.get_rect()
+  rectUpDown2.centery = round(998/screenScale)
+  rectUpDown2.right = round(1019/screenScale)
+  rectPauseButton = imgPauseButton.get_rect()
+  rectPauseButton.center = (midpoint[0], round(1079/screenScale))
+  rectPlayButton = imgPlayButton.get_rect()
+  rectPlayButton.center = (midpoint[0], round(1079/screenScale))
+  rectPlusOneButton = imgPlusOneButton.get_rect()
+  rectPlusOneButton.center = (midpoint[0] + round(65), round(1079/screenScale))
+  rectMinusOneButton = imgMinusOneButton.get_rect()
+  rectMinusOneButton.center = (midpoint[0] - round(65), round(1079/screenScale))
+  rectLevelUpButton = imgLevelUpButton.get_rect()
+  rectLevelUpButton.center = (midpoint[0] + round(130), round(1079/screenScale))
+  rectLevelDownButton = imgLevelDownButton.get_rect()
+  rectLevelDownButton.center = (midpoint[0] - round(130), round(1079/screenScale))
+  rectPrizeButton = imgPrizeButton.get_rect()
+  rectPrizeButton.center = (midpoint[0] - round(195), round(1079/screenScale))'''
+  rectNext = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
+  rectNext.center = (midpoint[0] + round(300/screenScale), round(1030/screenScale))
+  rectBack = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
+  rectBack.center = (midpoint[0] - round(300/screenScale), round(1030/screenScale))
+  rectPause = pygame.Rect(0,0,round(800/screenScale),round(100/screenScale))
+  rectPause.center = locMainTimer
+  rectPauseline = pygame.Rect(0,0,round(800/screenScale),round(100/screenScale))
+  rectPauseline.center = locMainTimer
+  rectPrizeBoxRight = pygame.Rect(0,0,round(610/screenScale),round(60/screenScale))
+  rectPrizeBoxRight.topleft = (round(1408/screenScale), round(276/screenScale))
+  bigRect = pygame.Rect(0,0,round(1996/screenScale),round(1096/screenScale))
+  bigRect.topleft = (round(26/screenScale), round(28/screenScale))
 
 
   #### font, font 모음집
@@ -444,52 +501,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
   numPlayer, numChips, numAverage, numEntries, numStarting = 0,0,0,0,0
   temp_input = 0
 
-  #### rect 모음집
-  rectMidPoint = pygame.Rect(0,0,20,20)
-  rectMidPoint.center = midpoint
-  rectPause = pygame.Rect(0,0,round(800/screenScale),round(100/screenScale))
-  rectPause.center = locMainTimer
-  rectPauseline = pygame.Rect(0,0,round(800/screenScale),round(100/screenScale))
-  rectPauseline.center = locMainTimer
-  '''rectSettings = imgSettings.get_rect()
-  rectSettings.center = locSettings'''
-  '''rectBar = imgBar.get_rect()
-  rectBar.center = (midpoint[0] + round(100/screenScale), midpoint[1] + round(150/screenScale))'''
-  xRbar, xGbar, xBbar = midpoint[0] - round(((255 - BACKGROUND[0]) * 2 + 90)/screenScale), midpoint[0] - round(((255 - BACKGROUND[1]) * 2 + 90)/screenScale), midpoint[0] - round(((255 - BACKGROUND[2]) * 2 + 90)/screenScale)
-  rectRBar = imgRBar.get_rect()
-  rectRBar.center = (xRbar, midpoint[1] - round(300/screenScale))
-  rectGBar = imgGBar.get_rect()
-  rectGBar.center = (xGbar, midpoint[1] - round(200/screenScale))
-  rectBBar = imgBBar.get_rect()
-  rectBBar.center = (xBbar, midpoint[1] - round(100/screenScale))
-  rectUpDown1 = imgUpDown.get_rect()
-  rectUpDown1.centery = round(998/screenScale)
-  rectUpDown1.right = round(500/screenScale)
-  rectUpDown2 = imgUpDown.get_rect()
-  rectUpDown2.centery = round(998/screenScale)
-  rectUpDown2.right = round(1019/screenScale)
-  rectPauseButton = imgPauseButton.get_rect()
-  rectPauseButton.center = (midpoint[0], round(1079/screenScale))
-  rectPlayButton = imgPlayButton.get_rect()
-  rectPlayButton.center = (midpoint[0], round(1079/screenScale))
-  rectPlusOneButton = imgPlusOneButton.get_rect()
-  rectPlusOneButton.center = (midpoint[0] + round(65), round(1079/screenScale))
-  rectMinusOneButton = imgMinusOneButton.get_rect()
-  rectMinusOneButton.center = (midpoint[0] - round(65), round(1079/screenScale))
-  rectLevelUpButton = imgLevelUpButton.get_rect()
-  rectLevelUpButton.center = (midpoint[0] + round(130), round(1079/screenScale))
-  rectLevelDownButton = imgLevelDownButton.get_rect()
-  rectLevelDownButton.center = (midpoint[0] - round(130), round(1079/screenScale))
-  rectPrizeButton = imgPrizeButton.get_rect()
-  rectPrizeButton.center = (midpoint[0] - round(195), round(1079/screenScale))
-  rectNext = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
-  rectNext.center = (midpoint[0] + round(300/screenScale), round(1030/screenScale))
-  rectBack = pygame.Rect(0,0,round(500/screenScale),round(140/screenScale))
-  rectBack.center = (midpoint[0] - round(300/screenScale), round(1030/screenScale))
-  rectPrizeBoxRight = pygame.Rect(0,0,round(610/screenScale),round(60/screenScale))
-  rectPrizeBoxRight.topleft = (round(1408/screenScale), round(276/screenScale))
-  bigRect = pygame.Rect(0,0,round(1996/screenScale),round(1096/screenScale))
-  bigRect.topleft = (round(26/screenScale), round(28/screenScale))
+  
   
 
   pauseEvent = True
@@ -549,35 +561,24 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
         surface.blit(textPause.getText(), textPause.getRect())
         pygame.draw.circle(surface, RED, shutCenter, shutRadius)
         pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
-        surface.blit(imgUpDown, rectUpDown1)
-        surface.blit(imgUpDown, rectUpDown2)
         #surface.blit(imgSettings, rectSettings)
-        blitImg(surface, imgSettings)
-        surface.blit(imgPlayButton, rectPlayButton)
-        surface.blit(imgPlusOneButton, rectPlusOneButton)
-        surface.blit(imgMinusOneButton, rectMinusOneButton)
-        surface.blit(imgLevelUpButton, rectLevelUpButton)
-        surface.blit(imgLevelDownButton, rectLevelDownButton)
-        surface.blit(imgPrizeButton, rectPrizeButton)
+        blitImg(surface, imgSettings, imgUpDown1, imgUpDown2, imgPlayButton, imgPlusOneButton, imgMinusOneButton, imgLevelDownButton, imgLevelUpButton,  imgPrizeButton)
         pygame.draw.rect(surface, WHITE, bigRect, width=8)
       else:
         surface.fill(BACKGROUND)
         pygame.draw.line(surface, WHITE, (midpoint[0] - round(400/screenScale), midpoint[1] + round(150/screenScale)), (midpoint[0] + round(600/screenScale), midpoint[1] + round(150/screenScale)), width=4) # Volume line
         #surface.blit(imgBar, rectBar)
-        blitImg(surface, imgBar)
+        pygame.draw.line(surface, WHITE, (midpoint[0] - round(600/screenScale), midpoint[1] - round(300/screenScale)), (midpoint[0] - round(90/screenScale), midpoint[1] - round(300/screenScale)), width = 2) # Bg R line
+        pygame.draw.line(surface, WHITE, (midpoint[0] - round(600/screenScale), midpoint[1] - round(200/screenScale)), (midpoint[0] - round(90/screenScale), midpoint[1] - round(200/screenScale)), width = 2) # Bg G line
+        pygame.draw.line(surface, WHITE, (midpoint[0] - round(600/screenScale), midpoint[1] - round(100/screenScale)), (midpoint[0] - round(90/screenScale), midpoint[1] - round(100/screenScale)), width = 2) # Bg B line
+        blitImg(surface, imgBar, imgRBar, imgGBar, imgBBar)
         blitText(surface, textVol, textBgSetting, textR, textG, textB)
         pygame.draw.rect(surface, PALEGRAY, rectNext)
         pygame.draw.rect(surface, DARKGRAY, rectNext, width = round(4/screenScale))
         surface.blit(textNext.getText(), textNext.getRect())
         pygame.draw.rect(surface, PALEGRAY, rectBack)
         pygame.draw.rect(surface, DARKGRAY, rectBack, width = round(4/screenScale))
-        pygame.draw.line(surface, WHITE, (midpoint[0] - round(600/screenScale), midpoint[1] - round(300/screenScale)), (midpoint[0] - round(90/screenScale), midpoint[1] - round(300/screenScale)), width = 2) # Bg R line
-        pygame.draw.line(surface, WHITE, (midpoint[0] - round(600/screenScale), midpoint[1] - round(200/screenScale)), (midpoint[0] - round(90/screenScale), midpoint[1] - round(200/screenScale)), width = 2) # Bg G line
-        pygame.draw.line(surface, WHITE, (midpoint[0] - round(600/screenScale), midpoint[1] - round(100/screenScale)), (midpoint[0] - round(90/screenScale), midpoint[1] - round(100/screenScale)), width = 2) # Bg B line
         surface.blit(textBack.getText(), textBack.getRect())
-        surface.blit(imgRBar, rectRBar)
-        surface.blit(imgGBar, rectGBar)
-        surface.blit(imgBBar, rectBBar)
       pygame.display.flip()
       clock.tick(FPS)
       pause_time_to_add = pause_start - time.time()
@@ -655,7 +656,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
               if mouseInRect(imgSettings.getRect(), position):
                 flagSettings = True
                 bgUndo = BACKGROUND.copy()
-                xRbar, xGbar, xBbar = rectRBar.centerx, rectGBar.centerx, rectBBar.centerx
+                print(imgRBar, imgGBar, imgBBar)
+                xRbar, xGbar, xBbar = imgRBar.getRect().centerx, imgGBar.getRect().centerx, imgBBar.getRect().centerx
                 imgBar.getRect().centerx = midpoint[0] - round(400/screenScale) + round(volume * 1000)
               if (round(445/screenScale)<=position[0]<=round(500/screenScale) and round(961/screenScale)<=position[1]<= round(988/screenScale)): #entrants up button
                 # dictNum = {0:numPlayer, 1:numAverage, 2:numChips, 3:numEntries, 4:numStarting}
@@ -679,8 +681,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                   if dictNum[0] != 0:
                     dictNum[1] = round(dictNum[2]/dictNum[0])
                     dictClicked[1].changeContent(font = dictClicked[1].getFont(), content=str(dictNum[1]))
-              elif mouseInRect(rectPlusOneButton, position) or mouseInRect(rectMinusOneButton, position):
-                factor = 60 if mouseInRect(rectPlusOneButton, position) else -60
+              elif mouseInRect(imgPlusOneButton.getRect(), position) or mouseInRect(imgMinusOneButton.getRect(), position):
+                factor = 60 if mouseInRect(imgPlusOneButton.getRect(), position) else -60
                 min, sec, total, newLevel, min_break, sec_break = timeupdate(min, sec, total, factor, currLevel, soundLevelup,lstBreakIdx)
                 if newLevel != currLevel:
                   currLevel = newLevel
@@ -696,7 +698,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                 textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
                 strBreakTimer = makeTimerString(min_break,sec_break,total)
                 textTimetoBreaknum.changeContent(font = textTimetoBreaknum.getFont(), content = strBreakTimer)
-              elif mouseInRect(rectPlayButton, position):
+              elif mouseInRect(imgPlayButton.getRect(), position):
                 soundLevelup.play()
                 pauseEvent = False
                 flag = False
@@ -704,10 +706,10 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                 textBBnum.changeContent(font = textBBnum.getFont(), content = format(LSTBLINDS[currLevel][1], ","))
                 if LSTBLINDS[currLevel][2] != 0:
                   textAntenum.changeContent(font = fontLeftObjs, content = format(LSTBLINDS[currLevel][2], ","))
-              elif (mouseInRect(rectLevelUpButton, position) and LSTLEVELS[currLevel] != 0) or (mouseInRect(rectLevelDownButton, position) and LSTLEVELS[currLevel - 1] != 0): 
-                currLevel = currLevel + 1 if mouseInRect(rectLevelUpButton, position) else currLevel - 1
+              elif (mouseInRect(imgLevelUpButton.getRect(), position) and LSTLEVELS[currLevel] != 0) or (mouseInRect(imgLevelDownButton.getRect(), position) and LSTLEVELS[currLevel - 1] != 0): 
+                currLevel = currLevel + 1 if mouseInRect(imgLevelUpButton.getRect(), position) else currLevel - 1
                 min, sec, total = LSTLEVELS[currLevel], 0, 60 * min
-                min_break = min
+                min_break, sec_break = min, 0
                 temp= currLevel+1
                 i = lstBreakIdx[currLevel]
                 while(temp < i):
@@ -723,7 +725,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                 textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
                 strBreakTimer = makeTimerString(min_break,sec_break,total)
                 textTimetoBreaknum.changeContent(font = textTimetoBreaknum.getFont(), content = strBreakTimer)
-              elif mouseInRect(rectPrizeButton, position):
+              elif mouseInRect(imgPrizeButton.getRect(), position):
                 prizeInput(screenScale)
                 lstTextPrize = []
                 flagPrizeStop = True
@@ -735,11 +737,11 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
               pygame.mouse.get_rel()
               if mouseInRect(imgBar.getRect(), position):
                 barMove = True
-              elif mouseInRect(rectRBar, position):
+              elif mouseInRect(imgRBar.getRect(), position):
                 rbarMove = True
-              elif mouseInRect(rectGBar, position):
+              elif mouseInRect(imgGBar.getRect(), position):
                 gbarMove = True
-              elif mouseInRect(rectBBar, position):
+              elif mouseInRect(imgBBar.getRect(), position):
                 bbarMove = True
               elif mouseInRect(rectNext, position):
                 flagSettings = False
@@ -755,7 +757,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                 flagSettings = False
                 barMove, rbarMove, gbarMove, bbarMove = False, False, False, False
                 BACKGROUND = bgUndo.copy()
-                rectRBar.centerx, rectGBar.centerx, rectBBar.centerx = xRbar, xGbar, xBbar
+                imgRBar.getRect().centerx, imgGBar.getRect().centerx, imgBBar.getRect().centerx = xRbar, xGbar, xBbar
         elif event.type == MOUSEMOTION and flagSettings:
           if barMove:
             x,y,z = pygame.mouse.get_pressed()
@@ -770,46 +772,34 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
             x,y,z = pygame.mouse.get_pressed()
             if x:
               mx, my = pygame.mouse.get_rel()
-              rectRBar.x += mx
-              if rectRBar.centerx < midpoint[0] - round(600/screenScale):
-                rectRBar.centerx = midpoint[0] - round(600/screenScale)
-              if rectRBar.centerx > midpoint[0] - round(90/screenScale):
-                rectRBar.centerx = midpoint[0] - round(90/screenScale)
+              moveBar(imgRBar, mx, my, midpoint, screenScale)
           elif gbarMove:
             x,y,z = pygame.mouse.get_pressed()
             if x:
               mx, my = pygame.mouse.get_rel()
-              rectGBar.x += mx
-              if rectGBar.centerx < midpoint[0] - round(600/screenScale):
-                rectGBar.centerx = midpoint[0] - round(600/screenScale)
-              if rectGBar.centerx > midpoint[0] - round(90/screenScale):
-                rectGBar.centerx = midpoint[0] - round(90/screenScale)
+              moveBar(imgGBar, mx, my, midpoint, screenScale)
           elif bbarMove:
             x,y,z = pygame.mouse.get_pressed()
             if x:
               mx, my = pygame.mouse.get_rel()
-              rectBBar.x += mx
-              if rectBBar.centerx < midpoint[0] - round(600/screenScale):
-                rectBBar.centerx = midpoint[0] - round(600/screenScale)
-              if rectBBar.centerx > midpoint[0] - round(90/screenScale):
-                rectBBar.centerx = midpoint[0] - round(90/screenScale)
+              moveBar(imgBBar, mx, my, midpoint, screenScale)
         elif event.type == MOUSEBUTTONUP and flagSettings:
           if barMove:
             volume = (imgBar.getRect().centerx - midpoint[0] + 400/screenScale) / float(1000)
             soundLevelup.set_volume(volume)
             soundLevelup.play()
           elif rbarMove:
-            r = 255 - round(((midpoint[0] - rectRBar.centerx) * screenScale - 90) / 2)
+            r = 255 - round(((midpoint[0] - imgRBar.getRect().centerx) * screenScale - 90) / 2)
             r = r if r >= 0 else 0
             r = r if r <= 255 else 255
             BACKGROUND[0] = r
           elif gbarMove:
-            r = 255 - round(((midpoint[0] - rectGBar.centerx) * screenScale - 90) / 2)
+            r = 255 - round(((midpoint[0] - imgGBar.getRect().centerx) * screenScale - 90) / 2)
             r = r if r >= 0 else 0
             r = r if r <= 255 else 255
             BACKGROUND[1] = r
           elif bbarMove:
-            r = 255 - round(((midpoint[0] - rectBBar.centerx) * screenScale - 90) / 2)
+            r = 255 - round(((midpoint[0] - imgBBar.getRect().centerx) * screenScale - 90) / 2)
             r = r if r >= 0 else 0
             r = r if r <= 255 else 255
             BACKGROUND[2] = r
@@ -919,8 +909,8 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                 if dictNum[0] != 0:
                   dictNum[1] = round(dictNum[2]/dictNum[0])
                   dictClicked[1].changeContent(font = dictClicked[1].getFont(), content=str(dictNum[1]))
-            elif mouseInRect(rectPlusOneButton, position) or mouseInRect(rectMinusOneButton, position):
-              factor = 60 if mouseInRect(rectPlusOneButton, position) else -60
+            elif mouseInRect(imgPlusOneButton.getRect(), position) or mouseInRect(imgMinusOneButton.getRect(), position):
+              factor = 60 if mouseInRect(imgPlusOneButton.getRect(), position) else -60
               min, sec, total, newLevel, min_break, sec_break = timeupdate(min, sec, total, factor, currLevel, soundLevelup,lstBreakIdx)
               if newLevel != currLevel:
                 currLevel = newLevel
@@ -936,17 +926,17 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
               textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
               strBreakTimer = makeTimerString(min_break,sec_break,total)
               textTimetoBreaknum.changeContent(font = textTimetoBreaknum.getFont(), content = strBreakTimer)
-            elif mouseInRect(rectPauseButton, position):
+            elif mouseInRect(imgPauseButton.getRect(), position):
               if pauseEvent:
                 pauseEvent = False
               else:
                 pause_start = time.time()
                 pauseEvent = True
                 continue
-            elif (mouseInRect(rectLevelUpButton, position) and LSTLEVELS[currLevel] != 0) or (mouseInRect(rectLevelDownButton, position) and LSTLEVELS[currLevel - 1] != 0):
-              currLevel = currLevel + 1 if mouseInRect(rectLevelUpButton, position) else currLevel - 1
+            elif (mouseInRect(imgLevelUpButton.getRect(), position) and LSTLEVELS[currLevel] != 0) or (mouseInRect(imgLevelDownButton.getRect(), position) and LSTLEVELS[currLevel - 1] != 0):
+              currLevel = currLevel + 1 if mouseInRect(imgLevelUpButton.getRect(), position) else currLevel - 1
               min, sec, total = LSTLEVELS[currLevel], 0, 60 * min
-              min_break = min
+              min_break, sec_break = min, 0
               temp= currLevel+1
               i = lstBreakIdx[currLevel]
               while(temp < i):
@@ -962,7 +952,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
               textMainTimer.changeContent(content = strTimer, font = fontMainTimer)
               strBreakTimer = makeTimerString(min_break,sec_break,total)
               textTimetoBreaknum.changeContent(font = textTimetoBreaknum.getFont(), content = strBreakTimer)
-            elif mouseInRect(rectPrizeButton, position):
+            elif mouseInRect(imgPrizeButton.getRect(), position):
               prizeInput(screenScale)
               lstTextPrize = []
               flagPrizeStop = True
@@ -999,15 +989,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
     blitText(surface, textMainTimer, textTitleTournament, textCurrLevel, textSB, textBB, textAnte, textSBnum, textBBnum, textAntenum, textNextSB, textNextBB, textNextAnte, textAvgChips, textTotalChips, textStartingStack, textTimetoBreak, textNextSBnum, textNextBBnum, textNextAntenum, textAvgChipsnum, textTotalChipsnum, textStartingStacknum, textTimetoBreaknum, textEntrants, textPlayersLeft, textEntrantsnum, textPlayersLeftnum, textPrizeRight)
     pygame.draw.circle(surface, RED, shutCenter, shutRadius)
     pygame.draw.circle(surface, BLACK, shutCenter, shutRadius, width = round(2/screenScale))
-    surface.blit(imgUpDown, rectUpDown1)
-    surface.blit(imgUpDown, rectUpDown2)
-    surface.blit(imgPauseButton, rectPauseButton)
-    surface.blit(imgPlusOneButton, rectPlusOneButton)
-    surface.blit(imgMinusOneButton, rectMinusOneButton)
-    surface.blit(imgLevelUpButton, rectLevelUpButton)
-    surface.blit(imgLevelDownButton, rectLevelDownButton)
-    surface.blit(imgPrizeButton, rectPrizeButton)
-    
+    blitImg(surface, imgUpDown1, imgUpDown2, imgPauseButton, imgPlusOneButton, imgMinusOneButton, imgLevelUpButton, imgLevelDownButton, imgPrizeButton)
     
     #clock.tick(FPS)
     pygame.draw.rect(surface, WHITE, bigRect, width=8)
@@ -1023,4 +1005,4 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
     return 0
 #### End of main function
   
-main([0, [100, 200, 0], [200, 400, 0], [300, 600, 0], [400, 800, 0], [0, 0, 0], [500, 1000, 1000], [600, 1200, 1200], [800, 1600, 1600], [1000, 2000, 2000], [1500, 3000, 3000], [0, 0, 0], [2000, 4000, 4000], [2500, 5000, 5000], [3000, 6000, 6000], [4000, 8000, 8000], [5000, 10000, 10000], [5500, 11000, 11000], [6000, 12000, 12000], [8000, 16000, 16000], [10000, 20000, 20000], [15000, 30000, 30000], [20000, 40000, 40000], [100000, 200000, 200000]] , [0, 15, 15, 15, 15, 10, 15, 15, 15, 15, 15, 10, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12] , "Sample Structure1" , True , 0.5)
+#main([0, [100, 200, 0], [200, 400, 0], [300, 600, 0], [400, 800, 0], [0, 0, 0], [500, 1000, 1000], [600, 1200, 1200], [800, 1600, 1600], [1000, 2000, 2000], [1500, 3000, 3000], [0, 0, 0], [2000, 4000, 4000], [2500, 5000, 5000], [3000, 6000, 6000], [4000, 8000, 8000], [5000, 10000, 10000], [5500, 11000, 11000], [6000, 12000, 12000], [8000, 16000, 16000], [10000, 20000, 20000], [15000, 30000, 30000], [20000, 40000, 40000], [100000, 200000, 200000]] , [0, 15, 15, 15, 15, 10, 15, 15, 15, 15, 15, 10, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12] , "Sample Structure1" , True , 0.5)

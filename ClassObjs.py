@@ -1,5 +1,6 @@
 from pygame.locals import *
 from enum import Enum
+from pygame import transform, image
 
 K_NUM = [K_0, K_1, K_2, K_3, K_4, K_5, K_6, K_7, K_8, K_9, K_KP0, K_KP1, K_KP2, K_KP3, K_KP4, K_KP5, K_KP6, K_KP7, K_KP8, K_KP9]
 BANNED = ["\\", "/", ":", "*", "?", "<", ">", "\"", "|", "`", "+", "\'"]
@@ -139,17 +140,20 @@ class ImgObj:
     self.img = None
     self.relative = relative
     try:
-      self.img = pygame.image.load(self.fileAddress)
+      self.img = image.load(self.fileAddress)
       if scalable:
         try:
-          self.img = pygame.transform.smoothscale(self.img, size)
+          self.img = transform.smoothscale(self.img, size)
         except:
-          self.img = pygame.transform.scale(self.img, size)
+          self.img = transform.scale(self.img, size)
       self.rect = self.img.get_rect()
       if self.relative == Relative.TOPLEFT:
         self.rect.topleft = position
       elif self.relative == Relative.CENTER:
         self.rect.center = position
+      elif self.relative == Relative.RCENTER:
+        self.rect.right = position[0]
+        self.rect.centery = position[1]
     except:
       print("Failed to Open the img File at " + self.fileAddress)
   def getImg(self):
