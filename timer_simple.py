@@ -657,7 +657,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
               flagPrizeStop = True
               prizeStopTimer = time.time()
               for i in range(len(TK_LST)):
-                temp = TextObj(font = fontPrize, content=TK_LST[i], relative="topleft", color=WHITE, position=(round(1590/screenScale), round((342+PRIZEINTERVAL*i)/screenScale)))
+                temp = TextObj(font = fontPrize, content=TK_LST[i], relative="topleft", color=WHITE, position=(round(1425/screenScale), round((342+PRIZEINTERVAL*i)/screenScale)))
                 lstTextPrize.append(temp)
           else: #Settings 상황
             pygame.mouse.get_rel()
