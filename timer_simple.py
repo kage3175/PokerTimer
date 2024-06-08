@@ -604,7 +604,7 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
                 if dictNum[0] != 0:
                   dictNum[1] = round(dictNum[2]/dictNum[0])
                   dictClicked[1].changeContent(font = dictClicked[1].getFont(), content=str(dictNum[1]))
-            elif mouseInRect(imgPlusOneButton.getRect(), position) or mouseInRect(imgMinusOneButton.getRect(), position):
+            elif mouseInRect(imgPlusOneButton.getRect(), position) or mouseInRect(imgMinusOneButton.getRect(), position): # 60s plus button
               factor = 60 if mouseInRect(imgPlusOneButton.getRect(), position) else -60
               min, sec, total, newLevel, min_break, sec_break = timeupdate(min, sec, total, factor, currLevel, soundLevelup,lstBreakIdx)
               if newLevel != currLevel:
@@ -632,9 +632,11 @@ def main(lstBLINDS, lstLevels,title, isLoad, vol):
               textBBnum.changeContent(font = textBBnum.getFont(), content = format(LSTBLINDS[currLevel][1], ","))
               if LSTBLINDS[currLevel][2] != 0:
                 textAntenum.changeContent(font = fontLeftObjs, content = format(LSTBLINDS[currLevel][2], ","))
-            elif (mouseInRect(imgLevelUpButton.getRect(), position) and LSTLEVELS[currLevel] != 0) or (mouseInRect(imgLevelDownButton.getRect(), position) and LSTLEVELS[currLevel - 1] != 0):
+            elif (mouseInRect(imgLevelUpButton.getRect(), position) and LSTLEVELS[currLevel] != 0) or (mouseInRect(imgLevelDownButton.getRect(), position) and LSTLEVELS[currLevel - 1] != 0): #Level up or down button
               currLevel = currLevel + 1 if mouseInRect(imgLevelUpButton.getRect(), position) else currLevel - 1
-              min, sec, total = LSTLEVELS[currLevel], 0, 60 * min
+              min, sec = LSTLEVELS[currLevel], 0
+              total = min*60
+              print(currLevel, min, sec, total)
               min_break, sec_break = min, 0
               temp= currLevel+1
               i = lstBreakIdx[currLevel]
