@@ -433,10 +433,12 @@ def main_load(vol, style):
             elif selectedIdx != -1:
               if event.key in K_NUM or event.key == K_BACKSPACE:
                 temp_input = (temp_input*10 + processAscii(event.key)) if (event.key in K_NUM) else (temp_input//10)
-                lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str(temp_input))
+                str_input = f"{temp_input:,}"
+                lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str_input)
                 tabbedOnly = False
               elif event.key == K_RETURN:
-                lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str(temp_input))
+                str_input = f"{temp_input:,}"
+                lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str_input)
                 objControl.changeLstBlinds(selectedIdx, lstBoxBlinds[selectedIdx][2] - 1, temp_input)
                 lstBoxBlinds[selectedIdx][2] = 0
                 selectedIdx = -1
@@ -448,12 +450,14 @@ def main_load(vol, style):
                   lstBoxBlinds[selectedIdx][2] = 0
                   if not tabbedOnly:
                     temp_input = 1 if (temp_input <= 0) else temp_input
-                    lstBoxBlinds[selectedIdx][1][2].changeContent(font = fontBox, content = str(temp_input))
+                    str_input = f"{temp_input:,}"
+                    lstBoxBlinds[selectedIdx][1][2].changeContent(font = fontBox, content = str_input)
                     objControl.changeLstBlinds(selectedIdx, lstBoxBlinds[selectedIdx][2] - 1, temp_input)
                   selectedIdx = -1
                 elif lstBoxBlinds[selectedIdx][2] != 2: #Duration이 선택됐던게 아닌 경우
                   if not tabbedOnly:
-                    lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str(temp_input))
+                    str_input = f"{temp_input:,}"
+                    lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str_input)
                     objControl.changeLstBlinds(selectedIdx, lstBoxBlinds[selectedIdx][2] - 1, temp_input)
                   tabbedOnly = True
                   if lstBoxBlinds[selectedIdx][2] != 5:
@@ -464,7 +468,8 @@ def main_load(vol, style):
                 else: #Duration이 선택됐던 경우
                   if not tabbedOnly:
                     temp_input = 1 if (temp_input == 0) else temp_input
-                    lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str(temp_input))
+                    str_input = f"{temp_input:,}"
+                    lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str_input)
                     objControl.changeLstBlinds(selectedIdx, lstBoxBlinds[selectedIdx][2] - 1, temp_input)
                   tabbedOnly = True
                   lstBoxBlinds[selectedIdx][2] = 0
@@ -506,7 +511,8 @@ def main_load(vol, style):
               if selectedIdx != -1:
                 if not tabbedOnly:
                   temp_input = 1 if lstBoxBlinds[selectedIdx][2] == 2 and temp_input <= 0 else temp_input
-                  lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str(temp_input))
+                  str_input = f"{temp_input:,}"
+                  lstBoxBlinds[selectedIdx][1][lstBoxBlinds[selectedIdx][2]].changeContent(font = fontBox, content = str_input)
                   objControl.changeLstBlinds(selectedIdx, lstBoxBlinds[selectedIdx][2] - 1, temp_input)
                 lstBoxBlinds[selectedIdx][2] = 0
                 selectedIdx = -1
